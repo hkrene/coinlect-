@@ -127,7 +127,7 @@ export default function LoginPage() {
             </div>
 
             <div className="mt-8 text-xs text-center text-gray-500">
-              Don't have an account? <Link href="/register" className="font-semibold text-white transition-colors hover:text-coinlect-accent">Sign up</Link>
+              Don&apos;t have an account? <Link href="/register" className="font-semibold text-white transition-colors hover:text-coinlect-accent">Sign up</Link>
             </div>
           </div>
           <AdBanner variant="compact" />

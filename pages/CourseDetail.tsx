@@ -16,6 +16,7 @@ export const CourseDetail: React.FC = () => {
   // State for tracking completed modules (array of indices)
   const [completedModules, setCompletedModules] = useState<number[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
+  const progressBarRef = React.useRef<HTMLDivElement>(null);
 
   // Modal State
   const [activeModuleIndex, setActiveModuleIndex] = useState<number | null>(null);
@@ -67,8 +68,8 @@ export const CourseDetail: React.FC = () => {
   const handleQuizSubmit = () => {
     if (activeModuleIndex === null || !course?.syllabus) return;
     
-    const module = course.syllabus[activeModuleIndex];
-    if (!module.quiz) {
+    const currentModule = course.syllabus[activeModuleIndex];
+    if (!currentModule.quiz) {
        // If no quiz, auto complete
        markModuleComplete(activeModuleIndex);
        setQuizSuccess(true);
@@ -80,7 +81,7 @@ export const CourseDetail: React.FC = () => {
       return;
     }
 
-    if (selectedQuizOption === module.quiz.correctAnswer) {
+    if (selectedQuizOption === currentModule.quiz.correctAnswer) {
       setQuizSuccess(true);
       setQuizError(null);
       markModuleComplete(activeModuleIndex);
@@ -99,9 +100,16 @@ export const CourseDetail: React.FC = () => {
   const progressPercentage = Math.round((completedModules.length / totalModules) * 100) || 0;
   const isCourseComplete = progressPercentage === 100;
 
+  // Update progress bar width
+  useEffect(() => {
+    if (progressBarRef.current) {
+      progressBarRef.current.style.width = `${progressPercentage}%`;
+    }
+  }, [progressPercentage]);
+
   if (!course) {
     return (
-      <div className="min-h-screen flex items-center justify-center flex-col gap-4 text-center px-6">
+      <div className="flex flex-col items-center justify-center min-h-screen gap-4 px-6 text-center">
         <h1 className="text-2xl font-bold text-white">Course Not Found</h1>
         <Link href="/academy">
           <Button variant="secondary" withArrow>Back to Academy</Button>
@@ -117,50 +125,50 @@ export const CourseDetail: React.FC = () => {
       
       {/* LEARNING MODAL */}
       {activeModule && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 duration-200 bg-black/90 backdrop-blur-sm animate-in fade-in">
           <div className="w-full max-w-4xl bg-[#111] border border-white/10 rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
             
             {/* Modal Header */}
             <div className="flex items-center justify-between p-6 border-b border-white/10 bg-[#161616]">
                <div className="flex flex-col">
-                  <span className="text-xs text-coinlect-accent uppercase font-bold tracking-wider mb-1">Module {activeModuleIndex! + 1}</span>
+                  <span className="mb-1 text-xs font-bold tracking-wider uppercase text-coinlect-accent">Module {activeModuleIndex! + 1}</span>
                   <h3 className="text-xl font-bold text-white">{activeModule.title}</h3>
                </div>
-               <button onClick={closeModule} className="p-2 rounded-full hover:bg-white/10 transition-colors">
+               <button onClick={closeModule} className="p-2 transition-colors rounded-full hover:bg-white/10" aria-label="Close module">
                  <X size={24} className="text-gray-400 hover:text-white" />
                </button>
             </div>
 
             {/* Modal Content */}
-            <div className="flex-1 overflow-y-auto p-6 md:p-10">
+            <div className="flex-1 p-6 overflow-y-auto md:p-10">
                {/* STEP 1: READING / VIDEO */}
                {learningStep === 'content' && (
-                 <div className="animate-in slide-in-from-right-10 duration-300">
-                    <div className="aspect-video bg-black rounded-xl border border-white/10 flex items-center justify-center mb-8 relative group cursor-pointer overflow-hidden">
-                        <img src={course.image} className="absolute inset-0 w-full h-full object-cover opacity-40" alt="Video thumbnail" />
+                 <div className="duration-300 animate-in slide-in-from-right-10">
+                    <div className="relative flex items-center justify-center mb-8 overflow-hidden bg-black border cursor-pointer aspect-video rounded-xl border-white/10 group">
+                        <img src={course.image} className="absolute inset-0 object-cover w-full h-full opacity-40" alt="Video thumbnail" />
                         <div className="w-16 h-16 rounded-full bg-coinlect-accent flex items-center justify-center relative z-10 shadow-[0_0_30px_rgba(245,158,11,0.5)] group-hover:scale-110 transition-transform">
-                             <PlayCircle size={32} className="text-black ml-1" />
+                             <PlayCircle size={32} className="ml-1 text-black" />
                         </div>
-                        <div className="absolute bottom-4 left-4 bg-black/70 px-3 py-1 rounded text-xs text-white">Simulation: {activeModule.duration}</div>
+                        <div className="absolute px-3 py-1 text-xs text-white rounded bottom-4 left-4 bg-black/70">Simulation: {activeModule.duration}</div>
                     </div>
 
                     <div className="prose prose-invert max-w-none">
-                        <h4 className="flex items-center gap-2 text-white text-lg font-bold mb-4">
+                        <h4 className="flex items-center gap-2 mb-4 text-lg font-bold text-white">
                            <FileText size={20} className="text-coinlect-accent" /> Transcript / Lecture
                         </h4>
-                        <div className="text-gray-300 leading-relaxed space-y-4">
+                        <div className="space-y-4 leading-relaxed text-gray-300">
                            {activeModule.content ? (
                              <p>{activeModule.content}</p>
                            ) : (
                              <p>
-                               Contenu de démonstration. Dans une application réelle, ce texte expliquerait en détail le concept de "{activeModule.title}". 
+                               Contenu de démonstration. Dans une application réelle, ce texte expliquerait en détail le concept de &quot;{activeModule.title}&quot;. 
                                Il est nécessaire de lire ce contenu ou de regarder la vidéo ci-dessus avant de pouvoir passer le quiz et valider ce module.
                              </p>
                            )}
                         </div>
                     </div>
 
-                    <div className="mt-12 flex justify-end">
+                    <div className="flex justify-end mt-12">
                        <Button onClick={() => setLearningStep('quiz')} withArrow>
                           Passer au Quiz
                        </Button>
@@ -170,19 +178,19 @@ export const CourseDetail: React.FC = () => {
 
                {/* STEP 2: QUIZ */}
                {learningStep === 'quiz' && (
-                 <div className="animate-in slide-in-from-right-10 duration-300 max-w-2xl mx-auto">
+                 <div className="max-w-2xl mx-auto duration-300 animate-in slide-in-from-right-10">
                     {!quizSuccess ? (
                         <>
-                            <div className="text-center mb-10">
-                                <div className="w-16 h-16 rounded-full bg-coinlect-accent/10 flex items-center justify-center mx-auto mb-4 text-coinlect-accent">
+                            <div className="mb-10 text-center">
+                                <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 rounded-full bg-coinlect-accent/10 text-coinlect-accent">
                                     <HelpCircle size={32} />
                                 </div>
-                                <h4 className="text-2xl font-bold text-white mb-2">Testez vos connaissances</h4>
+                                <h4 className="mb-2 text-2xl font-bold text-white">Testez vos connaissances</h4>
                                 <p className="text-gray-400">Répondez correctement pour valider ce module.</p>
                             </div>
 
-                            <div className="bg-white/5 border border-white/10 rounded-xl p-6 md:p-8 mb-8">
-                                <h5 className="text-lg font-semibold text-white mb-6">
+                            <div className="p-6 mb-8 border bg-white/5 border-white/10 rounded-xl md:p-8">
+                                <h5 className="mb-6 text-lg font-semibold text-white">
                                     {activeModule.quiz?.question || "Question de démonstration pour ce module ?"}
                                 </h5>
                                 
@@ -216,15 +224,15 @@ export const CourseDetail: React.FC = () => {
                             </div>
 
                             {quizError && (
-                                <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-sm text-center mb-6 animate-pulse">
+                                <div className="p-4 mb-6 text-sm text-center text-red-400 border rounded-lg bg-red-500/10 border-red-500/20 animate-pulse">
                                     {quizError}
                                 </div>
                             )}
 
-                            <div className="flex gap-4 justify-center">
+                            <div className="flex justify-center gap-4">
                                 <button 
                                     onClick={() => setLearningStep('content')}
-                                    className="px-6 py-3 rounded-lg text-gray-400 hover:text-white transition-colors"
+                                    className="px-6 py-3 text-gray-400 transition-colors rounded-lg hover:text-white"
                                 >
                                     Relire le cours
                                 </button>
@@ -234,12 +242,12 @@ export const CourseDetail: React.FC = () => {
                             </div>
                         </>
                     ) : (
-                        <div className="text-center py-10 animate-in zoom-in duration-300">
-                             <div className="w-20 h-20 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-6 text-green-500">
+                        <div className="py-10 text-center duration-300 animate-in zoom-in">
+                             <div className="flex items-center justify-center w-20 h-20 mx-auto mb-6 text-green-500 rounded-full bg-green-500/20">
                                     <CheckCircle size={40} />
                              </div>
-                             <h4 className="text-3xl font-bold text-white mb-4">Bravo !</h4>
-                             <p className="text-gray-400 mb-8">Vous avez validé le module <span className="text-white font-bold">"{activeModule.title}"</span>.</p>
+                             <h4 className="mb-4 text-3xl font-bold text-white">Bravo !</h4>
+                             <p className="mb-8 text-gray-400">Vous avez validé le module <span className="font-bold text-white">&quot;{activeModule.title}&quot;</span>.</p>
                              
                              <div className="flex justify-center gap-4">
                                 <Button onClick={closeModule} variant="outline">Fermer</Button>
@@ -261,22 +269,22 @@ export const CourseDetail: React.FC = () => {
         {/* Confetti/Success Effect Background if complete */}
         {isCourseComplete && (
            <div className="absolute inset-0 pointer-events-none">
-              <div className="absolute top-0 left-1/4 w-2 h-2 bg-yellow-500 rounded-full animate-bounce delay-100"></div>
-              <div className="absolute top-10 right-1/4 w-3 h-3 bg-blue-500 rounded-full animate-bounce delay-300"></div>
-              <div className="absolute bottom-1/2 left-1/2 w-2 h-2 bg-green-500 rounded-full animate-bounce delay-500"></div>
+              <div className="absolute top-0 w-2 h-2 delay-100 bg-yellow-500 rounded-full left-1/4 animate-bounce"></div>
+              <div className="absolute w-3 h-3 delay-300 bg-blue-500 rounded-full top-10 right-1/4 animate-bounce"></div>
+              <div className="absolute w-2 h-2 delay-500 bg-green-500 rounded-full bottom-1/2 left-1/2 animate-bounce"></div>
               <div className="absolute inset-0 bg-gradient-to-t from-green-900/20 to-transparent"></div>
            </div>
         )}
 
-        <div className="container mx-auto px-6 relative z-10">
-          <div className="flex justify-between items-start">
-            <Link href="/academy" className="inline-flex items-center gap-2 text-gray-500 hover:text-white mb-8 transition-colors text-sm">
-                <ArrowLeft size={16} /> Retour à l'Académie
+        <div className="container relative z-10 px-6 mx-auto">
+          <div className="flex items-start justify-between">
+            <Link href="/academy" className="inline-flex items-center gap-2 mb-8 text-sm text-gray-500 transition-colors hover:text-white">
+                <ArrowLeft size={16} /> Retour à l&apos;Académie
             </Link>
             {completedModules.length > 0 && (
                 <button 
                     onClick={resetProgress}
-                    className="text-xs text-gray-500 hover:text-red-400 flex items-center gap-1 transition-colors"
+                    className="flex items-center gap-1 text-xs text-gray-500 transition-colors hover:text-red-400"
                 >
                     <RefreshCw size={12} /> Réinitialiser
                 </button>
@@ -284,10 +292,10 @@ export const CourseDetail: React.FC = () => {
           </div>
           
           <ScrollReveal>
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="grid items-center gap-12 lg:grid-cols-2">
               <div>
                 <div className="flex items-center gap-3 mb-4">
-                  <span className="bg-coinlect-accent/10 text-coinlect-accent border border-coinlect-accent/20 px-3 py-1 rounded text-xs font-bold uppercase tracking-wider">
+                  <span className="px-3 py-1 text-xs font-bold tracking-wider uppercase border rounded bg-coinlect-accent/10 text-coinlect-accent border-coinlect-accent/20">
                     {course.category}
                   </span>
                   <span className={`px-3 py-1 rounded text-xs font-bold border ${
@@ -299,32 +307,32 @@ export const CourseDetail: React.FC = () => {
                   </span>
                 </div>
                 
-                <h1 className="text-3xl md:text-5xl font-bold text-white mb-6 leading-tight">
+                <h1 className="mb-6 text-3xl font-bold leading-tight text-white md:text-5xl">
                   {course.title}
                 </h1>
                 
                 {/* Progress Bar Section */}
-                <div className="mb-8 p-4 bg-white/5 rounded-xl border border-white/10">
-                    <div className="flex justify-between items-end mb-2">
+                <div className="p-4 mb-8 border bg-white/5 rounded-xl border-white/10">
+                    <div className="flex items-end justify-between mb-2">
                         <span className="text-sm font-semibold text-white">Votre Progression</span>
                         <span className={`text-xl font-bold ${isCourseComplete ? 'text-green-400' : 'text-coinlect-accent'}`}>
                             {progressPercentage}%
                         </span>
                     </div>
-                    <div className="w-full h-3 bg-black rounded-full overflow-hidden">
+                    <div className="w-full h-3 overflow-hidden bg-black rounded-full">
                         <div 
+                            ref={progressBarRef}
                             className={`h-full transition-all duration-1000 ease-out ${isCourseComplete ? 'bg-green-500' : 'bg-gradient-to-r from-coinlect-accent to-yellow-600'}`}
-                            style={{ width: `${progressPercentage}%` }}
                         ></div>
                     </div>
                     {isCourseComplete && (
-                        <div className="mt-3 flex items-center gap-2 text-green-400 text-sm font-medium animate-pulse">
+                        <div className="flex items-center gap-2 mt-3 text-sm font-medium text-green-400 animate-pulse">
                             <CheckCircle size={16} /> Cours terminé ! Félicitations.
                         </div>
                     )}
                 </div>
                 
-                <div className="flex flex-wrap items-center gap-6 text-sm text-gray-400 mb-8">
+                <div className="flex flex-wrap items-center gap-6 mb-8 text-sm text-gray-400">
                   <div className="flex items-center gap-2">
                     <Clock size={18} className="text-coinlect-accent" />
                     <span>{course.duration} de contenu</span>
@@ -343,9 +351,9 @@ export const CourseDetail: React.FC = () => {
               </div>
 
               {/* Video Preview / Hero Image */}
-              <div className="relative aspect-video rounded-2xl overflow-hidden border border-white/10 shadow-2xl group cursor-pointer" onClick={() => openModule(0)}>
-                <img src={course.image} alt={course.title} className="w-full h-full object-cover opacity-80 group-hover:scale-105 transition-transform duration-700" />
-                <div className="absolute inset-0 bg-black/40 group-hover:bg-black/30 transition-colors"></div>
+              <div className="relative overflow-hidden border shadow-2xl cursor-pointer aspect-video rounded-2xl border-white/10 group" onClick={() => openModule(0)}>
+                <img src={course.image} alt={course.title} className="object-cover w-full h-full transition-transform duration-700 opacity-80 group-hover:scale-105" />
+                <div className="absolute inset-0 transition-colors bg-black/40 group-hover:bg-black/30"></div>
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-20 h-20 rounded-full bg-coinlect-accent text-black flex items-center justify-center shadow-[0_0_30px_rgba(245,158,11,0.5)] transform group-hover:scale-110 transition-transform duration-300">
                     <PlayCircle size={40} fill="currentColor" className="text-black" />
@@ -360,17 +368,17 @@ export const CourseDetail: React.FC = () => {
         </div>
       </div>
 
-      <div className="container mx-auto px-6 py-16">
-        <div className="grid lg:grid-cols-3 gap-12">
+      <div className="container px-6 py-16 mx-auto">
+        <div className="grid gap-12 lg:grid-cols-3">
           
           {/* Main Content Area */}
-          <div className="lg:col-span-2 space-y-12">
+          <div className="space-y-12 lg:col-span-2">
             
             {/* About Section */}
             <ScrollReveal>
               <section>
-                <h3 className="text-2xl font-bold text-white mb-6">À propos de ce cours</h3>
-                <div className="text-gray-400 space-y-4 leading-relaxed">
+                <h3 className="mb-6 text-2xl font-bold text-white">À propos de ce cours</h3>
+                <div className="space-y-4 leading-relaxed text-gray-400">
                   <p>
                     Ce cours a été conçu pour vous fournir une compréhension approfondie du sujet. 
                     Que vous soyez débutant ou que vous cherchiez à affiner vos compétences, 
@@ -378,7 +386,7 @@ export const CourseDetail: React.FC = () => {
                   </p>
                   <p>
                     {course.description} À la fin de ce parcours, vous serez capable de comprendre les mécanismes sous-jacents, 
-                    d'analyser les tendances du marché et de prendre des décisions éclairées basées sur des données réelles.
+                    d&apos;analyser les tendances du marché et de prendre des décisions éclairées basées sur des données réelles.
                   </p>
                 </div>
               </section>
@@ -388,7 +396,7 @@ export const CourseDetail: React.FC = () => {
             <ScrollReveal delay={100}>
               <section>
                 <div className="flex items-center justify-between mb-6">
-                    <h3 className="text-2xl font-bold text-white flex items-center gap-2">
+                    <h3 className="flex items-center gap-2 text-2xl font-bold text-white">
                         <BookOpen className="text-coinlect-accent" /> Programme du cours
                     </h3>
                     <span className="text-sm text-gray-500">{completedModules.length}/{totalModules} terminés</span>
@@ -480,10 +488,10 @@ export const CourseDetail: React.FC = () => {
 
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            <div className="sticky top-28 space-y-6">
+            <div className="sticky space-y-6 top-28">
               
-              <div className="glass-card p-6 rounded-2xl border border-white/10">
-                 <h4 className="font-bold text-white mb-4">Ce que vous apprendrez</h4>
+              <div className="p-6 border glass-card rounded-2xl border-white/10">
+                 <h4 className="mb-4 font-bold text-white">Ce que vous apprendrez</h4>
                  <ul className="space-y-3">
                     <li className="flex items-start gap-3 text-sm text-gray-400">
                       <CheckCircle size={16} className={`mt-0.5 flex-shrink-0 ${isCourseComplete ? 'text-green-500' : 'text-coinlect-accent'}`} />

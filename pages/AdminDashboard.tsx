@@ -45,7 +45,7 @@ export const AdminDashboard: React.FC = () => {
     date: new Date().toLocaleDateString('fr-FR'),
     image: '',
     category: 'News',
-    author: user?.firstName || 'Admin',
+    author: user?.name || 'Admin',
     authorImage: 'https://randomuser.me/api/portraits/lego/1.jpg',
     featured: false
   });
@@ -127,7 +127,7 @@ export const AdminDashboard: React.FC = () => {
       <aside className="w-64 border-r border-white/5 bg-[#111] hidden md:block fixed h-full top-20 pt-8 px-4 z-20">
         <div className="space-y-2">
           <button onClick={() => setActiveTab('overview')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${activeTab === 'overview' ? 'bg-coinlect-accent text-black font-bold' : 'text-gray-400 hover:bg-white/5'}`}>
-            <LayoutDashboard size={18} /> Vue d'ensemble
+            <LayoutDashboard size={18} /> Vue d&apos;ensemble
           </button>
           <button onClick={() => setActiveTab('users')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${activeTab === 'users' ? 'bg-coinlect-accent text-black font-bold' : 'text-gray-400 hover:bg-white/5'}`}>
             <Users size={18} /> Utilisateurs
@@ -194,7 +194,7 @@ export const AdminDashboard: React.FC = () => {
                         </button>
                       </td>
                       <td className="p-4 text-right">
-                        <button onClick={() => {userService.delete(u.id); setRefreshTrigger(t => t+1)}} className="text-red-500 transition-colors hover:text-red-400"><Trash2 size={16} /></button>
+                        <button onClick={() => {userService.delete(u.id); setRefreshTrigger(t => t+1)}} className="text-red-500 transition-colors hover:text-red-400" aria-label="Delete user"><Trash2 size={16} /></button>
                       </td>
                     </tr>
                   ))}
@@ -212,7 +212,7 @@ export const AdminDashboard: React.FC = () => {
                 <thead className="text-xs text-gray-400 uppercase bg-white/5">
                   <tr>
                     <th className="p-4">Email</th>
-                    <th className="p-4">Date d'inscription</th>
+                    <th className="p-4">Date d&apos;inscription</th>
                     <th className="p-4 text-right">Actions</th>
                   </tr>
                 </thead>
@@ -222,7 +222,7 @@ export const AdminDashboard: React.FC = () => {
                       <td className="p-4 font-medium text-white">{s.email}</td>
                       <td className="p-4 text-gray-400">{new Date(s.subscribedAt).toLocaleDateString()}</td>
                       <td className="p-4 text-right">
-                        <button onClick={() => {newsletterService.delete(s.email); setRefreshTrigger(t => t+1)}} className="text-red-500 transition-colors hover:text-red-400"><Trash2 size={16} /></button>
+                        <button onClick={() => {newsletterService.delete(s.email); setRefreshTrigger(t => t+1)}} className="text-red-500 transition-colors hover:text-red-400" aria-label="Delete subscriber"><Trash2 size={16} /></button>
                       </td>
                     </tr>
                   ))}
@@ -248,7 +248,7 @@ export const AdminDashboard: React.FC = () => {
                       <p className="text-[10px] text-gray-500 uppercase tracking-widest">{c.category} • {c.level} • {c.syllabus.length} Mod.</p>
                     </div>
                   </div>
-                  <button onClick={() => { courseService.delete(c.id); setRefreshTrigger(t => t+1); }} className="p-2 text-red-500 hover:text-red-400"><Trash2 size={18} /></button>
+                  <button onClick={() => { courseService.delete(c.id); setRefreshTrigger(t => t+1); }} className="p-2 text-red-500 hover:text-red-400" aria-label="Delete course"><Trash2 size={18} /></button>
                 </div>
               ))}
             </div>
@@ -275,7 +275,7 @@ export const AdminDashboard: React.FC = () => {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <button onClick={() => { articleService.delete(a.id); setRefreshTrigger(t => t+1); }} className="p-2 text-red-500 transition-colors hover:text-red-400"><Trash2 size={18} /></button>
+                    <button onClick={() => { articleService.delete(a.id); setRefreshTrigger(t => t+1); }} className="p-2 text-red-500 transition-colors hover:text-red-400" aria-label="Delete article"><Trash2 size={18} /></button>
                   </div>
                 </div>
               ))}
@@ -292,7 +292,7 @@ export const AdminDashboard: React.FC = () => {
               <h2 className="flex items-center gap-2 text-xl font-bold">
                 {modalType === 'course' ? <><BookOpen className="text-coinlect-accent" /> Nouveau Cours Expert</> : <><FileText className="text-purple-500" /> Nouvel Article</>}
               </h2>
-              <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-white"><X size={24} /></button>
+              <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-white" aria-label="Close modal"><X size={24} /></button>
             </div>
 
             <div className="flex-1 p-8 overflow-y-auto">
@@ -310,7 +310,7 @@ export const AdminDashboard: React.FC = () => {
                       onChange={e => setCourseForm({...courseForm, description: e.target.value})} 
                     />
                     <div className="grid gap-4 md:grid-cols-3">
-                       <select className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" onChange={e => setCourseForm({...courseForm, level: e.target.value as any})}>
+                       <select className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" onChange={e => setCourseForm({...courseForm, level: e.target.value as any})} aria-label="Course level">
                          <option>Débutant</option><option>Intermédiaire</option><option>Avancé</option>
                        </select>
                        <input placeholder="Durée (ex: 35m)" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" onChange={e => setCourseForm({...courseForm, duration: e.target.value})} />
@@ -322,7 +322,7 @@ export const AdminDashboard: React.FC = () => {
                   {/* Learning Objectives */}
                   <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-bold tracking-widest uppercase text-coinlect-accent">2. Objectifs d'Apprentissage</h3>
+                      <h3 className="text-sm font-bold tracking-widest uppercase text-coinlect-accent">2. Objectifs d&apos;Apprentissage</h3>
                       <button type="button" onClick={handleAddObjective} className="flex items-center gap-1 text-xs font-bold text-coinlect-accent hover:underline"><Plus size={14}/> Ajouter un point</button>
                     </div>
                     <div className="space-y-2">
@@ -365,7 +365,7 @@ export const AdminDashboard: React.FC = () => {
                                    <div className="grid grid-cols-2 gap-2">
                                      {mod.quiz?.options.map((opt, oIdx) => (
                                        <div key={oIdx} className="flex items-center gap-1">
-                                          <input type="radio" name={`correct-${i}`} checked={mod.quiz?.correctAnswer === oIdx} onChange={() => updateQuiz(i, 'correctAnswer', oIdx)} />
+                                          <input type="radio" name={`correct-${i}`} checked={mod.quiz?.correctAnswer === oIdx} onChange={() => updateQuiz(i, 'correctAnswer', oIdx)} aria-label={`Mark option ${oIdx+1} as correct answer`} />
                                           <input placeholder={`Opt. ${oIdx+1}`} className="bg-transparent border-b border-white/5 p-1 text-[10px] w-full" value={opt} onChange={e => updateQuizOption(i, oIdx, e.target.value)} />
                                        </div>
                                      ))}
@@ -388,7 +388,7 @@ export const AdminDashboard: React.FC = () => {
                    <div className="flex items-center justify-between mb-6">
                       <label className="flex items-center gap-3 px-4 py-2 border cursor-pointer bg-white/5 rounded-xl border-white/10">
                         <input type="checkbox" checked={articleForm.featured} onChange={e => setArticleForm({...articleForm, featured: e.target.checked})} className="border-gray-600 rounded" />
-                        <span className="text-xs font-bold">Mettre en avant sur l'accueil</span>
+                        <span className="text-xs font-bold">Mettre en avant sur l&apos;accueil</span>
                       </label>
                    </div>
                    <input required placeholder="Titre de l'article" className="w-full p-4 text-xl font-bold text-white bg-black border outline-none border-white/10 rounded-xl focus:border-coinlect-accent" onChange={e => setArticleForm({...articleForm, title: e.target.value})} />
@@ -400,7 +400,7 @@ export const AdminDashboard: React.FC = () => {
                    <textarea placeholder="Contenu complet (Séparez les paragraphes par une nouvelle ligne)" className="w-full p-4 text-white bg-black border outline-none border-white/10 rounded-xl h-60" onChange={e => setArticleForm({...articleForm, content: [e.target.value]})} />
                    <div className="flex gap-4 pt-4">
                      <Button type="button" variant="outline" className="w-1/2" onClick={() => setIsModalOpen(false)}>Annuler</Button>
-                     <Button type="submit" className="w-1/2">Publier l'Article</Button>
+                     <Button type="submit" className="w-1/2">Publier l&apos;Article</Button>
                    </div>
                 </form>
               )}

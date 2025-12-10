@@ -165,6 +165,7 @@ export const Community: React.FC = () => {
                                     target="_blank" 
                                     rel="noopener noreferrer"
                                     className="flex items-center justify-center w-10 h-10 text-black transition-all bg-white rounded-full shadow-lg hover:bg-coinlect-accent hover:scale-110"
+                                    aria-label={`Visit ${item.name}`}
                                  >
                                      <ArrowRight size={20} />
                                  </a>
@@ -185,7 +186,7 @@ export const Community: React.FC = () => {
                         <Send size={28} />
                     </div>
                     
-                    <h3 className="mb-4 text-3xl font-bold text-white">Soutenez l'écosystème Coinlect</h3>
+                    <h3 className="mb-4 text-3xl font-bold text-white">Soutenez l&apos;écosystème Coinlect</h3>
                     <p className="mb-10 text-lg leading-relaxed text-gray-400">
                         Votre don nous aide à fournir une éducation Web3 gratuite et de qualité en Afrique. 
                         Abonnez-vous pour rester informé et participez à la révolution.

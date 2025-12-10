@@ -7,7 +7,7 @@ import { UserRole } from '@prisma/client';
 export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
   const auth = await getAuthContext(req);
   if (!auth) return unauthorized();
-  if (![UserRole.ADMIN, UserRole.EDITOR].includes(auth.role)) return forbidden();
+  if (auth.role !== UserRole.ADMIN && auth.role !== UserRole.EDITOR) return forbidden();
 
   try {
     const body = await req.json();
@@ -17,7 +17,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     }
 
     const data = parsed.data;
-    const module = await prisma.courseModule.create({
+    const courseModule = await prisma.courseModule.create({
       data: {
         courseId: params.id,
         title: data.title,
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
         durationMin: data.durationMin,
       },
     });
-    return NextResponse.json({ module }, { status: 201 });
+    return NextResponse.json({ module: courseModule }, { status: 201 });
   } catch (err) {
     console.error('Module create error', err);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

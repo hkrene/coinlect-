@@ -134,7 +134,7 @@ export const AboutPage: React.FC = () => {
                               <div className="bg-[#161616] p-6 rounded-2xl border border-white/5">
                                   <Users className="mb-4 text-blue-400" size={32} />
                                   <h3 className="mb-2 font-bold text-white">Inclusif</h3>
-                                  <p className="text-sm text-gray-500">Pour toute l'Afrique francophone.</p>
+                                  <p className="text-sm text-gray-500">Pour toute l&apos;Afrique francophone.</p>
                               </div>
                           </div>
                       </ScrollReveal>
