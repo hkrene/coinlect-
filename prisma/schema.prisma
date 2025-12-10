@@ -1,0 +1,232 @@
+// Data source and generator
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enums
+enum UserRole {
+  ADMIN
+  EDITOR
+  USER
+}
+
+enum PublishStatus {
+  DRAFT
+  PUBLISHED
+}
+
+enum FeaturedType {
+  COURSE
+  ARTICLE
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  UNSUBSCRIBED
+}
+
+enum SubscriptionSource {
+  DASHBOARD
+  WEBSITE
+  COURSE_SIGNUP
+}
+
+enum CampaignStatus {
+  DRAFT
+  SCHEDULED
+  SENT
+}
+
+enum DeliveryStatus {
+  PENDING
+  SENT
+  FAILED
+  BOUNCED
+}
+
+// Models
+model User {
+  id             String          @id @default(uuid())
+  email          String          @unique
+  passwordHash   String?
+  name           String?
+  role           UserRole        @default(USER)
+  provider       String?         // local | google
+  googleId       String?         @unique
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  lastActivityAt DateTime?
+
+  courses        Course[]        @relation("CourseAuthor")
+  articles       Article[]       @relation("ArticleAuthor")
+  enrollments    Enrollment[]
+  progress       Progress[]
+  refreshTokens  RefreshToken[]
+  subscribers    NewsletterSubscriber[]
+}
+
+model Course {
+  id            String          @id @default(uuid())
+  title         String
+  slug          String          @unique
+  description   String
+  seoTitle      String?
+  seoDescription String?
+  status        PublishStatus   @default(DRAFT)
+  publishedAt   DateTime?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  authorId      String?
+  author        User?           @relation("CourseAuthor", fields: [authorId], references: [id])
+
+  modules       CourseModule[]
+  enrollments   Enrollment[]
+  progress      Progress[]
+  featuredItems FeaturedItem[]
+}
+
+model CourseModule {
+  id          String   @id @default(uuid())
+  courseId    String
+  title       String
+  content     String
+  order       Int
+  durationMin Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  progress    Progress[]
+}
+
+model Article {
+  id             String        @id @default(uuid())
+  title          String
+  slug           String        @unique
+  excerpt        String?
+  content        String
+  tags           String[]
+  seoTitle       String?
+  seoDescription String?
+  status         PublishStatus @default(DRAFT)
+  publishedAt    DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  authorId       String?
+  author         User?         @relation("ArticleAuthor", fields: [authorId], references: [id])
+
+  featuredItems  FeaturedItem[]
+}
+
+model FeaturedItem {
+  id        String       @id @default(uuid())
+  type      FeaturedType
+  courseId  String?
+  articleId String?
+  order     Int          @default(0)
+  spotlight Boolean      @default(false)
+  createdAt DateTime     @default(now())
+
+  course    Course?      @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  article   Article?     @relation(fields: [articleId], references: [id], onDelete: Cascade)
+}
+
+model Enrollment {
+  id        String   @id @default(uuid())
+  userId    String
+  courseId  String
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, courseId])
+}
+
+model Progress {
+  id            String   @id @default(uuid())
+  userId        String
+  courseId      String
+  moduleId      String
+  completed     Boolean  @default(false)
+  progressPct   Int      @default(0)
+  lastActivity  DateTime @default(now())
+
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course        Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  module        CourseModule @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, moduleId])
+}
+
+model RefreshToken {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Newsletter System Models
+model NewsletterSubscriber {
+  id          String             @id @default(uuid())
+  email       String             @unique
+  status      SubscriptionStatus @default(ACTIVE)
+  source      SubscriptionSource @default(WEBSITE)
+  userId      String?            // Optional link to registered user
+  user        User?              @relation(fields: [userId], references: [id], onDelete: SetNull)
+  subscribedAt DateTime          @default(now())
+  unsubscribedAt DateTime?
+  unsubscribeToken String        @unique @default(uuid())
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  sendLogs    CampaignSendLog[]
+}
+
+model NewsletterCampaign {
+  id            String          @id @default(uuid())
+  title         String
+  subject       String
+  htmlContent   String          @db.Text
+  plainTextContent String?      @db.Text
+  status        CampaignStatus  @default(DRAFT)
+  scheduledAt   DateTime?
+  sentAt        DateTime?
+  createdAt     DateTime        @default(now())
+  updatedAt     DateTime        @updatedAt
+
+  sendLogs      CampaignSendLog[]
+
+  @@index([status])
+  @@index([scheduledAt])
+}
+
+model CampaignSendLog {
+  id            String          @id @default(uuid())
+  campaignId    String
+  campaign      NewsletterCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  subscriberId  String
+  subscriber    NewsletterSubscriber @relation(fields: [subscriberId], references: [id], onDelete: Cascade)
+  status        DeliveryStatus  @default(PENDING)
+  sentAt        DateTime?
+  openedAt      DateTime?
+  errorMessage  String?
+  createdAt     DateTime        @default(now())
+
+  @@unique([campaignId, subscriberId])
+  @@index([campaignId])
+  @@index([subscriberId])
+  @@index([status])
+}
+
