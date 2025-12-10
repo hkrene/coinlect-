@@ -35,13 +35,51 @@ npm run build
 npm start
 ```
 
+## Deployment to Vercel
+
+See [VERCEL_DEPLOYMENT.md](./VERCEL_DEPLOYMENT.md) for detailed deployment instructions.
+
+Quick steps:
+1. Push your code to GitHub/GitLab/Bitbucket
+2. Import project in Vercel
+3. Configure environment variables (see `.env.example`)
+4. Run database migrations
+5. Deploy!
+
+## Environment Variables
+
+Copy `.env.example` to `.env.local` and fill in the required values:
+
+```bash
+cp .env.example .env.local
+```
+
+Required variables:
+- `DATABASE_URL` - PostgreSQL connection string
+- `JWT_SECRET` - Secret key for JWT tokens
+- `NEXT_PUBLIC_APP_URL` - Your application URL
+- `NEXT_PUBLIC_GOOGLE_CLIENT_ID` - Google OAuth client ID
+- `GOOGLE_CLIENT_ID` - Google OAuth client ID (server-side)
+
+See `.env.example` for all available options.
+
+## Database Setup
+
+1. Create a PostgreSQL database
+2. Run migrations:
+   ```bash
+   npx prisma migrate dev
+   ```
+3. Generate Prisma client:
+   ```bash
+   npx prisma generate
+   ```
+
 ## Tech Stack
 
 - **Next.js 15** - React framework with App Router
 - **TypeScript** - Type safety
 - **Tailwind CSS** - Styling
+- **Prisma** - Database ORM
+- **PostgreSQL** - Database
 - **React Context** - State management (Theme, Auth, Language)
-# coinlect-apps
-# coinlect-apps
-# coinlect-
-# coinlect-
