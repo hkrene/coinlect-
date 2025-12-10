@@ -15,7 +15,7 @@ export function ComponentsLayout({ children }: { children: React.ReactNode }) {
   }, [pathname]);
 
   return (
-    <div className="min-h-screen bg-white dark:bg-black text-slate-900 dark:text-white font-sans selection:bg-coinlect-accent selection:text-black flex flex-col">
+    <div className="flex flex-col min-h-screen font-sans bg-white dark:bg-black text-slate-900 dark:text-white selection:bg-coinlect-accent selection:text-black">
       {!isLegalPage && <Header />}
       <main className="flex-grow">
         {children}

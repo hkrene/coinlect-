@@ -3,10 +3,10 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { ComponentsLayout } from '../../../components-layout';
 import { Button } from '@/components/Button';
 import { ArrowLeft, Save, Send, Calendar } from 'lucide-react';
 import Link from 'next/link';
+import { ComponentsLayout } from '../../../../components-layout';
 
 export default function NewCampaignPage() {
   const { isAuthenticated, isAdmin } = useAuth();
@@ -131,10 +131,11 @@ export default function NewCampaignPage() {
             </div>
 
             <div>
-              <label className="block mb-2 text-sm font-medium text-gray-400">
+              <label htmlFor="scheduledAt" className="block mb-2 text-sm font-medium text-gray-400">
                 Schedule Send (Optional)
               </label>
               <input
+                id="scheduledAt"
                 type="datetime-local"
                 value={formData.scheduledAt}
                 onChange={(e) => setFormData({ ...formData, scheduledAt: e.target.value })}

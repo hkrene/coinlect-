@@ -3,10 +3,10 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { ComponentsLayout } from '../../../components-layout';
 import { Button } from '@/components/Button';
 import { ArrowLeft, Send, Edit, BarChart3 } from 'lucide-react';
 import Link from 'next/link';
+import { ComponentsLayout } from '../../../../components-layout';
 
 export default function CampaignDetailPage({ params }: { params: { id: string } }) {
   const { isAuthenticated, isAdmin } = useAuth();

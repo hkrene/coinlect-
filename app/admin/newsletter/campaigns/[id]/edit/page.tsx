@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { ComponentsLayout } from '../../../components-layout';
+import { ComponentsLayout } from '../../../../../components-layout';
 import { Button } from '@/components/Button';
 import { ArrowLeft, Save } from 'lucide-react';
 import Link from 'next/link';
@@ -199,10 +199,11 @@ export default function EditCampaignPage({ params }: { params: { id: string } })
             </div>
 
             <div>
-              <label className="block mb-2 text-sm font-medium text-gray-400">
+              <label htmlFor="scheduledAt" className="block mb-2 text-sm font-medium text-gray-400">
                 Schedule Send (Optional)
               </label>
               <input
+                id="scheduledAt"
                 type="datetime-local"
                 value={formData.scheduledAt}
                 onChange={(e) => setFormData({ ...formData, scheduledAt: e.target.value })}

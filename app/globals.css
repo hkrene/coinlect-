@@ -45,3 +45,7 @@ body {
   transform: translateY(0);
 }
 
+.progress-bar {
+  width: var(--progress-width, 0%);
+}
+
