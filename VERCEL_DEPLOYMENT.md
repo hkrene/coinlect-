@@ -7,7 +7,6 @@ This guide will help you deploy the Coinlect application to Vercel.
 1. A Vercel account ([vercel.com](https://vercel.com))
 2. A PostgreSQL database (recommended: [Vercel Postgres](https://vercel.com/docs/storage/vercel-postgres) or [Neon](https://neon.tech))
 3. Google OAuth credentials (for authentication)
-4. Email service credentials (Resend, SendGrid, or AWS SES)
 
 ## Step 1: Prepare Your Repository
 
@@ -87,41 +86,6 @@ NEXT_PUBLIC_GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
 GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
 ```
 
-### Email Configuration
-
-Choose one email provider:
-
-**For Resend:**
-```env
-EMAIL_PROVIDER=resend
-RESEND_API_KEY=re_xxxxx
-EMAIL_FROM=noreply@yourdomain.com
-EMAIL_FROM_NAME=Coinlect
-```
-
-**For SendGrid:**
-```env
-EMAIL_PROVIDER=sendgrid
-SENDGRID_API_KEY=SG.xxxxx
-EMAIL_FROM=noreply@yourdomain.com
-EMAIL_FROM_NAME=Coinlect
-```
-
-**For Amazon SES:**
-```env
-EMAIL_PROVIDER=ses
-AWS_REGION=us-east-1
-AWS_ACCESS_KEY_ID=your-access-key
-AWS_SECRET_ACCESS_KEY=your-secret-key
-EMAIL_FROM=noreply@yourdomain.com
-EMAIL_FROM_NAME=Coinlect
-```
-
-**For Development/Testing:**
-```env
-EMAIL_PROVIDER=console
-```
-
 ### Optional Variables
 
 ```env
@@ -173,7 +137,6 @@ You can also add migrations to your build process by updating `package.json`:
 2. Test key features:
    - User registration/login
    - Google OAuth
-   - Newsletter subscription
    - Admin dashboard (if you have admin users)
 
 ## Step 8: Set Up Custom Domain (Optional)
@@ -215,7 +178,6 @@ You can also add migrations to your build process by updating `package.json`:
 - [ ] Database migrations completed
 - [ ] Environment variables configured
 - [ ] Google OAuth working
-- [ ] Email service configured and tested
 - [ ] Admin user created (if needed)
 - [ ] Custom domain configured (if applicable)
 - [ ] SSL certificate active

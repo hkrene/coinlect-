@@ -159,3 +159,5 @@ export const Deals: React.FC = () => {
     </div>
   );
 };
+
+export default Deals;

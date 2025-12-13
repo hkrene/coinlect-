@@ -1,10 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import { ScrollReveal } from '../components/ScrollReveal';
-import { Button } from '../components/Button';
-import { newsletterService } from '../services/db';
-import { Link, ArrowRight, MessageCircle, Twitter, Linkedin, Youtube, Send, Globe, CheckCircle } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 // Social Media Icons truncated...
 const Icons = {
@@ -102,22 +100,6 @@ const COMMUNITIES = [
 ];
 
 export const Community: React.FC = () => {
-  const [email, setEmail] = useState('');
-  const [isSubscribed, setIsSubscribed] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  const handleSubscribe = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email) return;
-    setLoading(true);
-    // Real tracking logic
-    newsletterService.add(email);
-    setTimeout(() => {
-        setLoading(false);
-        setIsSubscribed(true);
-        setEmail('');
-    }, 800);
-  };
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] pt-24 pb-20">
@@ -176,53 +158,9 @@ export const Community: React.FC = () => {
              </div>
          ))}
 
-         {/* Newsletter Subscription CTA */}
-         <ScrollReveal>
-            <div className="relative p-8 overflow-hidden border glass-card md:p-12 rounded-3xl border-white/10 bg-gradient-to-br from-gray-900 via-black to-black">
-                 <div className="absolute inset-0 bg-grid-pattern bg-[length:40px_40px] opacity-[0.05]"></div>
-                 
-                 <div className="relative z-10 max-w-2xl mx-auto text-center">
-                    <div className="flex items-center justify-center w-16 h-16 mx-auto mb-6 border rounded-full bg-coinlect-accent/10 border-coinlect-accent/20 text-coinlect-accent">
-                        <Send size={28} />
-                    </div>
-                    
-                    <h3 className="mb-4 text-3xl font-bold text-white">Soutenez l&apos;écosystème Coinlect</h3>
-                    <p className="mb-10 text-lg leading-relaxed text-gray-400">
-                        Votre don nous aide à fournir une éducation Web3 gratuite et de qualité en Afrique. 
-                        Abonnez-vous pour rester informé et participez à la révolution.
-                    </p>
-                    
-                    {isSubscribed ? (
-                        <div className="flex flex-col items-center duration-300 animate-in zoom-in">
-                            <div className="flex items-center gap-3 mb-2 text-xl font-bold text-green-400">
-                                <CheckCircle size={24} /> Merci pour votre inscription !
-                            </div>
-                            <p className="text-gray-500">Bienvenue dans la communauté Coinlect.</p>
-                        </div>
-                    ) : (
-                        <form onSubmit={handleSubscribe} className="flex flex-col gap-3 md:flex-row">
-                            <input 
-                                type="email" 
-                                required
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                placeholder="votre@email.com" 
-                                className="flex-1 px-6 py-4 text-white transition-colors border bg-white/5 border-white/10 rounded-xl focus:outline-none focus:border-coinlect-accent"
-                            />
-                            <Button 
-                                type="submit" 
-                                disabled={loading}
-                                className="px-8 py-4 text-base font-bold shadow-[0_0_20px_rgba(245,158,11,0.2)]"
-                            >
-                                {loading ? 'Chargement...' : 'Join Now'}
-                            </Button>
-                        </form>
-                    )}
-                 </div>
-            </div>
-         </ScrollReveal>
-
       </div>
     </div>
   );
 };
+
+export default Community;

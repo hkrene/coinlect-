@@ -341,3 +341,5 @@ export const Academy: React.FC = () => {
     </div>
   );
 };
+
+export default Academy;

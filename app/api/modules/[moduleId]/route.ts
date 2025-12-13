@@ -4,10 +4,11 @@ import { moduleSchema } from '@/lib/validators';
 import { getAuthContext, unauthorized, forbidden } from '@/lib/api';
 import { UserRole } from '@prisma/client';
 
-export async function PATCH(req: NextRequest, { params }: { params: { moduleId: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ moduleId: string }> }) {
+  const { moduleId } = await params;
   const auth = await getAuthContext(req);
   if (!auth) return unauthorized();
-  if (![UserRole.ADMIN, UserRole.EDITOR].includes(auth.role)) return forbidden();
+  if (auth.role !== UserRole.ADMIN && auth.role !== UserRole.EDITOR) return forbidden();
 
   try {
     const body = await req.json();
@@ -17,7 +18,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { moduleId: 
     }
 
     const updated = await prisma.courseModule.update({
-      where: { id: params.moduleId },
+      where: { id: moduleId },
       data: parsed.data,
     });
     return NextResponse.json({ module: updated });
@@ -27,13 +28,14 @@ export async function PATCH(req: NextRequest, { params }: { params: { moduleId: 
   }
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: { moduleId: string } }) {
+export async function DELETE(req: NextRequest, { params }: { params: Promise<{ moduleId: string }> }) {
+  const { moduleId } = await params;
   const auth = await getAuthContext(req);
   if (!auth) return unauthorized();
-  if (![UserRole.ADMIN, UserRole.EDITOR].includes(auth.role)) return forbidden();
+  if (auth.role !== UserRole.ADMIN && auth.role !== UserRole.EDITOR) return forbidden();
 
   try {
-    await prisma.courseModule.delete({ where: { id: params.moduleId } });
+    await prisma.courseModule.delete({ where: { id: moduleId } });
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error('Module delete error', err);

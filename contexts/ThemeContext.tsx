@@ -12,14 +12,29 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [theme, setTheme] = useState<Theme>(() => {
+  // Initialize with default theme to avoid SSR issues
+  const [theme, setTheme] = useState<Theme>('dark');
+  const [mounted, setMounted] = useState(false);
+
+  // Initialize theme from localStorage after mount (client-side only)
+  useEffect(() => {
+    setMounted(true);
     // Check local storage or system preference
-    const storedTheme = localStorage.getItem('coinlect_theme') as Theme;
-    if (storedTheme) return storedTheme;
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'dark'; // Default to dark as requested earlier
-  });
+    if (typeof window !== 'undefined') {
+      const storedTheme = localStorage.getItem('coinlect_theme') as Theme;
+      if (storedTheme && (storedTheme === 'light' || storedTheme === 'dark')) {
+        setTheme(storedTheme);
+      } else {
+        // Check system preference
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        setTheme(prefersDark ? 'dark' : 'dark'); // Default to dark
+      }
+    }
+  }, []);
 
   useEffect(() => {
+    if (!mounted || typeof window === 'undefined') return;
+    
     const root = window.document.documentElement;
     const body = window.document.body;
     
@@ -30,7 +45,7 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     body.classList.add(theme);
     
     localStorage.setItem('coinlect_theme', theme);
-  }, [theme]);
+  }, [theme, mounted]);
 
   const toggleTheme = () => {
     setTheme(prev => prev === 'light' ? 'dark' : 'light');

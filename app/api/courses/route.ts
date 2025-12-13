@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const auth = await getAuthContext(req);
   if (!auth) return unauthorized();
-  if (![UserRole.ADMIN, UserRole.EDITOR].includes(auth.role)) return forbidden();
+  if (auth.role !== UserRole.ADMIN && auth.role !== UserRole.EDITOR) return forbidden();
 
   try {
     const body = await req.json();

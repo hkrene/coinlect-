@@ -32,7 +32,7 @@ Your Coinlect application has been analyzed and prepared for Vercel deployment.
 ## Build Status
 
 The application builds successfully with only minor warnings:
-- Email type re-export warnings (non-blocking, webpack optimization)
+- Image optimization warnings (non-blocking, Next.js optimization suggestions)
 - These warnings don't affect functionality
 
 ## Next Steps
@@ -54,14 +54,12 @@ The application builds successfully with only minor warnings:
 4. **Post-Deployment**
    - Run database migrations
    - Test all functionality
-   - Verify email sending works
 
 ## Required Services
 
 Before deploying, ensure you have:
 - ✅ PostgreSQL database (Vercel Postgres, Neon, or Supabase)
 - ✅ Google OAuth credentials
-- ✅ Email service account (Resend, SendGrid, or AWS SES)
 
 ## Support
 

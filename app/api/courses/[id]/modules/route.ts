@@ -4,12 +4,13 @@ import { moduleSchema } from '@/lib/validators';
 import { getAuthContext, unauthorized, forbidden } from '@/lib/api';
 import { UserRole } from '@prisma/client';
 
-export async function POST(req: NextRequest, { params }: { params: { id: string } }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const auth = await getAuthContext(req);
   if (!auth) return unauthorized();
   if (auth.role !== UserRole.ADMIN && auth.role !== UserRole.EDITOR) return forbidden();
 
   try {
+    const { id } = await params;
     const body = await req.json();
     const parsed = moduleSchema.safeParse(body);
     if (!parsed.success) {
@@ -19,7 +20,7 @@ export async function POST(req: NextRequest, { params }: { params: { id: string 
     const data = parsed.data;
     const courseModule = await prisma.courseModule.create({
       data: {
-        courseId: params.id,
+        courseId: id,
         title: data.title,
         content: data.content,
         order: data.order,

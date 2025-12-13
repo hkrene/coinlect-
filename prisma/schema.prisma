@@ -25,29 +25,6 @@ enum FeaturedType {
   ARTICLE
 }
 
-enum SubscriptionStatus {
-  ACTIVE
-  UNSUBSCRIBED
-}
-
-enum SubscriptionSource {
-  DASHBOARD
-  WEBSITE
-  COURSE_SIGNUP
-}
-
-enum CampaignStatus {
-  DRAFT
-  SCHEDULED
-  SENT
-}
-
-enum DeliveryStatus {
-  PENDING
-  SENT
-  FAILED
-  BOUNCED
-}
 
 // Models
 model User {
@@ -67,7 +44,6 @@ model User {
   enrollments    Enrollment[]
   progress       Progress[]
   refreshTokens  RefreshToken[]
-  subscribers    NewsletterSubscriber[]
 }
 
 model Course {
@@ -175,58 +151,5 @@ model RefreshToken {
   createdAt DateTime @default(now())
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-// Newsletter System Models
-model NewsletterSubscriber {
-  id          String             @id @default(uuid())
-  email       String             @unique
-  status      SubscriptionStatus @default(ACTIVE)
-  source      SubscriptionSource @default(WEBSITE)
-  userId      String?            // Optional link to registered user
-  user        User?              @relation(fields: [userId], references: [id], onDelete: SetNull)
-  subscribedAt DateTime          @default(now())
-  unsubscribedAt DateTime?
-  unsubscribeToken String        @unique @default(uuid())
-  createdAt   DateTime           @default(now())
-  updatedAt   DateTime           @updatedAt
-
-  sendLogs    CampaignSendLog[]
-}
-
-model NewsletterCampaign {
-  id            String          @id @default(uuid())
-  title         String
-  subject       String
-  htmlContent   String          @db.Text
-  plainTextContent String?      @db.Text
-  status        CampaignStatus  @default(DRAFT)
-  scheduledAt   DateTime?
-  sentAt        DateTime?
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
-
-  sendLogs      CampaignSendLog[]
-
-  @@index([status])
-  @@index([scheduledAt])
-}
-
-model CampaignSendLog {
-  id            String          @id @default(uuid())
-  campaignId    String
-  campaign      NewsletterCampaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
-  subscriberId  String
-  subscriber    NewsletterSubscriber @relation(fields: [subscriberId], references: [id], onDelete: Cascade)
-  status        DeliveryStatus  @default(PENDING)
-  sentAt        DateTime?
-  openedAt      DateTime?
-  errorMessage  String?
-  createdAt     DateTime        @default(now())
-
-  @@unique([campaignId, subscriberId])
-  @@index([campaignId])
-  @@index([subscriberId])
-  @@index([status])
 }
 

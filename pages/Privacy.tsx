@@ -42,3 +42,5 @@ export const Privacy: React.FC = () => {
     </div>
   );
 };
+
+export default Privacy;

@@ -3,19 +3,18 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
-import { userService, courseService, articleService, newsletterService } from '../services/db';
+import { userService, courseService, articleService } from '../services/db';
 import { User, Course, Article, SyllabusItem } from '../types';
 import { Button } from '../components/Button';
-import { Trash2, Plus, Users, BookOpen, FileText, LayoutDashboard, X, Check, Globe, Shield, Star, Play, HelpCircle, Mail } from 'lucide-react';
+import { Trash2, Plus, Users, BookOpen, FileText, LayoutDashboard, X, Check, Globe, Shield, Star, Play, HelpCircle } from 'lucide-react';
 
 export const AdminDashboard: React.FC = () => {
   const { user, isAdmin } = useAuth();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'courses' | 'articles' | 'subscribers'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'courses' | 'articles'>('overview');
   const [users, setUsers] = useState<User[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
   const [articles, setArticles] = useState<Article[]>([]);
-  const [subscribers, setSubscribers] = useState<{email: string; subscribedAt: string}[]>([]);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // Modals
@@ -55,7 +54,6 @@ export const AdminDashboard: React.FC = () => {
     setUsers(userService.getAll());
     setCourses(courseService.getAll());
     setArticles(articleService.getAll());
-    setSubscribers(newsletterService.getAll());
   }, [isAdmin, router, refreshTrigger]);
 
   const toggleUserRole = (id: string) => {
@@ -138,9 +136,6 @@ export const AdminDashboard: React.FC = () => {
           <button onClick={() => setActiveTab('articles')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${activeTab === 'articles' ? 'bg-coinlect-accent text-black font-bold' : 'text-gray-400 hover:bg-white/5'}`}>
             <FileText size={18} /> Articles
           </button>
-          <button onClick={() => setActiveTab('subscribers')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${activeTab === 'subscribers' ? 'bg-coinlect-accent text-black font-bold' : 'text-gray-400 hover:bg-white/5'}`}>
-            <Mail size={18} /> Abonnés
-          </button>
         </div>
       </aside>
 
@@ -152,8 +147,7 @@ export const AdminDashboard: React.FC = () => {
               {[
                 { label: 'Utilisateurs', val: users.length, icon: <Users />, color: 'text-blue-500' },
                 { label: 'Cours', val: courses.length, icon: <BookOpen />, color: 'text-coinlect-accent' },
-                { label: 'Articles', val: articles.length, icon: <FileText />, color: 'text-purple-500' },
-                { label: 'Abonnés', val: subscribers.length, icon: <Mail />, color: 'text-green-500' }
+                { label: 'Articles', val: articles.length, icon: <FileText />, color: 'text-purple-500' }
               ].map((card, i) => (
                 <div key={i} className="bg-[#111] p-6 rounded-xl border border-white/10 flex items-center justify-between">
                   <div>
@@ -195,34 +189,6 @@ export const AdminDashboard: React.FC = () => {
                       </td>
                       <td className="p-4 text-right">
                         <button onClick={() => {userService.delete(u.id); setRefreshTrigger(t => t+1)}} className="text-red-500 transition-colors hover:text-red-400" aria-label="Delete user"><Trash2 size={16} /></button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
-
-        {activeTab === 'subscribers' && (
-          <div className="space-y-6 animate-in fade-in">
-            <h1 className="text-3xl font-bold">Abonnés Newsletter</h1>
-            <div className="bg-[#111] rounded-xl border border-white/10 overflow-hidden">
-              <table className="w-full text-left">
-                <thead className="text-xs text-gray-400 uppercase bg-white/5">
-                  <tr>
-                    <th className="p-4">Email</th>
-                    <th className="p-4">Date d&apos;inscription</th>
-                    <th className="p-4 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="text-sm divide-y divide-white/5">
-                  {subscribers.map(s => (
-                    <tr key={s.email} className="hover:bg-white/5">
-                      <td className="p-4 font-medium text-white">{s.email}</td>
-                      <td className="p-4 text-gray-400">{new Date(s.subscribedAt).toLocaleDateString()}</td>
-                      <td className="p-4 text-right">
-                        <button onClick={() => {newsletterService.delete(s.email); setRefreshTrigger(t => t+1)}} className="text-red-500 transition-colors hover:text-red-400" aria-label="Delete subscriber"><Trash2 size={16} /></button>
                       </td>
                     </tr>
                   ))}
@@ -411,3 +377,5 @@ export const AdminDashboard: React.FC = () => {
     </div>
   );
 };
+
+export default AdminDashboard;

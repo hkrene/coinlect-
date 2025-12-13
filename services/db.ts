@@ -7,19 +7,17 @@ const STORAGE_KEYS = {
   COURSES: 'coinlect_courses',
   ARTICLES: 'coinlect_articles',
   DEALS: 'coinlect_deals',
-  SESSION: 'coinlect_session',
-  SUBSCRIBERS: 'coinlect_subscribers'
+  SESSION: 'coinlect_session'
 };
 
 const initData = () => {
+  if (typeof window === 'undefined') return; // Skip on server-side
+  
   if (!localStorage.getItem(STORAGE_KEYS.COURSES)) {
     localStorage.setItem(STORAGE_KEYS.COURSES, JSON.stringify(COURSES_DATA));
   }
   if (!localStorage.getItem(STORAGE_KEYS.ARTICLES)) {
     localStorage.setItem(STORAGE_KEYS.ARTICLES, JSON.stringify(ARTICLES_DATA));
-  }
-  if (!localStorage.getItem(STORAGE_KEYS.SUBSCRIBERS)) {
-    localStorage.setItem(STORAGE_KEYS.SUBSCRIBERS, JSON.stringify([]));
   }
   localStorage.setItem(STORAGE_KEYS.DEALS, JSON.stringify(DEALS_DATA));
   
@@ -36,10 +34,14 @@ const initData = () => {
   }
 };
 
-initData();
+// Only initialize on client-side
+if (typeof window !== 'undefined') {
+  initData();
+}
 
 export const userService = {
   getAll: (): User[] => {
+    if (typeof window === 'undefined') return [];
     return JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS) || '[]');
   },
   create: (user: Omit<User, 'id' | 'createdAt'>): User => {
@@ -77,6 +79,7 @@ export const userService = {
 
 export const courseService = {
   getAll: (): Course[] => {
+    if (typeof window === 'undefined') return [];
     return JSON.parse(localStorage.getItem(STORAGE_KEYS.COURSES) || '[]');
   },
   add: (course: Omit<Course, 'id'>) => {
@@ -95,6 +98,7 @@ export const courseService = {
 
 export const articleService = {
   getAll: (): Article[] => {
+    if (typeof window === 'undefined') return [];
     return JSON.parse(localStorage.getItem(STORAGE_KEYS.ARTICLES) || '[]');
   },
   getFeatured: (): Article[] => {
@@ -117,24 +121,7 @@ export const articleService = {
 
 export const dealService = {
   getAll: (): Deal[] => {
+    if (typeof window === 'undefined') return [];
     return JSON.parse(localStorage.getItem(STORAGE_KEYS.DEALS) || '[]');
-  }
-};
-
-export const newsletterService = {
-  getAll: (): { email: string; subscribedAt: string }[] => {
-    return JSON.parse(localStorage.getItem(STORAGE_KEYS.SUBSCRIBERS) || '[]');
-  },
-  add: (email: string) => {
-    const subs = newsletterService.getAll();
-    if (!subs.find(s => s.email === email)) {
-      subs.push({ email, subscribedAt: new Date().toISOString() });
-      localStorage.setItem(STORAGE_KEYS.SUBSCRIBERS, JSON.stringify(subs));
-    }
-  },
-  delete: (email: string) => {
-    let subs = newsletterService.getAll();
-    subs = subs.filter(s => s.email !== email);
-    localStorage.setItem(STORAGE_KEYS.SUBSCRIBERS, JSON.stringify(subs));
   }
 };

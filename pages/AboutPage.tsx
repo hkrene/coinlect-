@@ -8,7 +8,7 @@ import { Globe2, Users, GraduationCap, ArrowRight, Target, Sparkles, Heart } fro
 import { Button } from '../components/Button';
 import Link from 'next/link';
 
-export const AboutPage: React.FC = () => {
+const AboutPage: React.FC = () => {
   const { t } = useLanguage();
 
   return (
@@ -194,3 +194,6 @@ export const AboutPage: React.FC = () => {
     </div>
   );
 };
+
+export { AboutPage };
+export default AboutPage;

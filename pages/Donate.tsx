@@ -98,3 +98,5 @@ export const Donate: React.FC = () => {
         </div>
     );
 };
+
+export default Donate;

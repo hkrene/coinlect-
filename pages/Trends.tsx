@@ -371,3 +371,5 @@ export const Trends: React.FC = () => {
     </div>
   );
 };
+
+export default Trends;

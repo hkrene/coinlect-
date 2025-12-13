@@ -182,3 +182,5 @@ export const ArticleDetail: React.FC = () => {
     </div>
   );
 };
+
+export default ArticleDetail;

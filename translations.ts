@@ -39,8 +39,6 @@ export const translations = {
       support: "Support",
       company: "Société",
       legal: "Légal",
-      newsletter: "Newsletter",
-      newsletterDesc: "Restez informé des dernières nouvelles du marché crypto.",
       rights: "Tous droits réservés.",
       helpCenter: "Centre d'aide",
       about: "À propos",
@@ -228,8 +226,7 @@ export const translations = {
         subtitle: "Connectez-vous avec des milliers de traders, développeurs et passionnés. Partagez des idées, obtenez du soutien et façonnez l'avenir de la finance ensemble.",
         discord: { title: "Serveur Discord", desc: "Discutez en direct avec la communauté, rejoignez les salons vocaux et obtenez une aide instantanée.", cta: "Rejoindre Discord" },
         twitter: { title: "Twitter / X", desc: "Restez informé des dernières nouvelles, annonces et analyses de marché.", cta: "Nous Suivre" },
-        github: { title: "Développeurs", desc: "Contribuez à nos dépôts open source et construisez sur notre API.", cta: "Voir GitHub" },
-        newsletter: { title: "S'abonner à la Newsletter", desc: "Recevez les analyses de marché directement dans votre boîte de réception." }
+        github: { title: "Développeurs", desc: "Contribuez à nos dépôts open source et construisez sur notre API.", cta: "Voir GitHub" }
     },
     deals: {
       title: "Offres",
@@ -306,8 +303,6 @@ export const translations = {
       support: "Support",
       company: "Company",
       legal: "Legal",
-      newsletter: "Newsletter",
-      newsletterDesc: "Stay updated with the latest crypto market news.",
       rights: "All rights reserved.",
       helpCenter: "Help Center",
       about: "About",
@@ -495,8 +490,7 @@ export const translations = {
         subtitle: "Connect with thousands of traders, developers, and enthusiasts. Share ideas, get support, and shape the future of finance together.",
         discord: { title: "Discord Server", desc: "Chat live with the community, join voice channels, and get instant support.", cta: "Join Discord" },
         twitter: { title: "Twitter / X", desc: "Stay updated with the latest news, announcements, and market analysis.", cta: "Follow Us" },
-        github: { title: "Developers", desc: "Contribute to our open source repositories and build on our API.", cta: "View GitHub" },
-        newsletter: { title: "Subscribe to Newsletter", desc: "Get market analysis directly in your inbox." }
+        github: { title: "Developers", desc: "Contribute to our open source repositories and build on our API.", cta: "View GitHub" }
     },
     deals: {
       title: "Exclusive",

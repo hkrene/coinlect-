@@ -29,22 +29,6 @@ Before deploying, ensure these are set in Vercel:
 - [ ] `NEXT_PUBLIC_GOOGLE_CLIENT_ID` - Google OAuth client ID
 - [ ] `GOOGLE_CLIENT_ID` - Google OAuth client ID (server-side)
 
-### Email Configuration (Choose One)
-- [ ] `EMAIL_PROVIDER` - `console` | `resend` | `sendgrid` | `ses`
-- [ ] `EMAIL_FROM` - Sender email address
-- [ ] `EMAIL_FROM_NAME` - Sender name
-
-**If using Resend:**
-- [ ] `RESEND_API_KEY`
-
-**If using SendGrid:**
-- [ ] `SENDGRID_API_KEY`
-
-**If using Amazon SES:**
-- [ ] `AWS_REGION`
-- [ ] `AWS_ACCESS_KEY_ID`
-- [ ] `AWS_SECRET_ACCESS_KEY`
-
 ### Optional
 - [ ] `GEMINI_API_KEY` - For AI chat features
 
@@ -77,10 +61,8 @@ Before deploying, ensure these are set in Vercel:
 3. [ ] Test application functionality:
    - [ ] User registration/login
    - [ ] Google OAuth
-   - [ ] Newsletter subscription
    - [ ] Admin dashboard access
 4. [ ] Check application logs in Vercel dashboard
-5. [ ] Verify email sending works (test newsletter)
 
 ## 📝 Notes
 
@@ -105,9 +87,4 @@ Before deploying, ensure these are set in Vercel:
 - Verify redirect URIs match exactly
 - Check both `NEXT_PUBLIC_GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_ID` are set
 - Ensure OAuth consent screen is configured
-
-**Email not sending:**
-- Verify email provider credentials are correct
-- Check `EMAIL_PROVIDER` matches your provider
-- Test with `EMAIL_PROVIDER=console` first for debugging
 

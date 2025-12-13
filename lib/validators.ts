@@ -62,25 +62,3 @@ export const progressSchema = z.object({
   completed: z.boolean().default(true),
   progressPct: z.number().int().min(0).max(100).optional(),
 });
-
-// Newsletter validators
-export const subscribeSchema = z.object({
-  email: z.string().email(),
-  source: z.enum(['DASHBOARD', 'WEBSITE', 'COURSE_SIGNUP']).optional(),
-  userId: z.string().uuid().optional(),
-});
-
-export const campaignSchema = z.object({
-  title: z.string().min(1),
-  subject: z.string().min(1),
-  htmlContent: z.string().min(1),
-  plainTextContent: z.string().optional(),
-  scheduledAt: z.string().datetime().optional(),
-});
-
-export const updateCampaignSchema = campaignSchema.partial();
-
-export const sendCampaignSchema = z.object({
-  campaignId: z.string().uuid(),
-  testEmail: z.string().email().optional(), // For testing before sending to all
-});
