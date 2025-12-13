@@ -3,6 +3,7 @@
 import React from 'react';
 import { ScrollReveal } from '../components/ScrollReveal';
 import { ArrowRight } from 'lucide-react';
+import CardSwap, { Card } from '../components/CardSwap';
 
 // Social Media Icons truncated...
 const Icons = {
@@ -42,7 +43,7 @@ const COMMUNITIES = [
         desc: 'Follow for real-time news & updates.',
         icon: Icons.X,
         url: 'https://x.com/coinlect',
-        members: '45K',
+        members: '1K',
         color: 'text-white'
       },
       {
@@ -100,6 +101,8 @@ const COMMUNITIES = [
 ];
 
 export const Community: React.FC = () => {
+  // Flatten all community items into a single array
+  const allCommunities = COMMUNITIES.flatMap(section => section.items);
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] pt-24 pb-20">
@@ -119,45 +122,43 @@ export const Community: React.FC = () => {
          </div>
       </div>
 
-      <div className="container max-w-5xl px-6 mx-auto">
-         
-         {COMMUNITIES.map((section, idx) => (
-             <div key={idx} className="mb-16">
-                 <ScrollReveal delay={idx * 100}>
-                     <h2 className="flex items-center gap-2 mb-6 text-xl font-bold text-white">
-                        <div className="w-1 h-6 rounded-full bg-coinlect-accent"></div>
-                        {section.category}
-                     </h2>
-                     
-                     <div className="grid gap-6 md:grid-cols-2">
-                         {section.items.map((item, itemIdx) => (
-                             <div key={itemIdx} className="flex items-center justify-between p-6 transition-all duration-300 border group glass-card rounded-xl border-white/5 hover:border-white/20 hover:bg-white/5">
-                                 <div className="flex items-center gap-5">
-                                     <div className={`w-14 h-14 rounded-full bg-[#111] flex items-center justify-center border border-white/10 group-hover:scale-110 transition-transform ${item.color}`}>
-                                         <item.icon />
-                                     </div>
-                                     <div>
-                                         <h3 className="text-lg font-bold text-white transition-colors group-hover:text-coinlect-accent">{item.name}</h3>
-                                         <p className="mb-1 text-sm text-gray-400">{item.desc}</p>
-                                         <span className="text-xs font-medium text-gray-500 bg-white/5 px-2 py-0.5 rounded">{item.members} members</span>
-                                     </div>
-                                 </div>
-                                 <a 
-                                    href={item.url} 
-                                    target="_blank" 
-                                    rel="noopener noreferrer"
-                                    className="flex items-center justify-center w-10 h-10 text-black transition-all bg-white rounded-full shadow-lg hover:bg-coinlect-accent hover:scale-110"
-                                    aria-label={`Visit ${item.name}`}
-                                 >
-                                     <ArrowRight size={20} />
-                                 </a>
-                             </div>
-                         ))}
+      <div className="container px-6 mx-auto max-w-7xl">
+         <div className="relative h-[600px] flex items-center justify-center">
+           <ScrollReveal>
+             <CardSwap
+               cardDistance={50}
+               verticalDistance={60}
+               delay={5000}
+               pauseOnHover={false}
+               width={400}
+               height={320}
+             >
+               {allCommunities.map((item, index) => (
+                 <Card
+                   key={index}
+                   customClass="p-6 cursor-pointer hover:border-coinlect-accent transition-colors bg-black/90 backdrop-blur-sm"
+                   onClick={() => window.open(item.url, '_blank', 'noopener,noreferrer')}
+                 >
+                   <div className="flex flex-col h-full">
+                     <div className={`w-12 h-12 rounded-full bg-[#111] flex items-center justify-center border border-white/10 mb-4 ${item.color}`}>
+                       <item.icon />
                      </div>
-                 </ScrollReveal>
-             </div>
-         ))}
-
+                     <h3 className="mb-2 text-xl font-bold text-white">{item.name}</h3>
+                     <p className="flex-grow mb-3 text-sm text-gray-400">{item.desc}</p>
+                     <div className="flex items-center justify-between">
+                       <span className="px-3 py-1 text-xs font-medium text-gray-500 rounded bg-white/5">
+                         {item.members} members
+                       </span>
+                       <div className="flex items-center justify-center w-10 h-10 text-black transition-all bg-white rounded-full shadow-lg hover:bg-coinlect-accent hover:scale-110">
+                         <ArrowRight size={20} />
+                       </div>
+                     </div>
+                   </div>
+                 </Card>
+               ))}
+             </CardSwap>
+           </ScrollReveal>
+         </div>
       </div>
     </div>
   );

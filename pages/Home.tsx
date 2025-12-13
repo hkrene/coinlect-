@@ -13,9 +13,7 @@ export const Home: React.FC = () => {
   return (
     <>
       <Hero />
-      <ScrollReveal className="w-full">
-        <Ticker />
-      </ScrollReveal>
+      <Ticker />
       <ScrollReveal>
         <About />
       </ScrollReveal>
