@@ -267,7 +267,7 @@ export const Academy: React.FC = () => {
 
           {/* Developer Space Section - Restyled to Blue Theme */}
           <ScrollReveal className="mt-32">
-              <div className="glass-card bg-[#0a0f1d] p-10 md:p-16 rounded-3xl border border-blue-500/20 relative overflow-hidden group">
+              <div className="bg-[#0a0f1d] p-10 md:p-16 rounded-3xl border border-blue-500/20 relative overflow-hidden group">
                   {/* Glowing Blue Background Elements */}
                   <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-blue-600/10 rounded-full blur-[100px] pointer-events-none"></div>
                   <div className="absolute -bottom-10 -left-10 w-[200px] h-[200px] bg-blue-400/10 rounded-full blur-[60px] pointer-events-none"></div>

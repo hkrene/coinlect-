@@ -180,7 +180,7 @@ export const Trends: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen pt-32 pb-20">
+    <div className="min-h-screen pt-32 pb-20 bg-black">
       <ScrollReveal>
           <div className="container px-6 mx-auto mb-12">
             <div className="flex flex-col items-end justify-between gap-4 md:flex-row">
@@ -217,7 +217,7 @@ export const Trends: React.FC = () => {
         
         {/* MARKET TABLE SECTION */}
         <ScrollReveal delay={200}>
-            <div className="glass-card rounded-2xl overflow-hidden border border-white/10 bg-[#0F0F0F] relative min-h-[400px]">
+            <div className="rounded-2xl overflow-hidden border border-white/10 bg-[#0F0F0F] relative min-h-[400px]">
                 {/* Decorative header glow */}
                 <div className="absolute top-0 left-0 right-0 h-1 opacity-50 bg-gradient-to-r from-transparent via-coinlect-accent/50 to-transparent"></div>
                 
@@ -312,14 +312,14 @@ export const Trends: React.FC = () => {
             {newsLoading && news.length === 0 ? (
                <div className="grid gap-8 md:grid-cols-3">
                    {Array.from({length: 6}).map((_, i) => (
-                       <div key={i} className="h-64 glass-card rounded-2xl animate-pulse"></div>
+                       <div key={i} className="h-64 bg-[#0F0F0F] border border-white/10 rounded-2xl animate-pulse"></div>
                    ))}
                </div>
             ) : (
                 <div className="grid gap-8 md:grid-cols-3">
                     {news.map((newsItem, idx) => (
                         <ScrollReveal key={newsItem.id} delay={idx * 50}>
-                            <article className="flex flex-col h-full overflow-hidden transition-all duration-300 border cursor-pointer group glass-card rounded-2xl border-white/10 hover:border-coinlect-accent/30" onClick={() => window.open(newsItem.url, '_blank')}>
+                            <article className="flex flex-col h-full overflow-hidden transition-all duration-300 border cursor-pointer group bg-[#0F0F0F] rounded-2xl border-white/10 hover:border-coinlect-accent/30" onClick={() => window.open(newsItem.url, '_blank')}>
                                 <div className="relative h-48 overflow-hidden bg-black/50">
                                     <img 
                                         src={newsItem.imageUrl} 

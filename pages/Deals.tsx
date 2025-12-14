@@ -98,7 +98,7 @@ export const Deals: React.FC = () => {
         <div className="grid gap-8 mb-20 md:grid-cols-2 lg:grid-cols-3">
             {filteredDeals.map((deal, idx) => (
                 <ScrollReveal key={deal.id} delay={idx * 50}>
-                    <div className="relative flex flex-col h-full p-6 overflow-hidden transition-all duration-300 border group glass-card rounded-2xl border-white/10 hover:border-coinlect-accent/30 hover:-translate-y-1">
+                    <div className="relative flex flex-col h-full p-6 overflow-hidden transition-all duration-300 border group bg-[#0F0F0F] rounded-2xl border-white/10 hover:border-coinlect-accent/30 hover:-translate-y-1">
                         
                         {/* Exclusive Badge */}
                         {deal.exclusive && (

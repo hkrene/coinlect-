@@ -134,29 +134,6 @@ export const Header: React.FC = () => {
 
         {/* Mobile Controls */}
         <div className="flex items-center gap-3 lg:hidden">
-            {/* Language Toggle */}
-            <div className="relative flex items-center">
-              <button 
-                onClick={() => setLanguage('fr')}
-                className={`relative z-10 w-9 h-9 rounded-full border-2 transition-all flex items-center justify-center ${
-                  language === 'fr' 
-                    ? 'border-coinlect-accent bg-black text-gray-200 shadow-[0_0_0_2px_rgba(245,158,11,0.3)]' 
-                    : 'border-white/10 bg-black text-gray-500'
-                }`}
-              >
-                <span className="text-[10px] font-semibold">FR</span>
-              </button>
-              <button 
-                onClick={() => setLanguage('en')}
-                className={`relative -ml-3 z-0 w-9 h-9 rounded-full border-2 transition-all flex items-center justify-center ${
-                  language === 'en' 
-                    ? 'border-coinlect-accent bg-black text-gray-200 shadow-[0_0_0_2px_rgba(245,158,11,0.3)]' 
-                    : 'border-white/10 bg-black text-gray-500'
-                }`}
-              >
-                <span className="text-[10px] font-semibold">EN</span>
-              </button>
-            </div>
             {!isAuthenticated && (
                 <Link href="/donate">
                     <Button className="px-3 py-1.5 text-xs h-8 shadow-none">{t.nav.donate}</Button>
@@ -187,6 +164,33 @@ export const Header: React.FC = () => {
           {isAdmin && (
              <Link href="/admin" className="block py-2 font-bold text-purple-400" onClick={() => setMobileMenuOpen(false)}>Admin Dashboard</Link>
           )}
+
+          {/* Language Toggle in Mobile Menu */}
+          <div className="flex items-center justify-center gap-2 py-4 border-t border-white/10">
+            <span className="text-xs font-semibold tracking-wider text-gray-400 uppercase">Language</span>
+            <div className="relative flex items-center">
+              <button 
+                onClick={() => setLanguage('fr')}
+                className={`relative z-10 w-10 h-10 rounded-full border-2 transition-all flex items-center justify-center ${
+                  language === 'fr' 
+                    ? 'border-coinlect-accent bg-black text-gray-200 shadow-[0_0_0_2px_rgba(245,158,11,0.3)]' 
+                    : 'border-white/10 bg-black text-gray-500'
+                }`}
+              >
+                <span className="text-xs font-semibold">FR</span>
+              </button>
+              <button 
+                onClick={() => setLanguage('en')}
+                className={`relative -ml-3 z-0 w-10 h-10 rounded-full border-2 transition-all flex items-center justify-center ${
+                  language === 'en' 
+                    ? 'border-coinlect-accent bg-black text-gray-200 shadow-[0_0_0_2px_rgba(245,158,11,0.3)]' 
+                    : 'border-white/10 bg-black text-gray-500'
+                }`}
+              >
+                <span className="text-xs font-semibold">EN</span>
+              </button>
+            </div>
+          </div>
 
           <div className="flex flex-col gap-2 mt-2">
             {isAuthenticated ? (
