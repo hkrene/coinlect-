@@ -1,0 +1,288 @@
+'use client';
+
+import React, { useState, useMemo, useEffect } from 'react';
+import { Search, ArrowRight, ChevronDown, Calendar, MapPin } from 'lucide-react';
+import { ScrollReveal } from '../components/ScrollReveal';
+import { eventService } from '../services/db';
+import { Event } from '../types';
+
+const FILTERS = ['All', 'Conference', 'Meetup', 'Web3', 'Workshop', 'Hackathon', 'Mixer'];
+
+export const Events: React.FC = () => {
+  const [events, setEvents] = useState<Event[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [activeFilter, setActiveFilter] = useState('All');
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
+
+  useEffect(() => {
+    setEvents(eventService.getAll());
+  }, []);
+
+  const filteredEvents = useMemo(() => {
+    let filtered = events;
+
+    // Apply search filter
+    if (searchQuery) {
+      filtered = filtered.filter(event =>
+        event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        event.location.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+
+    // Apply type filter
+    if (activeFilter !== 'All') {
+      filtered = filtered.filter(event =>
+        event.type.some(t => t.toLowerCase() === activeFilter.toLowerCase())
+      );
+    }
+
+    return filtered;
+  }, [searchQuery, activeFilter]);
+
+  const paginatedEvents = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    return filteredEvents.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredEvents, currentPage]);
+
+  const totalPages = Math.ceil(filteredEvents.length / itemsPerPage);
+
+  const renderBanner = (event: Event) => {
+    if (event.banner === 'africa-blockchain-festival') {
+      return (
+        <div className="relative h-48 overflow-hidden bg-teal-900 rounded-t-xl">
+          <div className="absolute px-3 py-1 text-xs font-bold text-black bg-orange-500 rounded top-4 right-4">
+            SAVE THE DATE
+          </div>
+          <div className="absolute inset-0 flex flex-col justify-center p-6 text-white">
+            <div className="space-y-1 text-sm font-medium">
+              <div>7th - 9th November 2025</div>
+              <div className="text-xs text-gray-300">Kigali Convention Center, Rwanda</div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    if (event.banner === 'blockf3st-africa') {
+      return (
+        <div className="relative h-48 overflow-hidden bg-blue-900 rounded-t-xl">
+          <div className="absolute inset-0 flex items-center gap-4 p-6 text-white">
+            <div className="flex items-center gap-2">
+              <div className="w-12 h-12 bg-red-500 rounded"></div>
+              <div className="w-12 h-12 bg-blue-500 rounded"></div>
+              <div className="w-12 h-12 bg-yellow-500 rounded"></div>
+              <div className="w-12 h-12 bg-green-500 rounded"></div>
+            </div>
+            <div className="text-lg font-bold">BLOCKF3ST AFRICA</div>
+          </div>
+        </div>
+      );
+    }
+
+    if (event.banner === 'aptos-meet-build') {
+      return (
+        <div className="relative h-48 overflow-hidden bg-blue-800 rounded-t-xl">
+          <div className="absolute inset-0 flex flex-col justify-center p-6 text-white">
+            <div className="mb-2 text-xs font-bold">APTOS</div>
+            <div className="mb-2 text-3xl font-bold">
+              Meet <span className="text-blue-400">Build</span>
+            </div>
+            <div className="text-xs text-gray-300">Opolo Hub, UniBen Benin City, Edo State</div>
+          </div>
+        </div>
+      );
+    }
+
+    if (event.banner === 'aptos-bootcamp') {
+      return (
+        <div className="relative h-48 overflow-hidden rounded-t-xl bg-slate-900">
+          <div className="absolute inset-0 flex flex-col justify-center p-6 text-xs text-white">
+            <div className="mb-2 font-bold">MOVE BOOTCAMP</div>
+            <div className="mb-1 font-semibold text-coinlect-accent">Hackathon Pool: $100,000 USD</div>
+            <div className="text-gray-400 space-y-0.5">
+              <div>Main Track: Build The Future Of Defi On Aptos</div>
+              <div>Best Tech Implementation</div>
+              <div>Top University Team</div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    if (event.banner === 'mantle-meetup') {
+      return (
+        <div className="relative h-48 overflow-hidden rounded-t-xl bg-gradient-to-br from-pink-400 via-pink-300 to-green-400">
+          <div className="absolute inset-0 flex flex-col justify-center p-6 text-black">
+            <div className="mb-2 text-sm font-bold">Developer Meetup with Mantle</div>
+            <div className="space-y-1 text-xs">
+              <div>10:00 AM - 3:00 PM</div>
+              <div>5th July, 2025</div>
+              <div>Cafe One, Yaba, Lagos</div>
+            </div>
+            <div className="absolute w-16 h-16 rounded-lg bottom-4 right-4 bg-green-500/30"></div>
+          </div>
+        </div>
+      );
+    }
+
+    if (event.banner === 'stellar-wacon') {
+      return (
+        <div className="relative h-48 overflow-hidden bg-gray-800 rounded-t-xl">
+          <div className="absolute inset-0 flex flex-col justify-center p-6 text-white">
+            <div className="mb-2 text-xs font-bold text-gray-400">Stellar West Africa Conference 2025</div>
+            <div className="mb-4 text-2xl font-bold">Where Blockchain Meets the Real World</div>
+            <div className="space-y-1 text-xs text-gray-300">
+              <div className="flex items-center gap-2">
+                <Calendar size={14} />
+                <span>May 31st, 2025.</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <MapPin size={14} />
+                <span>Lagos, Nigeria</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className="relative h-48 overflow-hidden bg-gray-800 rounded-t-xl">
+        <div className="absolute inset-0 flex items-center justify-center p-6 text-white">
+          <div className="text-sm">{event.title}</div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="min-h-screen bg-[#0a0a0a] pt-24 pb-20">
+      <div className="container px-6 mx-auto max-w-7xl">
+        {/* Header Section */}
+        <div className="mb-8">
+          <div className="flex flex-col gap-6 mb-6 md:flex-row md:items-center md:justify-between">
+            <h1 className="text-4xl font-extrabold text-white md:text-5xl">
+              UPCOMING EVENTS
+            </h1>
+            
+            {/* Search Bar */}
+            <div className="relative w-full max-w-md">
+              <Search className="absolute text-gray-400 transform -translate-y-1/2 left-4 top-1/2" size={20} />
+              <input
+                type="text"
+                placeholder="Search events..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full py-3 pl-12 pr-4 text-white placeholder-gray-500 transition-colors border rounded-lg bg-black/50 border-white/10 focus:outline-none focus:border-coinlect-accent"
+              />
+            </div>
+          </div>
+
+          {/* Filter Buttons */}
+          <div className="flex flex-wrap gap-3">
+            {FILTERS.map((filter) => (
+              <button
+                key={filter}
+                onClick={() => {
+                  setActiveFilter(filter);
+                  setCurrentPage(1);
+                }}
+                className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${
+                  activeFilter === filter
+                    ? 'bg-coinlect-accent text-black'
+                    : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10 hover:text-white'
+                }`}
+              >
+                {filter}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Events Grid */}
+        <div className="grid grid-cols-1 gap-6 mb-12 md:grid-cols-2 lg:grid-cols-3">
+          {paginatedEvents.map((event) => (
+            <ScrollReveal key={event.id}>
+              <div className="overflow-hidden transition-all border cursor-pointer group bg-black/50 border-white/10 rounded-xl hover:border-coinlect-accent/50">
+                {renderBanner(event)}
+                
+                <div className="p-6">
+                  {/* Event Type Badge */}
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {event.type.map((type, idx) => (
+                      <span
+                        key={idx}
+                        className="px-3 py-1 text-xs font-bold tracking-wider text-gray-400 uppercase border rounded-full bg-white/5 border-white/10"
+                      >
+                        {type}
+                      </span>
+                    ))}
+                  </div>
+
+                  {/* Event Title */}
+                  <h3 className="mb-4 text-xl font-bold text-white transition-colors line-clamp-2 group-hover:text-coinlect-accent">
+                    {event.title}
+                  </h3>
+
+                  {/* Event Details */}
+                  <div className="mb-6 space-y-3">
+                    <div className="flex items-start gap-3 text-sm text-gray-400">
+                      <Calendar className="mt-0.5 flex-shrink-0" size={16} />
+                      <span>{event.date}</span>
+                    </div>
+                    <div className="flex items-start gap-3 text-sm text-gray-400">
+                      <MapPin className="mt-0.5 flex-shrink-0" size={16} />
+                      <span>{event.location}</span>
+                    </div>
+                  </div>
+
+                  {/* Arrow Button */}
+                  <div className="flex justify-end">
+                    <div className="flex items-center justify-center w-10 h-10 transition-all border rounded-full bg-white/5 border-white/10 group-hover:bg-coinlect-accent group-hover:border-coinlect-accent">
+                      <ArrowRight className="text-gray-400 transition-colors group-hover:text-black" size={20} />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ScrollReveal>
+          ))}
+        </div>
+
+        {/* Pagination */}
+        <div className="flex items-center justify-between pt-8 border-t border-white/10">
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-gray-400">Page</span>
+            <div className="relative">
+              <select
+                value={currentPage}
+                onChange={(e) => setCurrentPage(Number(e.target.value))}
+                aria-label="Select page number"
+                className="px-4 py-2 pr-8 text-sm text-white border rounded-lg appearance-none cursor-pointer bg-black/50 border-white/10 focus:outline-none focus:border-coinlect-accent"
+              >
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                  <option key={page} value={page} className="bg-black">
+                    {page}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="absolute text-gray-400 transform -translate-y-1/2 pointer-events-none right-2 top-1/2" size={16} />
+            </div>
+            <span className="text-sm text-gray-400">of {totalPages}</span>
+          </div>
+
+          <button
+            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+            disabled={currentPage >= totalPages}
+            className="flex items-center gap-2 px-6 py-2 font-semibold text-black transition-colors rounded-lg bg-coinlect-accent hover:bg-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Next <ArrowRight size={16} />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Events;
+

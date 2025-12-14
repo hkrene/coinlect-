@@ -51,6 +51,7 @@ export const Footer: React.FC = () => {
                         <li><Link href="/trends" className="hover:text-coinlect-accent">{t.nav.trends}</Link></li>
                         <li><Link href="/academy" className="hover:text-coinlect-accent">{t.nav.academy}</Link></li>
                         <li><Link href="/deals" className="hover:text-coinlect-accent">{t.nav.deals}</Link></li>
+                        <li><Link href="/events" className="hover:text-coinlect-accent">{t.nav.events}</Link></li>
                         <li><Link href="/register" className="hover:text-coinlect-accent">{t.nav.register}</Link></li>
                     </ul>
                 </div>

@@ -3,23 +3,24 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
-import { userService, courseService, articleService } from '../services/db';
-import { User, Course, Article, SyllabusItem } from '../types';
+import { userService, courseService, articleService, eventService } from '../services/db';
+import { User, Course, Article, Event, SyllabusItem } from '../types';
 import { Button } from '../components/Button';
-import { Trash2, Plus, Users, BookOpen, FileText, LayoutDashboard, X, Check, Globe, Shield, Star, Play, HelpCircle } from 'lucide-react';
+import { Trash2, Plus, Users, BookOpen, FileText, LayoutDashboard, X, Check, Globe, Shield, Star, Play, HelpCircle, Calendar } from 'lucide-react';
 
 export const AdminDashboard: React.FC = () => {
   const { user, isAdmin } = useAuth();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'courses' | 'articles'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'courses' | 'articles' | 'events'>('overview');
   const [users, setUsers] = useState<User[]>([]);
   const [courses, setCourses] = useState<Course[]>([]);
   const [articles, setArticles] = useState<Article[]>([]);
+  const [events, setEvents] = useState<Event[]>([]);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // Modals
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalType, setModalType] = useState<'course' | 'article' | null>(null);
+  const [modalType, setModalType] = useState<'course' | 'article' | 'event' | null>(null);
 
   // Complex Form State
   // Added courseType: 'academy' to satisfy missing property requirement in Omit<Course, 'id'>
@@ -49,11 +50,22 @@ export const AdminDashboard: React.FC = () => {
     featured: false
   });
 
+  const [eventForm, setEventForm] = useState<Omit<Event, 'id'>>({
+    title: '',
+    date: '',
+    location: '',
+    type: [],
+    banner: 'africa-blockchain-festival',
+    bannerText: '',
+    description: ''
+  });
+
   useEffect(() => {
     if (!isAdmin) router.push('/');
     setUsers(userService.getAll());
     setCourses(courseService.getAll());
     setArticles(articleService.getAll());
+    setEvents(eventService.getAll());
   }, [isAdmin, router, refreshTrigger]);
 
   const toggleUserRole = (id: string) => {
@@ -117,6 +129,31 @@ export const AdminDashboard: React.FC = () => {
     setRefreshTrigger(p => p + 1);
   };
 
+  const handleSaveEvent = (e: React.FormEvent) => {
+    e.preventDefault();
+    eventService.add(eventForm);
+    setIsModalOpen(false);
+    setRefreshTrigger(p => p + 1);
+    setEventForm({
+      title: '',
+      date: '',
+      location: '',
+      type: [],
+      banner: 'africa-blockchain-festival',
+      bannerText: '',
+      description: ''
+    });
+  };
+
+  const toggleEventType = (type: string) => {
+    const types = eventForm.type;
+    if (types.includes(type)) {
+      setEventForm({ ...eventForm, type: types.filter(t => t !== type) });
+    } else {
+      setEventForm({ ...eventForm, type: [...types, type] });
+    }
+  };
+
   if (!isAdmin) return null;
 
   return (
@@ -136,6 +173,9 @@ export const AdminDashboard: React.FC = () => {
           <button onClick={() => setActiveTab('articles')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${activeTab === 'articles' ? 'bg-coinlect-accent text-black font-bold' : 'text-gray-400 hover:bg-white/5'}`}>
             <FileText size={18} /> Articles
           </button>
+          <button onClick={() => setActiveTab('events')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${activeTab === 'events' ? 'bg-coinlect-accent text-black font-bold' : 'text-gray-400 hover:bg-white/5'}`}>
+            <Calendar size={18} /> Événements
+          </button>
         </div>
       </aside>
 
@@ -147,7 +187,8 @@ export const AdminDashboard: React.FC = () => {
               {[
                 { label: 'Utilisateurs', val: users.length, icon: <Users />, color: 'text-blue-500' },
                 { label: 'Cours', val: courses.length, icon: <BookOpen />, color: 'text-coinlect-accent' },
-                { label: 'Articles', val: articles.length, icon: <FileText />, color: 'text-purple-500' }
+                { label: 'Articles', val: articles.length, icon: <FileText />, color: 'text-purple-500' },
+                { label: 'Événements', val: events.length, icon: <Calendar />, color: 'text-green-500' }
               ].map((card, i) => (
                 <div key={i} className="bg-[#111] p-6 rounded-xl border border-white/10 flex items-center justify-between">
                   <div>
@@ -248,6 +289,35 @@ export const AdminDashboard: React.FC = () => {
             </div>
           </div>
         )}
+
+        {activeTab === 'events' && (
+          <div className="space-y-6 animate-in fade-in">
+            <div className="flex items-center justify-between">
+              <h1 className="text-3xl font-bold">Gestion des Événements</h1>
+              <Button onClick={() => { setModalType('event'); setIsModalOpen(true); }}><Plus size={16} /> Créer un Événement</Button>
+            </div>
+            <div className="grid gap-4">
+              {events.map(e => (
+                <div key={e.id} className="bg-[#111] p-4 rounded-xl border border-white/10 flex justify-between items-center group">
+                  <div className="flex items-center gap-4">
+                    <div className="flex flex-wrap gap-1">
+                      {e.type.map((t, idx) => (
+                        <span key={idx} className="px-2 py-1 text-[10px] font-bold text-gray-400 uppercase bg-white/5 rounded">{t}</span>
+                      ))}
+                    </div>
+                    <div>
+                      <h4 className="font-bold text-white line-clamp-1">{e.title}</h4>
+                      <p className="text-[10px] text-gray-500">{e.date} • {e.location}</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    <button onClick={() => { eventService.delete(e.id); setRefreshTrigger(t => t+1); }} className="p-2 text-red-500 transition-colors hover:text-red-400" aria-label="Delete event"><Trash2 size={18} /></button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </main>
 
       {/* MODAL SYSTEM */}
@@ -256,7 +326,9 @@ export const AdminDashboard: React.FC = () => {
           <div className="bg-[#111] border border-white/10 rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-[0_0_50px_rgba(0,0,0,0.8)]">
             <div className="p-6 border-b border-white/10 flex justify-between items-center bg-[#161616]">
               <h2 className="flex items-center gap-2 text-xl font-bold">
-                {modalType === 'course' ? <><BookOpen className="text-coinlect-accent" /> Nouveau Cours Expert</> : <><FileText className="text-purple-500" /> Nouvel Article</>}
+                {modalType === 'course' ? <><BookOpen className="text-coinlect-accent" /> Nouveau Cours Expert</> : 
+                 modalType === 'article' ? <><FileText className="text-purple-500" /> Nouvel Article</> :
+                 <><Calendar className="text-green-500" /> Nouvel Événement</>}
               </h2>
               <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-white" aria-label="Close modal"><X size={24} /></button>
             </div>
@@ -349,7 +421,7 @@ export const AdminDashboard: React.FC = () => {
                     <Button type="submit" className="w-1/2 shadow-xl shadow-coinlect-accent/20">Publier le Cours</Button>
                   </div>
                 </form>
-              ) : (
+              ) : modalType === 'article' ? (
                 <form onSubmit={handleSaveArticle} className="space-y-6">
                    <div className="flex items-center justify-between mb-6">
                       <label className="flex items-center gap-3 px-4 py-2 border cursor-pointer bg-white/5 rounded-xl border-white/10">
@@ -368,6 +440,83 @@ export const AdminDashboard: React.FC = () => {
                      <Button type="button" variant="outline" className="w-1/2" onClick={() => setIsModalOpen(false)}>Annuler</Button>
                      <Button type="submit" className="w-1/2">Publier l&apos;Article</Button>
                    </div>
+                </form>
+              ) : (
+                <form onSubmit={handleSaveEvent} className="space-y-6">
+                  <input 
+                    required 
+                    placeholder="Titre de l'événement" 
+                    className="w-full p-4 text-xl font-bold text-white bg-black border outline-none border-white/10 rounded-xl focus:border-coinlect-accent" 
+                    value={eventForm.title}
+                    onChange={e => setEventForm({...eventForm, title: e.target.value})} 
+                  />
+                  <div className="grid grid-cols-2 gap-4">
+                    <input 
+                      required 
+                      placeholder="Date (ex: Friday, November 7, 2025)" 
+                      className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl focus:border-coinlect-accent" 
+                      value={eventForm.date}
+                      onChange={e => setEventForm({...eventForm, date: e.target.value})} 
+                    />
+                    <input 
+                      required 
+                      placeholder="Lieu" 
+                      className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl focus:border-coinlect-accent" 
+                      value={eventForm.location}
+                      onChange={e => setEventForm({...eventForm, location: e.target.value})} 
+                    />
+                  </div>
+                  <div className="space-y-3">
+                    <label className="block text-sm font-bold text-gray-400">Type d'événement</label>
+                    <div className="flex flex-wrap gap-2">
+                      {['CONFERENCE', 'MEETUP', 'WEB3', 'WORKSHOP', 'HACKATHON', 'MIXER'].map(type => (
+                        <button
+                          key={type}
+                          type="button"
+                          onClick={() => toggleEventType(type)}
+                          className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${
+                            eventForm.type.includes(type)
+                              ? 'bg-coinlect-accent text-black'
+                              : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
+                          }`}
+                        >
+                          {type}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <label className="block text-sm font-bold text-gray-400">Style de bannière</label>
+                    <select 
+                      aria-label="Banner style"
+                      className="w-full p-4 text-white bg-black border outline-none border-white/10 rounded-xl focus:border-coinlect-accent" 
+                      value={eventForm.banner}
+                      onChange={e => setEventForm({...eventForm, banner: e.target.value})}
+                    >
+                      <option value="africa-blockchain-festival">Africa Blockchain Festival</option>
+                      <option value="blockf3st-africa">Blockf3st Africa</option>
+                      <option value="aptos-meet-build">Aptos Meet & Build</option>
+                      <option value="aptos-bootcamp">Aptos Bootcamp</option>
+                      <option value="mantle-meetup">Mantle Meetup</option>
+                      <option value="stellar-wacon">Stellar WACON</option>
+                    </select>
+                  </div>
+                  <textarea 
+                    placeholder="Texte de la bannière (optionnel, utilisez \\n pour les sauts de ligne)" 
+                    className="w-full h-24 p-4 text-white bg-black border outline-none border-white/10 rounded-xl" 
+                    value={eventForm.bannerText}
+                    onChange={e => setEventForm({...eventForm, bannerText: e.target.value})} 
+                  />
+                  <textarea 
+                    placeholder="Description (optionnel)" 
+                    className="w-full h-32 p-4 text-white bg-black border outline-none border-white/10 rounded-xl" 
+                    value={eventForm.description}
+                    onChange={e => setEventForm({...eventForm, description: e.target.value})} 
+                  />
+                  <div className="flex gap-4 pt-4">
+                    <Button type="button" variant="outline" className="w-1/2" onClick={() => setIsModalOpen(false)}>Annuler</Button>
+                    <Button type="submit" className="w-1/2">Créer l&apos;Événement</Button>
+                  </div>
                 </form>
               )}
             </div>

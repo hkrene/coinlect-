@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { ARTICLES_DATA } from '../mockData';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -15,6 +15,15 @@ export const About: React.FC = () => {
   // Static latest list or you could rotate this too, but usually list stays constant or paginates separately.
   // We'll keep the list static for now as "Recent".
   const latest = ARTICLES_DATA.filter(a => a.id !== featured.id).slice(0, 5);
+
+  // Auto-switch articles every 5 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % ARTICLES_DATA.length);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   const nextSlide = () => {
     setCurrentIndex((prev) => (prev + 1) % ARTICLES_DATA.length);

@@ -1,5 +1,5 @@
 
-import { User, Course, Article } from '../types';
+import { User, Course, Article, Event } from '../types';
 import { COURSES_DATA, ARTICLES_DATA, DEALS_DATA, Deal } from '../mockData';
 
 const STORAGE_KEYS = {
@@ -7,6 +7,7 @@ const STORAGE_KEYS = {
   COURSES: 'coinlect_courses',
   ARTICLES: 'coinlect_articles',
   DEALS: 'coinlect_deals',
+  EVENTS: 'coinlect_events',
   SESSION: 'coinlect_session'
 };
 
@@ -20,6 +21,67 @@ const initData = () => {
     localStorage.setItem(STORAGE_KEYS.ARTICLES, JSON.stringify(ARTICLES_DATA));
   }
   localStorage.setItem(STORAGE_KEYS.DEALS, JSON.stringify(DEALS_DATA));
+  
+  // Initialize events with default data if not exists
+  if (!localStorage.getItem(STORAGE_KEYS.EVENTS)) {
+    const defaultEvents: Event[] = [
+      {
+        id: 1,
+        title: 'Africa Blockchain Festival 2025',
+        date: 'Friday, November 7, 2025',
+        location: 'Kigali Convention Center, Rwanda',
+        type: ['CONFERENCE'],
+        banner: 'africa-blockchain-festival',
+        bannerText: 'SAVE THE DATE\n7th - 9th November 2025\nKigali Convention Center, Rwanda'
+      },
+      {
+        id: 2,
+        title: 'Blockf3st Africa 2025',
+        date: 'Saturday, October 11, 2025',
+        location: 'Please register to see the exact location of this event.',
+        type: ['MEETUP', 'CONFERENCE', 'WEB3'],
+        banner: 'blockf3st-africa',
+        bannerText: 'BLOCKF3ST AFRICA'
+      },
+      {
+        id: 3,
+        title: 'Aptos Meet & Build, Edo',
+        date: 'Saturday, September 20, 2025',
+        location: 'Opolo Hub, Uniben Benin City, Edo State',
+        type: ['WORKSHOP'],
+        banner: 'aptos-meet-build',
+        bannerText: 'APTOS\nMeet Build\nOpolo Hub, UniBen Benin City, Edo State'
+      },
+      {
+        id: 4,
+        title: 'Aptos Africa BOOTCAMP',
+        date: 'Monday, August 25, 2025',
+        location: 'Virtual',
+        type: ['HACKATHON', 'WORKSHOP'],
+        banner: 'aptos-bootcamp',
+        bannerText: 'MOVE BOOTCAMP\nHackathon Pool: $100,000 USD'
+      },
+      {
+        id: 5,
+        title: 'Developer Meetup with Mantle',
+        date: 'Saturday, July 5, 2025',
+        location: 'Cafe One Yaba',
+        type: ['MEETUP', 'WORKSHOP'],
+        banner: 'mantle-meetup',
+        bannerText: 'Developer Meetup with Mantle\n10:00 AM - 3:00 PM\n5th July, 2025\nCafe One, Yaba, Lagos'
+      },
+      {
+        id: 6,
+        title: '#StellarWACon25- Where Blockchain Meets the Real World',
+        date: 'Saturday, May 31, 2025',
+        location: 'The zone, Gbagada expressway, Lagos.',
+        type: ['CONFERENCE'],
+        banner: 'stellar-wacon',
+        bannerText: 'Stellar West Africa Conference 2025\nWhere Blockchain Meets the Real World\nMay 31st, 2025.\nLagos, Nigeria'
+      }
+    ];
+    localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(defaultEvents));
+  }
   
   if (!localStorage.getItem(STORAGE_KEYS.USERS)) {
     const adminUser: User = {
@@ -123,5 +185,24 @@ export const dealService = {
   getAll: (): Deal[] => {
     if (typeof window === 'undefined') return [];
     return JSON.parse(localStorage.getItem(STORAGE_KEYS.DEALS) || '[]');
+  }
+};
+
+export const eventService = {
+  getAll: (): Event[] => {
+    if (typeof window === 'undefined') return [];
+    return JSON.parse(localStorage.getItem(STORAGE_KEYS.EVENTS) || '[]');
+  },
+  add: (event: Omit<Event, 'id'>) => {
+    const events = eventService.getAll();
+    const newEvent = { ...event, id: Date.now() };
+    events.unshift(newEvent as Event);
+    localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(events));
+    return newEvent;
+  },
+  delete: (id: number) => {
+    let events = eventService.getAll();
+    events = events.filter(e => e.id !== id);
+    localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(events));
   }
 };

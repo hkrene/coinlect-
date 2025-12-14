@@ -6,14 +6,14 @@ import { ScrollReveal } from './ScrollReveal';
 import { useLanguage } from '../contexts/LanguageContext';
 
 const partners: Partner[] = [
-  { name: 'Binance', description: 'Leader mondial des échanges.', logo: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765268653/binance_wice95.png' },
-  { name: 'OKX', description: 'Services de trading Web3.', logo: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765268654/okx_tofb2z.png' },
-  { name: 'Bybit', description: 'Produits dérivés crypto.', logo: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765268654/byit_lc7stv.png' },
-  { name: 'Kucoin', description: 'La bourse du peuple.', logo: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765268654/kucoin_sbnxez.png' },
-  { name: 'Mexc', description: 'Nouvelles pépites crypto.', logo: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765268654/mexc_w3lupl.png' },
-  { name: 'Maxus Chain', description: 'Solution blockchain scalable.', logo: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765268653/maxus_zx68dt.png' },
-  { name: 'Weex', description: 'Trading sécurisé.', logo: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765268654/weex_weulov.png' },
-  { name: 'Mbiyopay', description: 'Paiement mobile Afrique.', logo: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765268654/mbiyopay_gll2cd.png' },
+  { name: 'Binance', description: 'Binance est une plateforme crypto mondiale offrant des outils fiables pour trader et gérer des actifs numériques.', logo: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765268653/binance_wice95.png' },
+  { name: 'OKX', description: 'OKX est une plateforme crypto mondiale offrant des outils fiables pour trader et gérer des actifs numériques pro.', logo: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765268654/okx_tofb2z.png' },
+  { name: 'Bybit', description: 'Bybit est une plateforme crypto mondiale offrant des outils fiables pour trader et gérer des actifs numériques.', logo: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765268654/byit_lc7stv.png' },
+  { name: 'Kucoin', description: 'Kucoin est une plateforme crypto mondiale offrant fiables pour trader et gérer des actifs numériques.', logo: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765268654/kucoin_sbnxez.png' },
+  { name: 'Mexc', description: 'MEXC est une plateforme crypto mondiale offrant des outils fiables pour trader et gérer des actifs numériques ++.', logo: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765268654/mexc_w3lupl.png' },
+  { name: 'Maxuschain', description: 'Maxuschain est une plateforme crypto congolaise facilitant l\'accès aux actifs numériques.', logo: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765268653/maxus_zx68dt.png' },
+  { name: 'Weex', description: 'Weex est une plateforme crypto mondiale offrant des outils fiables pour trader et gérer des actifs numériques', logo: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765268654/weex_weulov.png' },
+  { name: 'Mbiyopay', description: 'MbiyoPay est une plateforme fintech africaine simplifiant palements numériques, les transferts d\'argent et les solutions de palement mobile et crypto.', logo: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765268654/mbiyopay_gll2cd.png' },
 ];
 
 interface PartnerCardProps {
@@ -22,12 +22,12 @@ interface PartnerCardProps {
 }
 
 const PartnerCard: React.FC<PartnerCardProps> = ({ partner, index }) => (
-  <div className="w-[160px] md:w-[240px] flex-shrink-0 group glass-card p-4 md:p-6 rounded-xl hover:bg-white/5 transition-all duration-300 border border-white/5 hover:border-coinlect-accent/30 relative overflow-hidden flex flex-col items-center text-center cursor-pointer bg-[#111]">
-      <div className="flex items-center justify-center w-20 h-10 mb-3">
-          <img src={partner.logo} alt={partner.name} className="object-contain max-w-full max-h-full transition-transform duration-300 filter group-hover:scale-110" />
+  <div className="w-[120px] md:w-[280px] flex-shrink-0 group p-4 md:p-6 rounded-xl transition-all duration-300 border border-white/20 hover:border-coinlect-accent relative overflow-hidden flex flex-col cursor-pointer bg-black">
+      <div className="flex items-center justify-center h-12 mb-0 md:justify-start md:h-8 md:mb-3">
+          <img src={partner.logo} alt={partner.name} className="object-contain max-h-full transition-transform duration-300 filter group-hover:scale-110" />
       </div>
-      <h3 className="mb-1 text-sm font-bold text-white md:text-base">{partner.name}</h3>
-      <p className="text-[10px] text-gray-500 leading-tight hidden md:block">{partner.description}</p>
+      <h3 className="hidden mb-2 text-sm font-semibold text-left text-white md:block md:text-base">{partner.name}</h3>
+      <p className="hidden md:block text-[10px] md:text-xs text-gray-400 leading-relaxed text-left">{partner.description}</p>
   </div>
 );
 
@@ -63,24 +63,27 @@ export const Partners: React.FC = () => {
         <ScrollReveal delay={200}>
             <div className="relative flex flex-col items-center justify-center mb-12">
                 {/* Center "Powered by" box */}
-                <div className="relative z-20 border border-white/20 rounded-lg px-6 py-2 bg-[#111] shadow-lg">
+                <div className="relative z-20 border border-coinlect-accent/50 rounded-lg px-6 py-2 bg-[#111] shadow-lg">
                     <span className="text-xs font-semibold tracking-widest text-gray-300 uppercase">Powered by</span>
                 </div>
                 
-                {/* The Bracket Line Structure */}
-                <div className="absolute top-[50%] left-0 right-0 h-[50px] pointer-events-none">
+                {/* The Bracket Line Structure - Updated to point to partner cards */}
+                <div className="absolute top-[50%] left-0 right-0 h-[60px] pointer-events-none">
                     {/* Vertical connecting line from box */}
-                    <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[25px] w-[1px] bg-white/20"></div>
+                    <div className="absolute top-0 left-1/2 -translate-x-1/2 h-[30px] w-[1px] bg-white/20"></div>
 
-                    {/* Horizontal fork line */}
-                    <div className="absolute top-[25px] left-[10%] right-[10%] h-[1px] bg-white/20"></div>
+                    {/* Horizontal fork line extending to both sides */}
+                    <div className="absolute top-[30px] left-[5%] right-[5%] h-[1px] bg-white/20"></div>
 
-                    {/* Vertical drops at ends of fork */}
-                    <div className="absolute top-[25px] left-[10%] h-[25px] w-[1px] bg-gradient-to-b from-white/20 to-transparent"></div>
-                    <div className="absolute top-[25px] right-[10%] h-[25px] w-[1px] bg-gradient-to-b from-white/20 to-transparent"></div>
+                    {/* Left vertical drop line pointing to first row */}
+                    <div className="absolute top-[30px] left-[5%] h-[30px] w-[1px] bg-gradient-to-b from-white/20 to-transparent">
+                        <div className="absolute bottom-0 w-2 h-2 -translate-x-1/2 bg-transparent border rounded-full left-1/2 border-white/30"></div>
+                    </div>
                     
-                    {/* Center drop line */}
-                    <div className="absolute top-[25px] left-1/2 -translate-x-1/2 h-[25px] w-[1px] bg-gradient-to-b from-white/20 to-transparent"></div>
+                    {/* Right vertical drop line pointing to second row - highlighted */}
+                    <div className="absolute top-[30px] right-[5%] h-[30px] w-[1px] bg-gradient-to-b from-coinlect-accent/50 to-transparent">
+                        <div className="absolute bottom-0 w-2 h-2 -translate-x-1/2 bg-transparent border rounded-full left-1/2 border-coinlect-accent/50"></div>
+                    </div>
                 </div>
             </div>
         </ScrollReveal>

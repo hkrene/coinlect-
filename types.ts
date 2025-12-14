@@ -55,6 +55,17 @@ export interface Article {
   featured: boolean;
 }
 
+export interface Event {
+  id: number;
+  title: string;
+  date: string;
+  location: string;
+  type: string[];
+  banner: string;
+  bannerText?: string;
+  description?: string;
+}
+
 /**
  * Interface for navigation links used in the Header
  */
