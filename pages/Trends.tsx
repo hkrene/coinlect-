@@ -186,14 +186,8 @@ export const Trends: React.FC = () => {
             <div className="flex flex-col items-end justify-between gap-4 md:flex-row">
                 <div>
                     <h1 className="mb-4 text-4xl font-bold">Market <span className="text-coinlect-accent">Trends</span></h1>
-                    <p className="text-gray-400">Real-time data powered by CoinGecko API.</p>
                 </div>
                 <div className="flex items-center gap-4">
-                    {lastUpdate && (
-                        <span className="text-xs text-gray-500">
-                            Last updated: {lastUpdate.toLocaleTimeString()}
-                        </span>
-                    )}
                     <button 
                         onClick={() => { setLoading(true); fetchMarketData(); fetchNews(); }}
                         className="p-2 transition-colors border rounded-full bg-white/5 hover:bg-white/10 border-white/10"
@@ -232,11 +226,11 @@ export const Trends: React.FC = () => {
                         <table className="w-full text-left border-collapse">
                             <thead className="text-xs font-semibold tracking-wider text-gray-500 uppercase border-b bg-white/5 border-white/10">
                                 <tr>
-                                    <th className="p-6 pl-8">Asset</th>
-                                    <th className="p-6 text-right">Price</th>
-                                    <th className="p-6 text-right">24h Change</th>
-                                    <th className="hidden p-6 text-right md:table-cell">24h Volume</th>
-                                    <th className="hidden p-6 text-right lg:table-cell">Market Cap</th>
+                                    <th className="p-3 pl-4 pr-2 text-left md:p-6 md:pl-8 md:pr-6">Asset</th>
+                                    <th className="p-3 px-2 text-right md:p-6 md:px-6">Price</th>
+                                    <th className="p-3 px-2 text-right md:p-6 md:px-6">24h Change</th>
+                                    <th className="p-3 px-2 text-right md:p-6 md:px-6">24h Volume</th>
+                                    <th className="p-3 pl-2 pr-4 text-right md:p-6 md:pl-6 md:pr-8">Market Cap</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-white/5">
@@ -244,43 +238,43 @@ export const Trends: React.FC = () => {
                                     // Skeleton Loader
                                     Array.from({ length: 10 }).map((_, i) => (
                                         <tr key={i} className="animate-pulse">
-                                            <td className="p-6 pl-8"><div className="w-32 h-10 rounded bg-white/5"></div></td>
-                                            <td className="p-6"><div className="w-20 h-6 ml-auto rounded bg-white/5"></div></td>
-                                            <td className="p-6"><div className="w-16 h-6 ml-auto rounded bg-white/5"></div></td>
-                                            <td className="hidden p-6 md:table-cell"><div className="w-24 h-6 ml-auto rounded bg-white/5"></div></td>
-                                            <td className="hidden p-6 lg:table-cell"><div className="h-6 ml-auto rounded w-28 bg-white/5"></div></td>
+                                            <td className="p-3 pl-4 pr-2 md:p-6 md:pl-8 md:pr-6"><div className="w-32 h-10 rounded bg-white/5"></div></td>
+                                            <td className="p-3 px-2 md:p-6 md:px-6"><div className="w-20 h-6 ml-auto rounded bg-white/5"></div></td>
+                                            <td className="p-3 px-2 md:p-6 md:px-6"><div className="w-16 h-6 ml-auto rounded bg-white/5"></div></td>
+                                            <td className="p-3 px-2 md:p-6 md:px-6"><div className="w-24 h-6 ml-auto rounded bg-white/5"></div></td>
+                                            <td className="p-3 pl-2 pr-4 md:p-6 md:pl-6 md:pr-8"><div className="h-6 ml-auto rounded w-28 bg-white/5"></div></td>
                                         </tr>
                                     ))
                                 ) : (
                                     coins.map((coin) => (
                                         <tr key={coin.id} className="transition-colors hover:bg-white/5 group">
-                                            <td className="p-6 pl-8">
-                                                <div className="flex items-center gap-4">
+                                            <td className="p-3 pl-4 pr-2 md:p-6 md:pl-8 md:pr-6">
+                                                <div className="flex items-center gap-2 md:gap-4">
                                                     <span className="hidden w-6 font-mono text-sm text-gray-600 md:block">#{coin.market_cap_rank}</span>
-                                                    <img src={coin.image} alt={coin.name} className="w-8 h-8 transition-transform duration-300 rounded-full shadow-lg group-hover:scale-110" />
+                                                    <img src={coin.image} alt={coin.name} className="w-6 h-6 transition-transform duration-300 rounded-full shadow-lg md:w-8 md:h-8 group-hover:scale-110" />
                                                     <div>
                                                         {/* Full name hidden on mobile */}
                                                         <div className="hidden text-sm font-bold text-white transition-colors group-hover:text-coinlect-accent md:block">{coin.name}</div>
                                                         {/* Ticker prominent on mobile, gray on desktop */}
-                                                        <div className="text-sm font-bold text-white uppercase md:text-xs md:text-gray-500 md:font-normal">{coin.symbol}</div>
+                                                        <div className="text-xs font-bold text-white uppercase md:text-gray-500 md:font-normal">{coin.symbol}</div>
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="p-6 text-right">
-                                                <div className="font-mono font-medium tracking-tight text-white">
+                                            <td className="p-3 px-2 text-right md:p-6 md:px-6">
+                                                <div className="font-mono text-xs font-medium tracking-tight text-white md:text-sm">
                                                     {formatCurrency(coin.current_price)}
                                                 </div>
                                             </td>
-                                            <td className="p-6 text-right">
-                                                <div className={`inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full border ${coin.price_change_percentage_24h >= 0 ? 'text-green-400 border-green-500/20 bg-green-500/10' : 'text-red-400 border-red-500/20 bg-red-500/10'}`}>
-                                                    {coin.price_change_percentage_24h >= 0 ? <ArrowUpRight size={12} strokeWidth={3} /> : <ArrowDownRight size={12} strokeWidth={3} />}
+                                            <td className="p-3 px-2 text-right md:p-6 md:px-6">
+                                                <div className={`inline-flex items-center gap-1 text-[10px] md:text-xs font-bold ${coin.price_change_percentage_24h >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                                    {coin.price_change_percentage_24h >= 0 ? <ArrowUpRight size={10} strokeWidth={3} className="md:w-3 md:h-3" /> : <ArrowDownRight size={10} strokeWidth={3} className="md:w-3 md:h-3" />}
                                                     {Math.abs(coin.price_change_percentage_24h).toFixed(2)}%
                                                 </div>
                                             </td>
-                                            <td className="hidden p-6 font-mono text-sm text-right text-gray-400 md:table-cell">
+                                            <td className="p-3 px-2 font-mono text-xs text-right text-gray-400 md:text-sm md:p-6 md:px-6">
                                                 ${formatCompactNumber(coin.total_volume)}
                                             </td>
-                                            <td className="hidden p-6 font-mono text-sm text-right text-gray-400 lg:table-cell">
+                                            <td className="p-3 pl-2 pr-4 font-mono text-xs text-right text-gray-400 md:text-sm md:p-6 md:pl-6 md:pr-8">
                                                 ${formatCompactNumber(coin.market_cap)}
                                             </td>
                                         </tr>

@@ -4,9 +4,9 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { userService, courseService, articleService, eventService } from '../services/db';
-import { User, Course, Article, Event, SyllabusItem } from '../types';
+import { User, Course, Article, Event } from '../types';
 import { Button } from '../components/Button';
-import { Trash2, Plus, Users, BookOpen, FileText, LayoutDashboard, X, Check, Globe, Shield, Star, Play, HelpCircle, Calendar } from 'lucide-react';
+import { Trash2, Plus, Users, BookOpen, FileText, LayoutDashboard, X, Check, Calendar } from 'lucide-react';
 
 export const AdminDashboard: React.FC = () => {
   const { user, isAdmin } = useAuth();
@@ -73,37 +73,6 @@ export const AdminDashboard: React.FC = () => {
     setRefreshTrigger(p => p + 1);
   };
 
-  const handleAddSyllabusItem = () => {
-    setCourseForm(prev => ({
-      ...prev,
-      syllabus: [...prev.syllabus, { 
-        title: '', duration: '5m', content: '', 
-        quiz: { question: '', options: ['', '', '', ''], correctAnswer: 0 } 
-      }]
-    }));
-  };
-
-  const updateSyllabusItem = (index: number, field: keyof SyllabusItem, value: any) => {
-    const newSyllabus = [...courseForm.syllabus];
-    newSyllabus[index] = { ...newSyllabus[index], [field]: value };
-    setCourseForm(prev => ({ ...prev, syllabus: newSyllabus }));
-  };
-
-  const updateQuiz = (sIndex: number, field: any, value: any) => {
-    const newSyllabus = [...courseForm.syllabus];
-    const quiz = newSyllabus[sIndex].quiz || { question: '', options: ['', '', '', ''], correctAnswer: 0 };
-    newSyllabus[sIndex].quiz = { ...quiz, [field]: value };
-    setCourseForm(prev => ({ ...prev, syllabus: newSyllabus }));
-  };
-
-  const updateQuizOption = (sIndex: number, oIndex: number, value: string) => {
-    const newSyllabus = [...courseForm.syllabus];
-    const quiz = newSyllabus[sIndex].quiz!;
-    const newOptions = [...quiz.options];
-    newOptions[oIndex] = value;
-    newSyllabus[sIndex].quiz = { ...quiz, options: newOptions };
-    setCourseForm(prev => ({ ...prev, syllabus: newSyllabus }));
-  };
 
   const handleAddObjective = () => {
     setCourseForm(prev => ({ ...prev, learningObjectives: [...prev.learningObjectives, ''] }));
@@ -117,7 +86,7 @@ export const AdminDashboard: React.FC = () => {
 
   const handleSaveCourse = (e: React.FormEvent) => {
     e.preventDefault();
-    courseService.add({ ...courseForm, modules: courseForm.syllabus.length });
+    courseService.add({ ...courseForm, modules: courseForm.modules || 0 });
     setIsModalOpen(false);
     setRefreshTrigger(p => p + 1);
   };
@@ -252,7 +221,7 @@ export const AdminDashboard: React.FC = () => {
                     <img src={c.image} className="object-cover w-20 h-12 rounded shadow" alt="" />
                     <div>
                       <h4 className="font-bold text-white transition-colors group-hover:text-coinlect-accent">{c.title}</h4>
-                      <p className="text-[10px] text-gray-500 uppercase tracking-widest">{c.category} • {c.level} • {c.syllabus.length} Mod.</p>
+                      <p className="text-[10px] text-gray-500 uppercase tracking-widest">{c.category} • {c.level} • {c.modules} Mod.</p>
                     </div>
                   </div>
                   <button onClick={() => { courseService.delete(c.id); setRefreshTrigger(t => t+1); }} className="p-2 text-red-500 hover:text-red-400" aria-label="Delete course"><Trash2 size={18} /></button>
@@ -373,48 +342,6 @@ export const AdminDashboard: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Syllabus Architect */}
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-bold tracking-widest uppercase text-coinlect-accent">3. Programme du Cours (Modules)</h3>
-                      <button type="button" onClick={handleAddSyllabusItem} className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-black transition-colors rounded-lg shadow-lg bg-coinlect-accent hover:bg-yellow-500 shadow-coinlect-accent/10">
-                        <Plus size={14}/> Ajouter un Module
-                      </button>
-                    </div>
-
-                    <div className="space-y-4">
-                       {courseForm.syllabus.map((mod, i) => (
-                         <div key={i} className="p-6 space-y-6 border bg-white/5 border-white/5 rounded-2xl">
-                           <div className="flex items-center gap-3">
-                             <div className="flex items-center justify-center w-8 h-8 text-sm font-bold text-black rounded-full bg-coinlect-accent">#{i+1}</div>
-                             <input placeholder="Titre du module" className="flex-1 p-2 font-bold bg-transparent border-b outline-none border-white/10 focus:border-coinlect-accent" value={mod.title} onChange={e => updateSyllabusItem(i, 'title', e.target.value)} />
-                             <input placeholder="Durée" className="w-20 p-2 text-xs text-center bg-transparent border-b border-white/10" value={mod.duration} onChange={e => updateSyllabusItem(i, 'duration', e.target.value)} />
-                           </div>
-                           
-                           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                              <div className="space-y-4">
-                                <label className="text-[10px] font-bold text-gray-500 uppercase flex items-center gap-2"><Play size={12}/> Contenu & Transcript</label>
-                                <textarea placeholder="Contenu textuel détaillé pour ce module..." className="w-full h-32 p-3 text-sm border outline-none bg-black/50 border-white/5 rounded-xl" value={mod.content} onChange={e => updateSyllabusItem(i, 'content', e.target.value)} />
-                              </div>
-                              <div className="space-y-4">
-                                <label className="text-[10px] font-bold text-gray-500 uppercase flex items-center gap-2"><HelpCircle size={12}/> Quiz du Module</label>
-                                <div className="p-4 space-y-3 border bg-black/50 rounded-xl border-white/5">
-                                   <input placeholder="Question" className="w-full p-2 text-sm bg-transparent border-b outline-none border-white/10" value={mod.quiz?.question} onChange={e => updateQuiz(i, 'question', e.target.value)} />
-                                   <div className="grid grid-cols-2 gap-2">
-                                     {mod.quiz?.options.map((opt, oIdx) => (
-                                       <div key={oIdx} className="flex items-center gap-1">
-                                          <input type="radio" name={`correct-${i}`} checked={mod.quiz?.correctAnswer === oIdx} onChange={() => updateQuiz(i, 'correctAnswer', oIdx)} aria-label={`Mark option ${oIdx+1} as correct answer`} />
-                                          <input placeholder={`Opt. ${oIdx+1}`} className="bg-transparent border-b border-white/5 p-1 text-[10px] w-full" value={opt} onChange={e => updateQuizOption(i, oIdx, e.target.value)} />
-                                       </div>
-                                     ))}
-                                   </div>
-                                </div>
-                              </div>
-                           </div>
-                         </div>
-                       ))}
-                    </div>
-                  </div>
 
                   <div className="flex gap-4 pt-10">
                     <Button type="button" variant="outline" className="w-1/2" onClick={() => setIsModalOpen(false)}>Annuler</Button>

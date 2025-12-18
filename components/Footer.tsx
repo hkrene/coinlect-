@@ -59,7 +59,10 @@ export const Footer: React.FC = () => {
                     <h4 className="mb-4 font-semibold text-white">{t.footer.support}</h4>
                     <ul className="space-y-2">
                         <li><a href="https://chat.whatsapp.com/LkCbdPcPL6i4yBnWMtJzpN?mode=hqrc" target="_blank" rel="noopener noreferrer" className="hover:text-coinlect-accent">{t.footer.helpCenter}</a></li>
-                        {/* Removed Fees, Security, API */}
+                        <li><button onClick={() => {
+                            const chatButton = document.querySelector('[data-chat-trigger]') as HTMLElement;
+                            if (chatButton) chatButton.click();
+                        }} className="text-left hover:text-coinlect-accent">{t.footer.chatbot}</button></li>
                     </ul>
                 </div>
                 <div>
@@ -90,9 +93,8 @@ export const Footer: React.FC = () => {
                     <span className="text-gray-500">© 2025 Coinlect. {t.footer.rights}</span>
                 </div>
                 <div className="flex flex-col items-center gap-4 md:flex-row">
-                    {/* Language Toggle in Footer */}
-                    <div className="flex items-center gap-2">
-                        <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Language</span>
+                    <div className="flex items-center gap-4">
+                        {/* Language Toggle beside Social Icons */}
                         <div className="relative flex items-center">
                             <button 
                                 onClick={() => setLanguage('fr')}
@@ -115,32 +117,32 @@ export const Footer: React.FC = () => {
                                 <span className="text-[10px] font-semibold">EN</span>
                             </button>
                         </div>
-                    </div>
-                    <div className="flex gap-4">
+                        <div className="flex gap-4">
                         {/* Twitter/X */}
-                        <a href="https://x.com/coinlect" target="_blank" rel="noopener noreferrer" className="text-gray-500 transition-colors hover:text-white">
+                        <a href="https://x.com/coinlect" target="_blank" rel="noopener noreferrer" aria-label="Follow us on X (Twitter)" className="text-gray-500 transition-colors hover:text-white">
                              <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
                                 <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/>
                             </svg>
                         </a>
                         {/* LinkedIn */}
-                        <a href="https://www.linkedin.com/company/coinlect-academie" target="_blank" rel="noopener noreferrer" className="text-gray-500 transition-colors hover:text-white">
+                        <a href="https://www.linkedin.com/company/coinlect-academie" target="_blank" rel="noopener noreferrer" aria-label="Follow us on LinkedIn" className="text-gray-500 transition-colors hover:text-white">
                             <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
                                 <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
                             </svg>
                         </a>
                         {/* YouTube */}
-                        <a href="https://www.youtube.com/@Coinlect" target="_blank" rel="noopener noreferrer" className="text-gray-500 transition-colors hover:text-white">
+                        <a href="https://www.youtube.com/@Coinlect" target="_blank" rel="noopener noreferrer" aria-label="Subscribe to our YouTube channel" className="text-gray-500 transition-colors hover:text-white">
                             <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
                                 <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
                             </svg>
                         </a>
                         {/* Telegram */}
-                        <a href="https://t.me/coinlect_academy" target="_blank" rel="noopener noreferrer" className="text-gray-500 transition-colors hover:text-white">
+                        <a href="https://t.me/coinlect_academy" target="_blank" rel="noopener noreferrer" aria-label="Join our Telegram channel" className="text-gray-500 transition-colors hover:text-white">
                             <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
                                 <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
                             </svg>
                         </a>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -41,73 +41,73 @@ export default function LoginPage() {
 
   return (
     <ComponentsLayout>
-      <div className="container flex flex-col items-center justify-center min-h-screen px-6 pt-32 pb-20 mx-auto">
+      <div className="container flex flex-col items-center justify-center min-h-screen px-4 py-8 mx-auto sm:px-6 md:pt-32 md:pb-20">
         <ScrollReveal className="w-full max-w-md">
-          <div className="relative p-8 overflow-hidden border glass-card rounded-2xl border-white/10">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-coinlect-accent/10 rounded-full blur-[50px] pointer-events-none"></div>
+          <div className="relative p-6 overflow-hidden border glass-card sm:p-8 rounded-2xl border-white/10">
+            <div className="absolute top-0 right-0 w-24 h-24 sm:w-32 sm:h-32 bg-coinlect-accent/10 rounded-full blur-[50px] pointer-events-none"></div>
 
-            <div className="mb-8 text-center">
-              <h1 className="mb-2 text-2xl font-bold">Welcome Back</h1>
-              <p className="text-sm text-gray-500">Enter your credentials to access your account</p>
-              <div className="mt-2 text-[10px] text-gray-600 bg-white/5 p-2 rounded">
-                Demo Admin: admin@coinlect.com / admin123
+            <div className="mb-6 text-center sm:mb-8">
+              <h1 className="mb-2 text-xl font-bold sm:text-2xl md:text-3xl">Welcome Back</h1>
+              <p className="text-xs text-gray-500 sm:text-sm">Enter your credentials to access your account</p>
+              <div className="mt-3 text-[10px] sm:text-xs text-gray-600 bg-white/5 p-2 sm:p-3 rounded">
+                <span className="block sm:inline">Demo Admin: admin@coinlect.com / admin123</span>
               </div>
             </div>
 
             {error && (
-              <div className="p-3 mb-4 text-xs text-center text-red-400 border rounded bg-red-500/10 border-red-500/20">
+              <div className="p-3 mb-4 text-xs text-center text-red-400 border rounded sm:text-sm bg-red-500/10 border-red-500/20">
                 {error}
               </div>
             )}
 
-            <form className="space-y-6" onSubmit={handleSubmit}>
+            <form className="space-y-5 sm:space-y-6" onSubmit={handleSubmit}>
               <div>
-                <label className="block mb-2 text-xs font-medium text-gray-400">Email Address</label>
+                <label className="block mb-2 text-xs font-medium text-gray-400 sm:text-sm">Email Address</label>
                 <input 
                   type="email" 
                   required
-                  className="w-full px-4 py-3 text-white transition-colors border rounded-lg bg-black/50 border-white/10 focus:outline-none focus:border-coinlect-accent" 
+                  className="w-full px-3 py-3 text-sm text-white transition-colors border rounded-lg sm:px-4 sm:py-3 sm:text-base bg-black/50 border-white/10 focus:outline-none focus:border-coinlect-accent focus:ring-1 focus:ring-coinlect-accent/50" 
                   placeholder="you@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
               <div>
-                <label className="block mb-2 text-xs font-medium text-gray-400">Password</label>
+                <label className="block mb-2 text-xs font-medium text-gray-400 sm:text-sm">Password</label>
                 <input 
                   type="password" 
                   required
-                  className="w-full px-4 py-3 text-white transition-colors border rounded-lg bg-black/50 border-white/10 focus:outline-none focus:border-coinlect-accent" 
+                  className="w-full px-3 py-3 text-sm text-white transition-colors border rounded-lg sm:px-4 sm:py-3 sm:text-base bg-black/50 border-white/10 focus:outline-none focus:border-coinlect-accent focus:ring-1 focus:ring-coinlect-accent/50" 
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
               
-              <div className="flex items-center justify-between text-xs">
+              <div className="flex flex-col gap-3 text-xs sm:flex-row sm:items-center sm:justify-between sm:text-sm">
                 <label className="flex items-center gap-2 text-gray-400 cursor-pointer">
-                  <input type="checkbox" className="bg-transparent border-gray-600 rounded" />
-                  Remember me
+                  <input type="checkbox" className="w-4 h-4 bg-transparent border-gray-600 rounded" />
+                  <span>Remember me</span>
                 </label>
-                <a href="#" className="text-coinlect-accent hover:underline">Forgot password?</a>
+                <a href="#" className="font-medium text-coinlect-accent hover:underline">Forgot password?</a>
               </div>
 
-              <Button className="justify-center w-full py-3" disabled={isLoading}>
+              <Button className="justify-center w-full py-3 text-sm font-semibold sm:py-4 sm:text-base" disabled={isLoading}>
                 {isLoading ? 'Signing In...' : 'Sign In'}
               </Button>
             </form>
 
-            <div className="mt-6">
+            <div className="mt-5 sm:mt-6">
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-white/10"></div>
                 </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="px-2 text-gray-500 bg-transparent">Or continue with</span>
+                <div className="relative flex justify-center text-xs uppercase sm:text-sm">
+                  <span className="px-3 text-gray-500 bg-[#0a0a0a]">Or continue with</span>
                 </div>
               </div>
 
-              <div className="mt-4">
+              <div className="mt-4 sm:mt-5">
                 <GoogleAuthButton
                   variant="login"
                   onSuccess={(user, tokens) => {
@@ -120,17 +120,19 @@ export default function LoginPage() {
               </div>
 
               {googleError && (
-                <div className="p-3 mt-4 text-xs text-center text-red-400 border rounded bg-red-500/10 border-red-500/20">
+                <div className="p-3 mt-4 text-xs text-center text-red-400 border rounded sm:text-sm bg-red-500/10 border-red-500/20">
                   {googleError}
                 </div>
               )}
             </div>
 
-            <div className="mt-8 text-xs text-center text-gray-500">
+            <div className="mt-6 text-xs text-center text-gray-500 sm:mt-8 sm:text-sm">
               Don&apos;t have an account? <Link href="/register" className="font-semibold text-white transition-colors hover:text-coinlect-accent">Sign up</Link>
             </div>
           </div>
-          <AdBanner variant="compact" />
+          <div className="mt-6">
+            <AdBanner variant="compact" />
+          </div>
         </ScrollReveal>
       </div>
     </ComponentsLayout>
