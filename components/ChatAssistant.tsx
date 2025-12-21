@@ -144,6 +144,7 @@ export const ChatAssistant: React.FC = () => {
 
       {/* Toggle Button */}
       <button 
+        data-chat-trigger
         onClick={() => setIsOpen(!isOpen)}
         className="h-14 w-14 rounded-full bg-coinlect-accent shadow-[0_0_20px_rgba(245,158,11,0.5)] flex items-center justify-center text-black hover:scale-110 transition-transform duration-300 group overflow-hidden relative"
       >

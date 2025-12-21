@@ -42,62 +42,90 @@ export default function RegisterPage() {
 
   return (
     <ComponentsLayout>
-      <div className="container flex flex-col items-center justify-center min-h-screen px-6 pt-32 pb-20 mx-auto">
+      <div className="container flex flex-col items-center justify-center min-h-screen px-4 py-8 mx-auto sm:px-6 md:pt-32 md:pb-20">
         <ScrollReveal className="w-full max-w-md">
-          <div className="relative p-8 overflow-hidden border glass-card rounded-2xl border-white/10">
-            <div className="absolute top-0 left-0 w-32 h-32 bg-blue-500/10 rounded-full blur-[50px] pointer-events-none"></div>
+          <div className="relative p-6 overflow-hidden border glass-card sm:p-8 rounded-2xl border-white/10">
+            <div className="absolute top-0 left-0 w-24 h-24 sm:w-32 sm:h-32 bg-blue-500/10 rounded-full blur-[50px] pointer-events-none"></div>
 
-            <div className="mb-8 text-center">
-              <h1 className="mb-2 text-2xl font-bold">Create Account</h1>
-              <p className="text-sm text-gray-500">Join Coinlect and start your crypto journey</p>
+            <div className="mb-6 text-center sm:mb-8">
+              <h1 className="mb-2 text-xl font-bold sm:text-2xl md:text-3xl">Create Account</h1>
+              <p className="text-xs text-gray-500 sm:text-sm">Join Coinlect and start your crypto journey</p>
             </div>
 
             {error && (
-              <div className="p-3 mb-4 text-xs text-center text-red-400 border rounded bg-red-500/10 border-red-500/20">
+              <div className="p-3 mb-4 text-xs text-center text-red-400 border rounded sm:text-sm bg-red-500/10 border-red-500/20">
                 {error}
               </div>
             )}
 
-            <form className="space-y-4" onSubmit={handleSubmit}>
-              <div className="grid grid-cols-2 gap-4">
+            <form className="space-y-4 sm:space-y-5" onSubmit={handleSubmit}>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="block mb-2 text-xs font-medium text-gray-400">First Name</label>
-                  <input id="firstName" type="text" required onChange={handleChange} className="w-full px-4 py-3 text-white transition-colors border rounded-lg bg-black/50 border-white/10 focus:outline-none focus:border-coinlect-accent" />
+                  <label className="block mb-2 text-xs font-medium text-gray-400 sm:text-sm">First Name</label>
+                  <input 
+                    id="firstName" 
+                    type="text" 
+                    required 
+                    onChange={handleChange} 
+                    className="w-full px-3 py-3 text-sm text-white transition-colors border rounded-lg sm:px-4 sm:text-base bg-black/50 border-white/10 focus:outline-none focus:border-coinlect-accent focus:ring-1 focus:ring-coinlect-accent/50" 
+                    placeholder="John"
+                  />
                 </div>
                 <div>
-                  <label className="block mb-2 text-xs font-medium text-gray-400">Last Name</label>
-                  <input id="lastName" type="text" required onChange={handleChange} className="w-full px-4 py-3 text-white transition-colors border rounded-lg bg-black/50 border-white/10 focus:outline-none focus:border-coinlect-accent" />
+                  <label className="block mb-2 text-xs font-medium text-gray-400 sm:text-sm">Last Name</label>
+                  <input 
+                    id="lastName" 
+                    type="text" 
+                    required 
+                    onChange={handleChange} 
+                    className="w-full px-3 py-3 text-sm text-white transition-colors border rounded-lg sm:px-4 sm:text-base bg-black/50 border-white/10 focus:outline-none focus:border-coinlect-accent focus:ring-1 focus:ring-coinlect-accent/50" 
+                    placeholder="Doe"
+                  />
                 </div>
               </div>
               <div>
-                <label className="block mb-2 text-xs font-medium text-gray-400">Email Address</label>
-                <input id="email" type="email" required onChange={handleChange} className="w-full px-4 py-3 text-white transition-colors border rounded-lg bg-black/50 border-white/10 focus:outline-none focus:border-coinlect-accent" placeholder="you@example.com" />
+                <label className="block mb-2 text-xs font-medium text-gray-400 sm:text-sm">Email Address</label>
+                <input 
+                  id="email" 
+                  type="email" 
+                  required 
+                  onChange={handleChange} 
+                  className="w-full px-3 py-3 text-sm text-white transition-colors border rounded-lg sm:px-4 sm:text-base bg-black/50 border-white/10 focus:outline-none focus:border-coinlect-accent focus:ring-1 focus:ring-coinlect-accent/50" 
+                  placeholder="you@example.com" 
+                />
               </div>
               <div>
-                <label className="block mb-2 text-xs font-medium text-gray-400">Password</label>
-                <input id="password" type="password" required onChange={handleChange} className="w-full px-4 py-3 text-white transition-colors border rounded-lg bg-black/50 border-white/10 focus:outline-none focus:border-coinlect-accent" placeholder="••••••••" />
+                <label className="block mb-2 text-xs font-medium text-gray-400 sm:text-sm">Password</label>
+                <input 
+                  id="password" 
+                  type="password" 
+                  required 
+                  onChange={handleChange} 
+                  className="w-full px-3 py-3 text-sm text-white transition-colors border rounded-lg sm:px-4 sm:text-base bg-black/50 border-white/10 focus:outline-none focus:border-coinlect-accent focus:ring-1 focus:ring-coinlect-accent/50" 
+                  placeholder="••••••••" 
+                />
               </div>
               
-              <div className="my-4 text-xs text-gray-500">
-                By clicking Sign Up, you agree to our <a href="#" className="underline">Terms</a> and <a href="#" className="underline">Privacy Policy</a>.
+              <div className="pt-2 text-xs text-gray-500 sm:text-sm">
+                By clicking Sign Up, you agree to our <a href="/terms" className="font-medium underline text-coinlect-accent">Terms</a> and <a href="/privacy" className="font-medium underline text-coinlect-accent">Privacy Policy</a>.
               </div>
 
-              <Button className="justify-center w-full py-3" disabled={isLoading}>
+              <Button className="justify-center w-full py-3 text-sm font-semibold sm:py-4 sm:text-base" disabled={isLoading}>
                 {isLoading ? 'Creating Account...' : 'Sign Up'}
               </Button>
             </form>
 
-            <div className="mt-6">
+            <div className="mt-5 sm:mt-6">
               <div className="relative">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-white/10"></div>
                 </div>
-                <div className="relative flex justify-center text-xs uppercase">
-                  <span className="px-2 text-gray-500 bg-transparent">Or continue with</span>
+                <div className="relative flex justify-center text-xs uppercase sm:text-sm">
+                  <span className="px-3 text-gray-500 bg-[#0a0a0a]">Or continue with</span>
                 </div>
               </div>
 
-              <div className="mt-4">
+              <div className="mt-4 sm:mt-5">
                 <GoogleAuthButton
                   variant="register"
                   onSuccess={(user, tokens) => {
@@ -110,17 +138,19 @@ export default function RegisterPage() {
               </div>
 
               {googleError && (
-                <div className="p-3 mt-4 text-xs text-center text-red-400 border rounded bg-red-500/10 border-red-500/20">
+                <div className="p-3 mt-4 text-xs text-center text-red-400 border rounded sm:text-sm bg-red-500/10 border-red-500/20">
                   {googleError}
                 </div>
               )}
             </div>
 
-            <div className="mt-8 text-xs text-center text-gray-500">
+            <div className="mt-6 text-xs text-center text-gray-500 sm:mt-8 sm:text-sm">
               Already have an account? <Link href="/login" className="font-semibold text-white transition-colors hover:text-coinlect-accent">Sign in</Link>
             </div>
           </div>
-          <AdBanner variant="compact" />
+          <div className="mt-6">
+            <AdBanner variant="compact" />
+          </div>
         </ScrollReveal>
       </div>
     </ComponentsLayout>

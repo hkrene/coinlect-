@@ -5,13 +5,12 @@ import { ScrollReveal } from '../components/ScrollReveal';
 import { Button } from '../components/Button';
 import { dealService } from '../services/db';
 import { Deal } from '../mockData';
-import { Search, Tag, ExternalLink, ShieldCheck } from 'lucide-react';
+import { Tag, ExternalLink, ShieldCheck } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { AdBanner } from '../components/AdBanner';
 
 export const Deals: React.FC = () => {
   const [deals, setDeals] = useState<Deal[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
   // We use the English keys as the source of truth for logic, regardless of display language
   const [activeCategory, setActiveCategory] = useState('All');
   const { t } = useLanguage();
@@ -27,15 +26,11 @@ export const Deals: React.FC = () => {
 
   // Filter Logic
   const filteredDeals = deals.filter(deal => {
-    // Check search
-    const matchesSearch = deal.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                          deal.description.toLowerCase().includes(searchQuery.toLowerCase());
-    
     // Check Category using canonical keys
     const isAll = activeCategory === 'All';
     const matchesCategory = isAll || deal.category === activeCategory;
 
-    return matchesSearch && matchesCategory;
+    return matchesCategory;
   });
 
   return (
@@ -54,21 +49,6 @@ export const Deals: React.FC = () => {
              <p className="max-w-2xl mx-auto mb-10 text-lg leading-relaxed text-gray-400">
                {t.deals.subtitle}
              </p>
-
-             {/* Search Bar */}
-             <div className="relative max-w-lg mx-auto group">
-                <div className="absolute -inset-0.5 bg-gradient-to-r from-coinlect-accent to-blue-600 rounded-lg blur opacity-20 group-hover:opacity-40 transition duration-500"></div>
-                <div className="relative flex items-center p-2 bg-black border rounded-lg border-white/10">
-                    <Search className="ml-3 text-gray-400" size={20} />
-                    <input 
-                        type="text" 
-                        placeholder={t.deals.searchPlaceholder}
-                        className="w-full py-2 pl-3 pr-4 text-white placeholder-gray-600 bg-transparent focus:outline-none"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                </div>
-             </div>
            </ScrollReveal>
         </div>
       </div>
@@ -147,7 +127,7 @@ export const Deals: React.FC = () => {
         {filteredDeals.length === 0 && (
             <div className="py-20 text-center">
                 <p className="text-lg text-gray-500">No deals found matching your criteria.</p>
-                <button onClick={() => {setSearchQuery(''); setActiveCategory('All')}} className="mt-2 text-coinlect-accent hover:underline">Clear filters</button>
+                <button onClick={() => setActiveCategory('All')} className="mt-2 text-coinlect-accent hover:underline">Clear filters</button>
             </div>
         )}
 

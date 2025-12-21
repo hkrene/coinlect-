@@ -38,7 +38,7 @@ export const Events: React.FC = () => {
     }
 
     return filtered;
-  }, [searchQuery, activeFilter]);
+  }, [events, searchQuery, activeFilter]);
 
   const paginatedEvents = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -285,4 +285,3 @@ export const Events: React.FC = () => {
 };
 
 export default Events;
-
