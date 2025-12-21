@@ -183,9 +183,9 @@ export const Trends: React.FC = () => {
     <div className="min-h-screen pt-32 pb-20 bg-black">
       <ScrollReveal>
           <div className="container px-6 mx-auto mb-12">
-            <div className="flex flex-col items-end justify-between gap-4 md:flex-row">
+            <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
                 <div>
-                    <h1 className="mb-4 text-4xl font-bold">Market <span className="text-coinlect-accent">Trends</span></h1>
+                    <h1 className="mb-4 text-4xl font-bold text-center md:text-left">Market <span className="text-coinlect-accent">Trends</span></h1>
                 </div>
                 <div className="flex items-center gap-4">
                     <button 
@@ -226,11 +226,11 @@ export const Trends: React.FC = () => {
                         <table className="w-full text-left border-collapse">
                             <thead className="text-xs font-semibold tracking-wider text-gray-500 uppercase border-b bg-white/5 border-white/10">
                                 <tr>
-                                    <th className="p-3 pl-4 pr-2 text-left md:p-6 md:pl-8 md:pr-6">Asset</th>
-                                    <th className="p-3 px-2 text-right md:p-6 md:px-6">Price</th>
-                                    <th className="p-3 px-2 text-right md:p-6 md:px-6">24h Change</th>
-                                    <th className="p-3 px-2 text-right md:p-6 md:px-6">24h Volume</th>
-                                    <th className="p-3 pl-2 pr-4 text-right md:p-6 md:pl-6 md:pr-8">Market Cap</th>
+                                    <th className="p-3 pl-4 pr-2 text-left sm:p-3 sm:pl-4 sm:pr-2 md:p-6 md:pl-8 md:pr-6">Asset</th>
+                                    <th className="p-3 px-2 text-right sm:p-3 sm:px-2 md:p-6 md:px-6">Price</th>
+                                    <th className="p-3 px-2 text-right sm:p-3 sm:px-2 md:p-6 md:px-6">24h Change</th>
+                                    <th className="p-3 px-2 text-right sm:p-3 sm:px-2 md:p-6 md:px-6">24h Volume</th>
+                                    <th className="p-3 pl-2 pr-4 text-right sm:p-3 sm:pl-2 sm:pr-4 md:p-6 md:pl-6 md:pr-8">Market Cap</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-white/5">
@@ -238,17 +238,17 @@ export const Trends: React.FC = () => {
                                     // Skeleton Loader
                                     Array.from({ length: 10 }).map((_, i) => (
                                         <tr key={i} className="animate-pulse">
-                                            <td className="p-3 pl-4 pr-2 md:p-6 md:pl-8 md:pr-6"><div className="w-32 h-10 rounded bg-white/5"></div></td>
-                                            <td className="p-3 px-2 md:p-6 md:px-6"><div className="w-20 h-6 ml-auto rounded bg-white/5"></div></td>
-                                            <td className="p-3 px-2 md:p-6 md:px-6"><div className="w-16 h-6 ml-auto rounded bg-white/5"></div></td>
-                                            <td className="p-3 px-2 md:p-6 md:px-6"><div className="w-24 h-6 ml-auto rounded bg-white/5"></div></td>
-                                            <td className="p-3 pl-2 pr-4 md:p-6 md:pl-6 md:pr-8"><div className="h-6 ml-auto rounded w-28 bg-white/5"></div></td>
+                                            <td className="p-3 pl-4 pr-2 sm:p-3 sm:pl-4 sm:pr-2 md:p-6 md:pl-8 md:pr-6"><div className="w-32 h-10 rounded bg-white/5"></div></td>
+                                            <td className="p-3 px-2 sm:p-3 sm:px-2 md:p-6 md:px-6"><div className="w-20 h-6 ml-auto rounded bg-white/5"></div></td>
+                                            <td className="p-3 px-2 sm:p-3 sm:px-2 md:p-6 md:px-6"><div className="w-16 h-6 ml-auto rounded bg-white/5"></div></td>
+                                            <td className="p-3 px-2 sm:p-3 sm:px-2 md:p-6 md:px-6"><div className="w-24 h-6 ml-auto rounded bg-white/5"></div></td>
+                                            <td className="p-3 pl-2 pr-4 sm:p-3 sm:pl-2 sm:pr-4 md:p-6 md:pl-6 md:pr-8"><div className="h-6 ml-auto rounded w-28 bg-white/5"></div></td>
                                         </tr>
                                     ))
                                 ) : (
                                     coins.map((coin) => (
                                         <tr key={coin.id} className="transition-colors hover:bg-white/5 group">
-                                            <td className="p-3 pl-4 pr-2 md:p-6 md:pl-8 md:pr-6">
+                                            <td className="p-3 pl-4 pr-2 sm:p-3 sm:pl-4 sm:pr-2 md:p-6 md:pl-8 md:pr-6">
                                                 <div className="flex items-center gap-2 md:gap-4">
                                                     <span className="hidden w-6 font-mono text-sm text-gray-600 md:block">#{coin.market_cap_rank}</span>
                                                     <img src={coin.image} alt={coin.name} className="w-6 h-6 transition-transform duration-300 rounded-full shadow-lg md:w-8 md:h-8 group-hover:scale-110" />
@@ -260,21 +260,21 @@ export const Trends: React.FC = () => {
                                                     </div>
                                                 </div>
                                             </td>
-                                            <td className="p-3 px-2 text-right md:p-6 md:px-6">
+                                            <td className="p-3 px-2 sm:p-3 sm:px-2 md:p-6 md:px-6">
                                                 <div className="font-mono text-xs font-medium tracking-tight text-white md:text-sm">
                                                     {formatCurrency(coin.current_price)}
                                                 </div>
                                             </td>
-                                            <td className="p-3 px-2 text-right md:p-6 md:px-6">
+                                            <td className="p-3 px-2 sm:p-3 sm:px-2 md:p-6 md:px-6">
                                                 <div className={`inline-flex items-center gap-1 text-[10px] md:text-xs font-bold ${coin.price_change_percentage_24h >= 0 ? 'text-green-400' : 'text-red-400'}`}>
                                                     {coin.price_change_percentage_24h >= 0 ? <ArrowUpRight size={10} strokeWidth={3} className="md:w-3 md:h-3" /> : <ArrowDownRight size={10} strokeWidth={3} className="md:w-3 md:h-3" />}
                                                     {Math.abs(coin.price_change_percentage_24h).toFixed(2)}%
                                                 </div>
                                             </td>
-                                            <td className="p-3 px-2 font-mono text-xs text-right text-gray-400 md:text-sm md:p-6 md:px-6">
+                                            <td className="p-3 px-2 sm:p-3 sm:px-2 font-mono text-xs text-right text-gray-400 md:text-sm md:p-6 md:px-6">
                                                 ${formatCompactNumber(coin.total_volume)}
                                             </td>
-                                            <td className="p-3 pl-2 pr-4 font-mono text-xs text-right text-gray-400 md:text-sm md:p-6 md:pl-6 md:pr-8">
+                                            <td className="p-3 pl-2 pr-4 sm:p-3 sm:pl-2 sm:pr-4 font-mono text-xs text-right text-gray-400 md:text-sm md:p-6 md:pl-6 md:pr-8">
                                                 ${formatCompactNumber(coin.market_cap)}
                                             </td>
                                         </tr>

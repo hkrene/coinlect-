@@ -3,7 +3,6 @@
 import React from 'react';
 import { ScrollReveal } from '../components/ScrollReveal';
 import { ArrowRight } from 'lucide-react';
-import CardSwap, { Card } from '../components/CardSwap';
 
 // Social Media Icons truncated...
 const Icons = {
@@ -101,9 +100,6 @@ const COMMUNITIES = [
 ];
 
 export const Community: React.FC = () => {
-  // Flatten all community items into a single array
-  const allCommunities = COMMUNITIES.flatMap(section => section.items);
-
   return (
     <div className="min-h-screen bg-[#0a0a0a] pt-24 pb-20">
       
@@ -121,44 +117,32 @@ export const Community: React.FC = () => {
              </ScrollReveal>
          </div>
       </div>
-
       <div className="container px-6 mx-auto max-w-7xl">
-         <div className="relative h-[600px] flex items-center justify-center">
-           <ScrollReveal>
-             <CardSwap
-               cardDistance={50}
-               verticalDistance={60}
-               delay={5000}
-               pauseOnHover={false}
-               width={400}
-               height={320}
-             >
-               {allCommunities.map((item, index) => (
-                 <Card
-                   key={index}
-                   customClass="p-6 cursor-pointer hover:border-coinlect-accent transition-colors bg-black/90 backdrop-blur-sm"
-                   onClick={() => window.open(item.url, '_blank', 'noopener,noreferrer')}
-                 >
-                   <div className="flex flex-col h-full">
-                     <div className={`w-12 h-12 rounded-full bg-[#111] flex items-center justify-center border border-white/10 mb-4 ${item.color}`}>
-                       <item.icon />
-                     </div>
-                     <h3 className="mb-2 text-xl font-bold text-white">{item.name}</h3>
-                     <p className="flex-grow mb-3 text-sm text-gray-400">{item.desc}</p>
-                     <div className="flex items-center justify-between">
-                       <span className="px-3 py-1 text-xs font-medium text-gray-500 rounded bg-white/5">
-                         {item.members} members
-                       </span>
-                       <div className="flex items-center justify-center w-10 h-10 text-black transition-all bg-white rounded-full shadow-lg hover:bg-coinlect-accent hover:scale-110">
-                         <ArrowRight size={20} />
+         {COMMUNITIES.map((section, sectionIndex) => (
+           <div key={sectionIndex} className="mb-12">
+             <ScrollReveal delay={sectionIndex * 100}>
+               <h2 className="mb-6 text-3xl font-bold text-white md:text-4xl">{section.category}</h2>
+             </ScrollReveal>
+             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+               {section.items.map((item, itemIndex) => (
+                 <ScrollReveal key={itemIndex} delay={(sectionIndex * 100) + (itemIndex * 50)}>
+                   <div
+                     className="flex items-center justify-between p-4 transition-colors duration-300 border rounded-lg cursor-pointer bg-white/5 hover:bg-white/10 border-white/10"
+                     onClick={() => window.open(item.url, '_blank', 'noopener,noreferrer')}
+                   >
+                     <div className="flex items-center gap-3">
+                       <div className={`w-8 h-8 rounded-full flex items-center justify-center ${item.color}`}>
+                         <item.icon />
                        </div>
+                       <span className="text-sm font-semibold text-white">{item.name}</span>
                      </div>
+                     <ArrowRight size={16} className="text-gray-400" />
                    </div>
-                 </Card>
+                 </ScrollReveal>
                ))}
-             </CardSwap>
-           </ScrollReveal>
-         </div>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

@@ -13,6 +13,7 @@ export const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [academyDropdownOpen, setAcademyDropdownOpen] = useState(false);
+  const [mobileAcademyDropdownOpen, setMobileAcademyDropdownOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
   const pathname = usePathname();
   const { t, language, setLanguage } = useLanguage();
@@ -147,7 +148,7 @@ export const Header: React.FC = () => {
                       onMouseLeave={() => setAcademyDropdownOpen(false)}
                     >
                       <div className="md:col-span-1 lg:col-span-1 xl:col-span-1">
-                        <h3 className="mb-4 text-lg font-semibold text-white">All Categories</h3>
+                        <h3 className="mb-4 text-lg font-semibold text-white">{t.academy.megaMenu.allCategories}</h3>
                         <Link
                           href={academyMegaMenuContent[0].href}
                           className="block p-3 transition-colors rounded-lg group hover:bg-white/5"
@@ -301,32 +302,49 @@ export const Header: React.FC = () => {
       {/* Mobile/Tablet Menu */}
       {mobileMenuOpen && (
         <div className="absolute left-0 right-0 flex flex-col gap-4 p-6 bg-black border-b shadow-2xl border-white/10 lg:hidden top-full animate-in slide-in-from-top-5">
-          {navItems.map((item) => (
-            <div key={item.href}>
-              <Link
-                href={item.href}
-                className={`py-2 block font-medium ${isActive(item.href) ? 'text-coinlect-accent' : 'text-gray-300'}`}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                {item.label}
-              </Link>
-              {item.label === t.nav.academy && (
-                <div className="pl-4 mt-2 ml-4 space-y-2 border-l border-white/10">
-                  {academyDropdownItems.map((dropdownItem) => (
-                    <Link
-                      key={dropdownItem.href}
-                      href={dropdownItem.href}
-                      className="block py-1 text-sm text-gray-400 transition-colors hover:text-white"
-                      onClick={() => setMobileMenuOpen(false)}
-                    >
-                      {dropdownItem.label}
-                    </Link>
-                  ))}
-                </div>
-              )}
-            </div>
-          ))}
-          {isAdmin && (
+              {navItems.map((item) => {
+                if (item.label === t.nav.academy) {
+                  return (
+                    <div key={item.href} className="relative">
+                      <button
+                        onClick={() => setMobileAcademyDropdownOpen(!mobileAcademyDropdownOpen)}
+                        className={`py-2 flex justify-between items-center w-full font-medium ${isActive(item.href) ? 'text-coinlect-accent' : 'text-gray-300'}`}
+                      >
+                        {item.label}
+                        <ChevronDown size={18} className={`transition-transform duration-200 ${mobileAcademyDropdownOpen ? 'rotate-180' : ''}`} />
+                      </button>
+                      {mobileAcademyDropdownOpen && (
+                        <div className="pl-4 mt-2 ml-4 space-y-2 border-l border-white/10">
+                          {academyMegaMenuContent.map((megaMenuItem) => (
+                            <Link
+                              key={megaMenuItem.href}
+                              href={megaMenuItem.href}
+                              className="block py-1 text-sm text-gray-400 transition-colors hover:text-white"
+                              onClick={() => {
+                                setMobileMenuOpen(false);
+                                setMobileAcademyDropdownOpen(false);
+                              }}
+                            >
+                              <p className="font-medium text-white group-hover:text-coinlect-accent">{megaMenuItem.title}</p>
+                              <p className="mt-1 text-xs text-gray-500">{megaMenuItem.description}</p>
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`py-2 block font-medium ${isActive(item.href) ? 'text-coinlect-accent' : 'text-gray-300'}`}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {item.label}
+                  </Link>
+                );
+              })}          {isAdmin && (
              <Link href="/admin" className="block py-2 font-bold text-purple-400" onClick={() => setMobileMenuOpen(false)}>Admin Dashboard</Link>
           )}
 
