@@ -201,6 +201,26 @@ export const translations = {
             related: "Articles Similaires",
             copyLink: "Copier le lien",
             copied: "Copié !"
+        },
+        megaMenu: {
+          allCategories: "Toutes les Catégories",
+          allCategoriesDesc: "Apprenez tout ce que vous devez savoir",
+          education: "Éducation",
+          educationDesc: "L'éducation blockchain et crypto est le point de départ.",
+          defi: "DeFi",
+          defiDesc: "La DeFi, ou finance décentralisée, vise à remplacer la finance traditionnelle centralisée.",
+          adoption: "Adoption",
+          adoptionDesc: "L'adoption des cryptomonnaies est nécessaire pour que ces actifs numériques se généralisent.",
+          reviews: "Revues",
+          reviewsDesc: "De nombreuses revues de projets de cryptomonnaies et de blockchain pour votre éducation.",
+          guides: "Guides",
+          guidesDesc: "Nos guides blockchain vous aideront à trouver votre chemin à travers les échanges, les outils et d'autres applications crypto.",
+          trading: "Trading",
+          tradingDesc: "Le trading de cryptos est un excellent moyen de s'impliquer dans la révolution blockchain.",
+          mining: "Minage",
+          miningDesc: "Apprenez tout ce que vous devez savoir sur le minage de cryptos",
+          news: "Actualités",
+          newsDesc: "Les marchés crypto évoluent rapidement. Laissez-nous vous tenir informés avec notre couverture détaillée de l'actualité crypto."
         }
     },
     trends: {
@@ -467,6 +487,26 @@ export const translations = {
             related: "Related Articles",
             copyLink: "Copy Link",
             copied: "Copied!"
+        },
+        megaMenu: {
+          allCategories: "All Categories",
+          allCategoriesDesc: "Learn everything you need to know",
+          education: "Education",
+          educationDesc: "Blockchain and crypto education is where it all starts.",
+          defi: "DeFi",
+          defiDesc: "DeFi, or decentralized finance, is working to replace centralized traditional finance.",
+          adoption: "Adoption",
+          adoptionDesc: "Cryptocurrency adoption is needed to make these digital assets go mainstream.",
+          reviews: "Reviews",
+          reviewsDesc: "Loads of cryptocurrency and blockchain project reviews for your education.",
+          guides: "Guides",
+          guidesDesc: "Our blockchain guides will help you find your way through exchanges, tools, and other crypto apps.",
+          trading: "Trading",
+          tradingDesc: "Crypto trading is a great way to get involved in the blockchain revolution.",
+          mining: "Mining",
+          miningDesc: "Learn everything you need to know about crypto mining",
+          news: "News",
+          newsDesc: "Crypto markets move fast. Let us keep you up to date with our detailed crypto news coverage."
         }
     },
     trends: {
