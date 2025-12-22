@@ -180,7 +180,7 @@ export const Events: React.FC = () => {
           </div>
 
           {/* Filter Buttons */}
-          <div className="flex flex-wrap gap-3">
+          <div className="flex w-full gap-2 pb-2 overflow-x-auto md:pb-0 scrollbar-hide mb-12">
             {FILTERS.map((filter) => (
               <button
                 key={filter}
@@ -188,10 +188,10 @@ export const Events: React.FC = () => {
                   setActiveFilter(filter);
                   setCurrentPage(1);
                 }}
-                className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${
+                className={`whitespace-nowrap px-4 py-2 rounded-full text-xs font-bold border transition-all ${
                   activeFilter === filter
-                    ? 'bg-coinlect-accent text-black'
-                    : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10 hover:text-white'
+                    ? 'bg-white text-black border-white'
+                    : 'bg-transparent border-white/10 text-gray-400 hover:border-white/30 hover:text-white'
                 }`}
               >
                 {filter}

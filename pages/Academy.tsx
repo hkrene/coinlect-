@@ -41,6 +41,21 @@ export const Academy: React.FC = () => {
         setActiveTab('articles');
     }
 
+    // Detect category parameter for filtering
+    const categoryParam = searchParams?.get('category');
+    if (categoryParam) {
+      // Map new categories to existing filters
+      const categoryMapping: { [key: string]: string } = {
+        'education': 'Tous', // Default to all for education
+        'defi': 'DeFi',
+        'adoption': 'Tous', // Default to all for adoption
+        'mining': 'Tous', // Default to all for mining
+        'guides': 'Tous', // Default to all for guides
+        'trading': 'Trading'
+      };
+      setActiveCategory(categoryMapping[categoryParam] || 'Tous');
+    }
+
     const fetchedCourses = courseService.getAll();
     setCourses(fetchedCourses);
     setArticles(articleService.getAll());
@@ -265,76 +280,201 @@ export const Academy: React.FC = () => {
               )}
           </div>
 
-          {/* Developer Space Section - Restyled to Blue Theme */}
-          <ScrollReveal className="mt-32">
-              <div className="bg-[#0a0f1d] p-10 md:p-16 rounded-3xl border border-blue-500/20 relative overflow-hidden group">
-                  {/* Glowing Blue Background Elements */}
-                  <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-blue-600/10 rounded-full blur-[100px] pointer-events-none"></div>
-                  <div className="absolute -bottom-10 -left-10 w-[200px] h-[200px] bg-blue-400/10 rounded-full blur-[60px] pointer-events-none"></div>
-                  
-                  <div className="relative z-10">
-                      <div className="flex flex-col justify-between gap-8 mb-12 md:flex-row md:items-center">
-                          <div>
-                              <div className="flex items-center gap-2 mb-4 text-sm font-bold tracking-widest text-blue-400 uppercase">
-                                  <Code size={18} /> {t.academy.devSpace}
-                              </div>
-                              <h2 className="max-w-xl text-3xl font-bold leading-tight text-white md:text-5xl">
-                                  {t.academy.buildFuture} <span className="text-blue-400">Web3</span>
-                              </h2>
-                          </div>
-                          <div className="flex gap-4">
-                              <a href="https://ethereum.org/en/developers/docs/" target="_blank" rel="noopener noreferrer">
-                                <Button className="bg-blue-600 text-white hover:bg-blue-500 shadow-[0_0_15px_rgba(37,99,235,0.3)]">Ethereum Docs</Button>
-                              </a>
-                              <a href="https://docs.bnbchain.org/docs/learn/intro" target="_blank" rel="noopener noreferrer">
-                                <Button variant="secondary" className="text-blue-400 border-blue-500/30 hover:bg-blue-500/10">BSC Docs</Button>
-                              </a>
-                          </div>
-                      </div>
+          <ScrollReveal className="px-6 mx-auto mt-20 max-w-7xl">
+    {/* Header */}
+    <header className="mb-8">
+        <h2 className="mb-2 text-2xl font-semibold text-slate-100 md:text-4xl">
+            {t.academy.tradingTools.title}
+        </h2>
+        <p className="max-w-xl text-sm text-slate-400">
+            Market scanners, explorers and analytics platforms used by active traders.
+        </p>
+    </header>
 
-                      <div className="grid gap-8 md:grid-cols-3">
-                          {[
-                            { 
-                                icon: <Cpu />, 
-                                title: "Ethereum Docs", 
-                                desc: "La documentation la plus complète pour débuter. Apprenez les bases d'Ethereum, d'EVM et de Web3.js.",
-                                link: "https://ethereum.org/en/developers/docs/" 
-                            },
-                            { 
-                                icon: <Terminal />, 
-                                title: "Solidity par l'Exemple", 
-                                desc: "Apprenez le langage Solidity avec des extraits de code concrets et faciles à comprendre.",
-                                link: "https://solidity-by-example.org/" 
-                            },
-                            { 
-                                icon: <Layers />, 
-                                title: "BNB Chain Learn", 
-                                desc: "Découvrez comment déployer vos premières applications sur BSC, l'une des chaînes les plus populaires.",
-                                link: "https://docs.bnbchain.org/docs/learn/intro" 
-                            }
-                          ].map((item, idx) => (
-                              <a 
-                                href={item.link} 
-                                target="_blank" 
-                                rel="noopener noreferrer" 
-                                key={idx} 
-                                className="p-8 transition-all duration-300 border bg-white/5 rounded-2xl border-white/5 hover:border-blue-500/40 hover:bg-blue-500/5 group/card"
-                              >
-                                  <div className="flex items-center justify-center w-12 h-12 mb-6 text-blue-400 transition-transform rounded-xl bg-blue-500/10 group-hover/card:scale-110">
-                                      {item.icon}
-                                  </div>
-                                  <h4 className="flex items-center justify-between mb-4 text-xl font-bold text-white">
-                                      {item.title}
-                                      <ExternalLink size={14} className="transition-opacity opacity-0 group-hover/card:opacity-100" />
-                                  </h4>
-                                  <p className="mb-4 text-sm leading-relaxed text-gray-400">{item.desc}</p>
-                                  <span className="text-xs font-bold tracking-wider text-blue-400 uppercase group-hover/card:underline">Commencer</span>
-                              </a>
-                          ))}
-                      </div>
-                  </div>
-              </div>
-          </ScrollReveal>
+    {/* Tools Grid */}
+    <div className="flex gap-4 pb-4 overflow-x-auto scrollbar-hide">
+        {[
+            {
+                title: t.academy.tradingTools.dexscreener.title,
+                desc: t.academy.tradingTools.dexscreener.desc,
+                link: "https://dexscreener.com/",
+            },
+            {
+                title: t.academy.tradingTools.dextools.title,
+                desc: t.academy.tradingTools.dextools.desc,
+                link: "https://www.dextools.io/",
+            },
+            {
+                title: t.academy.tradingTools.basescan.title,
+                desc: t.academy.tradingTools.basescan.desc,
+                link: "https://basescan.org/",
+            },
+            {
+                title: t.academy.tradingTools.etherscan.title,
+                desc: t.academy.tradingTools.etherscan.desc,
+                link: "https://etherscan.io/",
+            },
+            {
+                title: t.academy.tradingTools.tonscan.title,
+                desc: t.academy.tradingTools.tonscan.desc,
+                link: "https://tonscan.org/",
+            },
+            {
+                title: t.academy.tradingTools.bscscan.title,
+                desc: t.academy.tradingTools.bscscan.desc,
+                link: "https://bscscan.com/",
+            },
+            {
+                title: t.academy.tradingTools.solscan.title,
+                desc: t.academy.tradingTools.solscan.desc,
+                link: "https://solscan.io/",
+            },
+            {
+                title: t.academy.tradingTools.coingecko.title,
+                desc: t.academy.tradingTools.coingecko.desc,
+                link: "https://www.coingecko.com/",
+            },
+            {
+                title: t.academy.tradingTools.coinmarketcap.title,
+                desc: t.academy.tradingTools.coinmarketcap.desc,
+                link: "https://coinmarketcap.com/",
+            },
+            {
+                title: t.academy.tradingTools.more.title,
+                desc: t.academy.tradingTools.more.desc,
+                link: "#",
+            },
+        ].map((item, idx) => (
+            <a
+                key={idx}
+                href={item.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="relative flex flex-col justify-between flex-shrink-0 w-64 p-5 overflow-hidden transition-all border group md:w-80 rounded-xl border-white/10 bg-white/5 hover:border-coinlect-accent hover:bg-coinlect-accent/10"
+            >
+                <div className="absolute inset-0 transition-opacity duration-300 opacity-0 pointer-events-none bg-gradient-to-br from-transparent via-transparent to-coinlect-accent/10 group-hover:opacity-100"></div>
+                <div className="relative z-10">
+                    <h4 className="flex items-center justify-between mb-1 text-base font-semibold text-white">
+                        {item.title}
+                        <ExternalLink
+                            size={16}
+                            className="text-gray-400 transition-transform group-hover:translate-x-1"
+                        />
+                    </h4>
+                    <p className="text-sm leading-relaxed text-gray-400">
+                        {item.desc}
+                    </p>
+                </div>
+                <div className="relative z-10 mt-3 text-sm font-medium transition-colors text-coinlect-accent group-hover:text-white">
+                    Open tool →
+                </div>
+            </a>
+        ))}
+    </div>
+</ScrollReveal>
+
+         {/* Developer Space Section – Page Level */}
+<ScrollReveal className="mt-32">
+  <section className="px-6 md:px-12">
+    
+    {/* Header */}
+    <header className="flex flex-col gap-6 mb-12 md:flex-row md:items-center md:justify-between">
+      <div>
+        <div className="flex items-center gap-2 mb-2 text-xs font-semibold tracking-widest text-blue-400 uppercase">
+          <Code size={14} />
+          {t.academy.devSpace}
+        </div>
+
+        <h2 className="max-w-2xl text-2xl font-semibold text-slate-100 md:text-4xl">
+          {t.academy.buildFuture} <span className="text-blue-400">Web3</span>
+        </h2>
+
+        <p className="max-w-xl mt-3 text-sm text-slate-400">
+          Documentation, tooling and references for developers building on-chain applications.
+        </p>
+      </div>
+
+      <div className="flex gap-3">
+        <a
+          href="https://ethereum.org/en/developers/docs/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Button className="h-10 px-5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-500">
+            Ethereum Docs
+          </Button>
+        </a>
+
+        <a
+          href="https://docs.bnbchain.org/docs/learn/intro"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          <Button
+            variant="outline"
+            className="h-10 px-5 text-sm rounded-md border-slate-700 text-slate-300 hover:bg-slate-800"
+          >
+            BNB Chain
+          </Button>
+        </a>
+      </div>
+    </header>
+
+    {/* Resources Grid */}
+    <div className="grid gap-6 md:grid-cols-3">
+      {[
+        {
+          icon: <Cpu size={18} />,
+          title: "Ethereum Documentation",
+          desc: "Core concepts, EVM internals, smart contracts and tooling for Ethereum developers.",
+          link: "https://ethereum.org/en/developers/docs/",
+        },
+        {
+          icon: <Terminal size={18} />,
+          title: "Solidity by Example",
+          desc: "Minimal, practical Solidity snippets covering real-world contract patterns.",
+          link: "https://solidity-by-example.org/",
+        },
+        {
+          icon: <Layers size={18} />,
+          title: "BNB Chain Learn",
+          desc: "Deploy, test and scale dApps on BSC with official chain documentation.",
+          link: "https://docs.bnbchain.org/docs/learn/intro",
+        },
+      ].map((item, idx) => (
+        <a
+          key={idx}
+          href={item.link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group rounded-lg border border-slate-800 bg-[#0f131b] p-6 transition hover:border-blue-500/40"
+        >
+          <div className="flex items-center justify-center mb-4 text-blue-400 rounded-md h-9 w-9 bg-slate-800">
+            {item.icon}
+          </div>
+
+          <h4 className="flex items-center justify-between mb-2 text-sm font-semibold text-slate-100">
+            {item.title}
+            <ExternalLink
+              size={14}
+              className="transition-opacity opacity-0 group-hover:opacity-100"
+            />
+          </h4>
+
+          <p className="text-xs leading-relaxed text-slate-400">
+            {item.desc}
+          </p>
+
+          <div className="mt-4 text-xs font-medium text-blue-400">
+            Open documentation →
+          </div>
+        </a>
+      ))}
+    </div>
+
+  </section>
+</ScrollReveal>
+
 
           <AdBanner className="mt-20" />
       </div>

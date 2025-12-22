@@ -56,16 +56,12 @@ export const Deals: React.FC = () => {
       <div className="container px-6 py-12 mx-auto">
         {/* Category Filters */}
         <ScrollReveal>
-          <div className="flex flex-wrap justify-center gap-2 mb-12">
+          <div className="flex w-full gap-2 pb-2 mb-12 overflow-x-auto md:w-auto md:pb-0 scrollbar-hide">
             {canonicalCategories.map((catKey, index) => (
               <button
                 key={catKey}
                 onClick={() => setActiveCategory(catKey)}
-                className={`px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 border ${
-                  activeCategory === catKey 
-                    ? 'bg-coinlect-accent text-black border-coinlect-accent' 
-                    : 'bg-transparent text-gray-400 border-white/10 hover:border-white/30 hover:text-white'
-                }`}
+                className={`whitespace-nowrap px-4 py-2 rounded-full text-xs font-bold border transition-all ${activeCategory === catKey ? 'bg-white text-black border-white' : 'bg-transparent border-white/10 text-gray-400 hover:border-white/30 hover:text-white'}`}
               >
                 {/* Display the translated label using the index */}
                 {displayCategories[index] || catKey}
