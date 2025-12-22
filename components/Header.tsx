@@ -19,15 +19,6 @@ export const Header: React.FC = () => {
   const { t, language, setLanguage } = useLanguage();
   const { user, isAuthenticated, logout, isAdmin } = useAuth();
 
-  const navItems: NavItem[] = [
-    { label: t.nav.home, href: '/' },
-    { label: t.nav.academy, href: '/academy' },
-    { label: t.nav.deals, href: '/deals' },
-    { label: t.nav.trends, href: '/trends' },
-    { label: t.nav.community, href: '/community' },
-    { label: t.nav.events, href: '/events' },
-  ];
-
   const academyMegaMenuContent = [
     { 
       title: t.academy.megaMenu.allCategories, 
@@ -75,6 +66,17 @@ export const Header: React.FC = () => {
       href: '/trends?section=news' 
     },
   ];
+
+  const navItems: NavItem[] = [
+    { label: t.nav.home, href: '/' },
+    { label: t.footer.about, href: '/about' },
+    { label: t.nav.academy, href: '/academy' },
+    { label: t.nav.deals, href: '/deals' },
+    { label: t.nav.trends, href: '/trends' },
+    { label: t.nav.community, href: '/community' },
+    { label: t.nav.events, href: '/events' },
+  ];
+
 
   useEffect(() => {
     const handleScroll = () => {

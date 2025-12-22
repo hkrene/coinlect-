@@ -1,11 +1,10 @@
-import { AboutPage } from '@/pages/AboutPage';
+import { About } from '@/pages/About';
 import { ComponentsLayout } from '../components-layout';
 
-export default function AboutPageRoute() {
+export default function AboutPage() {
   return (
     <ComponentsLayout>
-      <AboutPage />
+      <About />
     </ComponentsLayout>
   );
 }
-

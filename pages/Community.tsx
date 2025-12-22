@@ -123,7 +123,7 @@ export const Community: React.FC = () => {
              <ScrollReveal delay={sectionIndex * 100}>
                <h2 className="mb-6 text-3xl font-bold text-white md:text-4xl">{section.category}</h2>
              </ScrollReveal>
-             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+             <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
                {section.items.map((item, itemIndex) => (
                  <ScrollReveal key={itemIndex} delay={(sectionIndex * 100) + (itemIndex * 50)}>
                    <div
