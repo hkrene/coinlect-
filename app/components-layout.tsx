@@ -8,7 +8,7 @@ import { ChatAssistant } from '@/components/ChatAssistant';
 
 export function ComponentsLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isLegalPage = pathname === '/privacy' || pathname === '/terms';
+  const isSpecialPage = pathname === '/privacy' || pathname === '/terms' || pathname === '/login' || pathname === '/register' || pathname === '/forgot-password';
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -16,12 +16,12 @@ export function ComponentsLayout({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex flex-col min-h-screen font-sans text-white bg-black selection:bg-coinlect-accent selection:text-black dark">
-      {!isLegalPage && <Header />}
+      {!isSpecialPage && <Header />}
       <main className="flex-grow">
         {children}
       </main>
-      {!isLegalPage && <Footer />}
-      {!isLegalPage && <ChatAssistant />}
+      {!isSpecialPage && <Footer />}
+      {!isSpecialPage && <ChatAssistant />}
     </div>
   );
 }
