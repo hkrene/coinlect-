@@ -147,18 +147,6 @@ export const ArticleDetail: React.FC = () => {
              ))}
          </div>
 
-         {/* Author Bio Box */}
-         <div className="flex flex-col items-center gap-6 p-8 mt-12 text-center border bg-white/5 rounded-xl border-white/10 md:flex-row md:items-start md:text-left">
-             <img src={article.authorImage} alt={article.author} className="w-20 h-20 border-2 rounded-full border-coinlect-accent" />
-             <div>
-                 <h4 className="mb-2 text-lg font-bold text-white">About {article.author}</h4>
-                 <p className="mb-4 text-sm text-gray-400">
-                     Senior Crypto Analyst at Coinlect. Specialized in DeFi protocols and on-chain data analysis. 
-                     Helping over 100k students understand the complexities of the blockchain.
-                 </p>
-                 <button className="text-sm font-bold text-coinlect-accent hover:underline">View all posts</button>
-             </div>
-         </div>
       </div>
 
       {/* Related Articles */}
