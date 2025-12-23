@@ -14,6 +14,18 @@ interface TeamMember {
   };
 }
 
+interface Volunteer {
+  name: string;
+  title: string;
+  image: string;
+  socials: {
+    twitter?: string;
+    linkedin?: string;
+  };
+}
+
+
+
 const TEAM_MEMBERS: TeamMember[] = [
   {
     name: "Hirwa Rene",
@@ -52,7 +64,7 @@ const TEAM_MEMBERS: TeamMember[] = [
     },
   },
   {
-    name: "Sylvien Diman'da",
+    name: "Sylvain Kaman'da",
     title: "Community Manager Lead",
     image: "https://res.cloudinary.com/drsd8adkq/image/upload/v1766394673/sylvain-kamanda_bnswmr.jpg",
     socials: {
@@ -62,11 +74,51 @@ const TEAM_MEMBERS: TeamMember[] = [
   },
   {
     name: "Emmanuel Kayombo",
-    title: "Active Member",
+    title: "Active Member at UNH",
     image: "https://res.cloudinary.com/drsd8adkq/image/upload/v1766406311/emmailka_jgzlqy.jpg",
     socials: {
       twitter: "https://x.com/",
       linkedin: "https://www.linkedin.com/in/emmanuel-kayombo-0b4b8b2b2/",
+    },
+  },
+];
+
+const VOLUNTEERS: Volunteer[] = [
+  
+  {
+    name: "Josue Kitumaini",
+    title: "Volunteer at UNILU",
+    image: "https://res.cloudinary.com/drsd8adkq/image/upload/v1766489997/josuecrypto_nulqyu.jpg",
+    socials: {
+      twitter: "https://x.com/josue_mus2?s=21",
+      linkedin: "https://www.linkedin.com/in/josu%C3%A9-kitumaini-836215221/",
+    },
+  },
+  {
+    name: "David Kalunga",
+    title: "Volunteer at UCB",
+    image: "https://res.cloudinary.com/drsd8adkq/image/upload/v1766491935/davidkalunga_jfr0st.jpg",
+    socials: {
+      twitter: "https://x.com/DavidKalun71250",
+      linkedin: "https://www.linkedin.com/in/david-kalunga-24788a382",
+    },
+  },
+  {
+    name: "Odilon Nfan",
+    title: "Active Member",
+    image: "https://res.cloudinary.com/drsd8adkq/image/upload/v1766491935/odilon_xsbjqr.jpg",
+    socials: {
+      twitter: "#",
+      linkedin: "https://www.linkedin.com/in/odilon-nfan-467550252?",
+    },
+  },
+  {
+    name: "John X",
+    title: "Active Member",
+    image: "https://res.cloudinary.com/drsd8adkq/image/upload/v1766400615/coinlect-fest_hreelt.jpg",
+    socials: {
+      twitter: "#",
+      linkedin: "#",
     },
   },
 ];
@@ -197,6 +249,51 @@ export const About: React.FC = () => {
             </div>
           </div>
         </ScrollReveal>
+        {/* Volunteers Section */}
+<ScrollReveal delay={500}>
+  <div className="mb-16 text-center">
+    <h2 className="mb-12 text-4xl font-extrabold text-white md:text-5xl">
+      Our <span className="text-coinlect-accent">Volunteers</span>
+    </h2>
+
+    <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+      {VOLUNTEERS.map((volunteer, index) => (
+        <div key={index} className="flex flex-col items-center">
+          <img
+            src={volunteer.image}
+            alt={volunteer.name}
+            className="object-cover w-32 h-32 mb-4 rounded-full shadow-lg"
+          />
+          <h3 className="text-lg font-bold text-white">{volunteer.name}</h3>
+          <p className="mb-3 text-sm text-gray-400">{volunteer.title}</p>
+          <div className="flex gap-3">
+            {volunteer.socials.twitter && (
+              <a
+                href={volunteer.socials.twitter}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-coinlect-accent"
+              >
+                <Twitter size={20} />
+              </a>
+            )}
+            {volunteer.socials.linkedin && (
+              <a
+                href={volunteer.socials.linkedin}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-400 hover:text-coinlect-accent"
+              >
+                <Linkedin size={20} />
+              </a>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</ScrollReveal>
+
 
       </div>
     </div>
