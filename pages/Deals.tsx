@@ -5,13 +5,12 @@ import { ScrollReveal } from '../components/ScrollReveal';
 import { Button } from '../components/Button';
 import { dealService } from '../services/db';
 import { Deal } from '../mockData';
-import { Tag, ExternalLink, ShieldCheck } from 'lucide-react';
+import { Tag, ExternalLink, ShieldCheck, AlertTriangle } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { AdBanner } from '../components/AdBanner';
 
 export const Deals: React.FC = () => {
   const [deals, setDeals] = useState<Deal[]>([]);
-  // We use the English keys as the source of truth for logic, regardless of display language
   const [activeCategory, setActiveCategory] = useState('All');
   const { t } = useLanguage();
 
@@ -19,118 +18,106 @@ export const Deals: React.FC = () => {
     setDeals(dealService.getAll());
   }, []);
 
-  // Display labels from translation
   const displayCategories = t.deals.filters;
-  // Canonical keys matching mockData.ts
   const canonicalCategories = ["All", "Exchange", "Wallet", "Tax", "Trading Tool", "Security"];
 
-  // Filter Logic
   const filteredDeals = deals.filter(deal => {
-    // Check Category using canonical keys
     const isAll = activeCategory === 'All';
-    const matchesCategory = isAll || deal.category === activeCategory;
-
-    return matchesCategory;
+    return isAll || deal.category === activeCategory;
   });
 
   return (
-    <div className="pt-24 min-h-screen bg-[#0a0a0a]">
+    <div className="min-h-screen bg-black">
       
-      {/* Hero Section */}
-      <div className="relative py-16 overflow-hidden border-b border-white/5">
-        <div className="absolute inset-0 bg-gradient-to-b from-blue-900/10 to-transparent"></div>
-        <div className="absolute right-0 top-0 w-1/3 h-full bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-coinlect-accent/10 to-transparent pointer-events-none"></div>
+      {/* SECTION HEADER: Style Dokploy avec marge ajustée */}
+      <section className="relative w-full pt-48 pb-24 overflow-hidden bg-black">
+        {/* Background Grid */}
+        <div aria-hidden className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px]" />
 
-        <div className="container relative z-10 px-6 mx-auto text-center">
-           <ScrollReveal>
-             <h1 className="mb-6 text-4xl font-extrabold md:text-6xl">
-               {t.deals.title} <span className="text-coinlect-accent">{t.deals.titleSuffix}</span>
-             </h1>
-             <p className="max-w-2xl mx-auto mb-10 text-lg leading-relaxed text-gray-400">
-               {t.deals.subtitle}
-             </p>
-           </ScrollReveal>
+        <div className="relative z-10 w-full px-6 mx-auto max-w-7xl">
+          <ScrollReveal>
+            <div className="text-center">
+              <h1 className="mb-8 text-5xl font-bold leading-[1.1] tracking-tighter text-white md:text-7xl lg:text-8xl">
+                <span className="text-[#a1a1aa]">{t.deals.title}</span>{' '}
+                <span className="relative inline-block text-white">
+                  <span className="absolute inset-x-0 top-1/2 h-[2px] w-[110%] -translate-x-[5%] bg-white -rotate-2 z-10" />
+                  {t.deals.titleSuffix}
+                </span>
+              </h1>
+              <p className="max-w-3xl mx-auto text-base leading-relaxed text-[#71717a] md:text-xl lg:text-2xl">
+                {t.deals.subtitle}
+              </p>
+            </div>
+          </ScrollReveal>
         </div>
-      </div>
+      </section>
 
       <div className="container px-6 py-12 mx-auto">
-        {/* Category Filters */}
+        {/* Filtres Catégories */}
         <ScrollReveal>
-          <div className="flex w-full gap-2 pb-2 mb-12 overflow-x-auto md:w-auto md:pb-0 scrollbar-hide">
+          <div className="flex w-full gap-2 pb-2 mb-16 overflow-x-auto md:w-auto md:pb-0 scrollbar-hide">
             {canonicalCategories.map((catKey, index) => (
               <button
                 key={catKey}
                 onClick={() => setActiveCategory(catKey)}
-                className={`whitespace-nowrap px-4 py-2 rounded-full text-xs font-bold border transition-all ${activeCategory === catKey ? 'bg-white text-black border-white' : 'bg-transparent border-white/10 text-gray-400 hover:border-white/30 hover:text-white'}`}
+                className={`whitespace-nowrap px-6 py-2 rounded-none text-xs font-bold border transition-all ${
+                  activeCategory === catKey 
+                    ? 'bg-white text-black border-white' 
+                    : 'bg-transparent border-white/10 text-gray-400 hover:border-white/30 hover:text-white'
+                }`}
               >
-                {/* Display the translated label using the index */}
+                {/* Traduction via le contexte de langue */}
                 {displayCategories[index] || catKey}
               </button>
             ))}
           </div>
         </ScrollReveal>
 
-        {/* Deals Grid */}
-        <div className="grid gap-8 mb-20 md:grid-cols-2 lg:grid-cols-3">
-            {filteredDeals.map((deal, idx) => (
-                <ScrollReveal key={deal.id} delay={idx * 50}>
-                    <div className="relative flex flex-col h-full p-6 overflow-hidden transition-all duration-300 border group bg-[#0F0F0F] rounded-2xl border-white/10 hover:border-coinlect-accent/30 hover:-translate-y-1">
-                        
-                        {/* Exclusive Badge */}
-                        {deal.exclusive && (
-                            <div className="absolute top-0 right-0 bg-coinlect-accent text-black text-[10px] font-bold px-3 py-1 rounded-bl-xl z-20 flex items-center gap-1 shadow-lg">
-                                <ShieldCheck size={12} /> {t.deals.exclusive}
+        {/* Liste des Offres */}
+        <div className="flex flex-col gap-8 mb-20">
+            {filteredDeals.length > 0 ? (
+                filteredDeals.map((deal, idx) => (
+                    <ScrollReveal key={deal.id} delay={idx * 50}>
+                        <div className="relative flex flex-col md:flex-row h-full overflow-hidden transition-all duration-300 border rounded-none bg-[#0a0a0a] border-white/10 hover:border-white/30 group">
+                            
+                            <div className="relative w-full md:w-[380px] h-56 md:h-auto overflow-hidden bg-black flex items-center justify-center border-b md:border-b-0 md:border-r border-white/10">
+                                <img src={deal.logo} alt={deal.name} className="object-cover w-full h-full transition-all duration-700 opacity-60 group-hover:opacity-100 group-hover:scale-105" />
+                                {deal.exclusive && (
+                                    <div className="absolute top-0 left-0 bg-white text-black text-[10px] font-black uppercase tracking-widest px-3 py-1.5 z-20 flex items-center gap-1 shadow-2xl">{t.deals.exclusive}
+                                    </div>
+                                )}
                             </div>
-                        )}
 
-                        <div className="flex items-start justify-between mb-6">
-                            {/* Logo Display - Direct, no card container */}
-                            <div className="flex items-center w-auto h-12">
-                                <img src={deal.logo} alt={deal.name} className="object-contain w-auto h-full" />
+                            <div className="flex flex-col flex-grow p-8">
+                                <div className="flex flex-col mb-4">
+                                    <span className="text-[10px] font-bold text-coinlect-accent uppercase tracking-[0.2em] mb-3">{deal.category}</span>
+                                    <h3 className="text-2xl font-bold tracking-tight text-white md:text-3xl">{deal.name} — {deal.discount}</h3>
+                                </div>
+                                <p className="mb-6 text-sm leading-relaxed text-[#71717a] max-w-2xl font-medium">{deal.description}</p>
+                                
+                                <div className="flex items-center gap-6 mt-auto wrap">
+                                    <a href={deal.link} target="_blank" rel="noopener noreferrer">
+                                        <button className="px-10 py-4 text-xs font-bold tracking-widest text-black uppercase transition-all bg-white rounded-none hover:bg-coinlect-accent">
+                                            {t.deals.claim}
+                                        </button>
+                                    </a>
+                                    {deal.code && (
+                                        <div className="flex items-center gap-3 text-xs font-bold tracking-widest text-gray-500 uppercase">
+                                            <span>{t.deals.coupon} :</span>
+                                            <span className="px-4 py-2 text-white border border-dashed bg-white/5 border-white/10">{deal.code}</span>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
-                            <span className="bg-white/5 border border-white/10 text-gray-400 text-[10px] px-2 py-1 rounded uppercase tracking-wider font-bold">
-                                {deal.category}
-                            </span>
                         </div>
-
-                        <h3 className="mb-2 text-xl font-bold text-white">{deal.name}</h3>
-                        <div className="flex items-center gap-2 mb-4 text-sm font-bold text-green-400">
-                            <Tag size={16} /> {deal.discount}
-                        </div>
-                        
-                        <p className="flex-grow mb-6 text-sm leading-relaxed text-gray-400">
-                            {deal.description}
-                        </p>
-
-                        {/* Coupon Code Section */}
-                        {deal.code && (
-                            <div className="flex items-center justify-between p-3 mb-6 transition-colors border border-dashed rounded-lg bg-white/5 border-white/20 group-hover:bg-white/10">
-                                <span className="text-xs text-gray-500">{t.deals.coupon}</span>
-                                <span className="font-mono font-bold tracking-widest cursor-pointer select-all text-coinlect-accent">{deal.code}</span>
-                            </div>
-                        )}
-
-                        <a href={deal.link} target="_blank" rel="noopener noreferrer" className="mt-auto">
-                            <Button className="justify-center w-full group-hover:bg-coinlect-accent group-hover:text-black">
-                                {t.deals.claim} <ExternalLink size={16} />
-                            </Button>
-                        </a>
-                    </div>
-                </ScrollReveal>
-            ))}
+                    </ScrollReveal>
+                ))
+            ) : (
+                <div className="py-20 text-center">
+                    <p className="text-gray-500">Aucune offre trouvée pour cette catégorie.</p>
+                </div>
+            )}
         </div>
-        
-        {filteredDeals.length === 0 && (
-            <div className="py-20 text-center">
-                <p className="text-lg text-gray-500">No deals found matching your criteria.</p>
-                <button onClick={() => setActiveCategory('All')} className="mt-2 text-coinlect-accent hover:underline">Clear filters</button>
-            </div>
-        )}
-
-        <ScrollReveal>
-            <AdBanner variant="wide" />
-        </ScrollReveal>
-
       </div>
     </div>
   );
