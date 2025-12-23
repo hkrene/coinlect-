@@ -166,6 +166,25 @@ export const Header: React.FC = () => {
                </Link>
              );
            })}
+           <div className="flex flex-col gap-2 pt-4 mt-4 border-t border-white/10">
+             <div className="flex items-center gap-2">
+               <div className="relative flex items-center flex-none">
+                 <button onClick={() => setLanguage('fr')} className={`relative z-10 w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all ${language === 'fr' ? 'border-coinlect-accent bg-black text-gray-200' : 'border-white/10 bg-black text-gray-500'}`}>
+                   <span className="text-xs font-semibold">FR</span>
+                 </button>
+                 <button onClick={() => setLanguage('en')} className={`relative -ml-3 z-0 w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all ${language === 'en' ? 'border-coinlect-accent bg-black text-gray-200' : 'border-white/10 bg-black text-gray-500'}`}>
+                   <span className="text-xs font-semibold">EN</span>
+                 </button>
+               </div>
+               {!isAuthenticated && <Link href="/register" className="flex-grow"><Button variant="outline" className="px-4 py-2 text-xs text-white border-white/20" onClick={() => setMobileMenuOpen(false)}>{t.nav.getStarted}</Button></Link>}
+             </div>
+             {isAuthenticated && (
+               <div className="flex items-center justify-between p-2 mt-2 rounded-lg bg-white/5">
+                 <span className="text-sm font-semibold text-white">{user?.name || user?.email}</span>
+                 <button onClick={() => { logout(); setMobileMenuOpen(false); }} className="p-1.5 bg-red-500/10 text-red-600 rounded-full hover:bg-red-500"><LogOut size={14} /></button>
+               </div>
+             )}
+           </div>
         </div>
       )}
     </header>
