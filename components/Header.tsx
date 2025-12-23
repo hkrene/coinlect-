@@ -75,7 +75,6 @@ export const Header: React.FC = () => {
     { label: t.nav.trends, href: '/trends' },
     { label: t.nav.community, href: '/community' },
     { label: t.nav.events, href: '/events' },
-    { label: t.footer.about, href: '/about' },
   ];
 
 
