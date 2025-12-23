@@ -83,15 +83,7 @@ export const Footer: React.FC = () => {
                 </div>
             </div>
 
-            <div className="flex flex-col items-center justify-between pt-8 border-t md:flex-row border-white/5">
-                <div className="flex items-center gap-4 mb-4 md:mb-0">
-                    <img 
-                        src="https://res.cloudinary.com/drsd8adkq/image/upload/v1765187097/coinlect-0_denz8g.jpg" 
-                        alt="Coinlect" 
-                        className="hidden w-auto h-6 rounded-full opacity-70 md:block"
-                    />
-                    <span className="text-gray-500">© 2025 Coinlect. {t.footer.rights}</span>
-                </div>
+            <div className="flex flex-col items-center justify-between border-t md:flex-row border-white/5">
                 <div className="flex flex-col items-center gap-4 md:flex-row">
                     <div className="flex items-center gap-4">
                         {/* Language Toggle beside Social Icons */}
@@ -144,6 +136,12 @@ export const Footer: React.FC = () => {
                         </a>
                         </div>
                     </div>
+                </div>
+                <div className="flex items-center gap-4 my-4 md:mb-0">
+                    <span className="text-xs text-gray-500">© 2025 Coinlect. {t.footer.rights}</span>
+                    <a href="http://hirwarene-dev.netlify.app" className="text-xs text-gray-500" target="_blank" rel="noopener noreferrer">
+                <span>Designed by <span  className='text-blue-500'>Hkrene</span></span>
+                </a>
                 </div>
             </div>
         </div>
