@@ -132,7 +132,7 @@ export const Academy: React.FC = () => {
           <div className="flex flex-col items-center justify-between gap-6 mb-12 md:flex-row">
               <div className="flex p-1 bg-[#111] rounded-xl border border-white/5 w-full md:w-auto">
                   <button onClick={() => setActiveTab('courses')} className={`flex-1 md:flex-none px-8 py-3 rounded-lg text-sm font-bold transition-all ${activeTab === 'courses' ? 'bg-coinlect-accent text-black' : 'text-gray-400 hover:text-white'}`}>Cours</button>
-                  <button onClick={() => setActiveTab('articles')} className={`flex-1 md:flex-none px-8 py-3 rounded-lg text-sm font-bold transition-all ${activeTab === 'articles' ? 'bg-coinlect-accent text-black' : 'text-gray-400 hover:text-white'}`}>Blog & Analyse</button>
+                  <button onClick={() => setActiveTab('articles')} className={`flex-1 md:flex-none px-8 py-3 rounded-lg text-sm font-bold transition-all ${activeTab === 'articles' ? 'bg-coinlect-accent text-black' : 'text-gray-400 hover:text-white'}`}>Articles & Analyse</button>
               </div>
               {activeTab === 'courses' && (
                   <div className="flex w-full gap-2 pb-2 overflow-x-auto md:w-auto md:pb-0 scrollbar-hide">
@@ -153,28 +153,51 @@ export const Academy: React.FC = () => {
           </div>
 
           {/* Trading Tools (Horizontal Scroll) */}
-          <ScrollReveal className="mt-20">
-            <header className="mb-8">
-                <h2 className="mb-2 text-2xl font-semibold text-slate-100 md:text-4xl">{t.academy.tradingTools.title}</h2>
-                <p className="max-w-xl text-sm text-slate-400">Market scanners, explorers and analytics platforms used by active traders.</p>
-            </header>
-            <div className="flex gap-4 pb-4 overflow-x-auto scrollbar-hide">
-                  {/* ... (Trading Tools mapping unchanged) */}
-                  {[
-                    { title: "DexScreener", desc: "Real-time charts & trading history", link: "https://dexscreener.com/" },
-                    { title: "DexTools", desc: "The central hub for DeFi traders", link: "https://dextools.io/" },
-                    { title: "BaseScan", desc: "Base ecosystem block explorer", link: "https://basescan.org/" },
-                    { title: "EtherScan", desc: "Ethereum blockchain explorer", link: "https://etherscan.io/" },
-                  ].map((item, idx) => (
-                      <a key={idx} href={item.link} target="_blank" rel="noopener noreferrer" className="relative flex flex-col justify-between flex-shrink-0 w-64 p-5 overflow-hidden transition-all border group md:w-80 rounded-xl border-white/10 bg-white/5 hover:border-coinlect-accent hover:bg-coinlect-accent/10">
-                          <div className="relative z-10">
-                              <h4 className="flex items-center justify-between mb-1 text-base font-semibold text-white">{item.title}<ExternalLink size={16} className="text-gray-400 transition-transform group-hover:translate-x-1" /></h4>
-                              <p className="text-sm leading-relaxed text-gray-400">{item.desc}</p>
-                          </div>
-                      </a>
-                  ))}
-            </div>
-          </ScrollReveal>
+<ScrollReveal className="mt-20">
+  <header className="mb-8">
+      <h2 className="mb-2 text-2xl font-semibold text-slate-100 md:text-4xl">
+        {t.academy.tradingTools.title}
+      </h2>
+      <p className="max-w-xl text-sm text-slate-400">
+        Scanners de marché, explorateurs et plateformes d'analyse utilisés par les traders actifs.
+      </p>
+  </header>
+  <div className="flex gap-4 pb-4 overflow-x-auto scrollbar-hide">
+        {[
+          { title: "DexScreener", desc: "Graphiques en temps réel et historique de trading", link: "https://dexscreener.com/" },
+          { title: "DexTools", desc: "Le hub central pour les traders DeFi", link: "https://dextools.io/" },
+          { title: "BaseScan", desc: "Explorateur de blocs de l'écosystème Base", link: "https://basescan.org/" },
+          { title: "EtherScan", desc: "Explorateur de la blockchain Ethereum", link: "https://etherscan.io/" },
+          { title: "BscScan", desc: "Explorateur de blocs pour la BNB Smart Chain", link: "https://bscscan.com/" },
+          { title: "Solscan", desc: "Analyse et explorateur de l'écosystème Solana", link: "https://solscan.io/" },
+          { title: "Tonviewer", desc: "Explorateur de données pour le réseau TON", link: "https://tonviewer.com/" },
+          { title: "Tonscan", desc: "Explorateur de blockchain officiel de TON", link: "https://tonscan.org/" },
+          { title: "CoinGecko", desc: "Données de marché et classement des cryptos", link: "https://www.coingecko.com/" },
+          { title: "CoinMarketCap", desc: "Suivi des prix, capitalisation et volumes", link: "https://coinmarketcap.com/" },
+          { title: "SuiScan", desc: "Explorateur de blocs et d'objets pour Sui", link: "https://suiscan.xyz/" },
+          { title: "RugCheck", desc: "Vérification de sécurité et détection de scam", link: "https://rugcheck.xyz/" },
+          { title: "LunarCrush", desc: "Analyse des réseaux sociaux et sentiments Web3", link: "https://lunarcrush.com/" },
+        ].map((item, idx) => (
+            <a 
+              key={idx} 
+              href={item.link} 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="relative flex flex-col justify-between flex-shrink-0 w-64 p-5 overflow-hidden transition-all border rounded-none group md:w-80 border-white/10 bg-white/5 hover:border-coinlect-accent hover:bg-coinlect-accent/10"
+            >
+                <div className="relative z-10">
+                    <h4 className="flex items-center justify-between mb-1 text-base font-semibold text-white">
+                      {item.title}
+                      <ExternalLink size={16} className="text-gray-400 transition-transform group-hover:translate-x-1" />
+                    </h4>
+                    <p className="text-sm leading-relaxed text-gray-400">
+                      {item.desc}
+                    </p>
+                </div>
+            </a>
+        ))}
+  </div>
+</ScrollReveal>
       </div>
 
       {/* SECTION 3: DEVELOPER / WEB3 ECOSYSTEM (Edge to Edge) */}
