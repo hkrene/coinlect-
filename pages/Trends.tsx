@@ -185,7 +185,7 @@ export const Trends: React.FC = () => {
           <div className="container px-6 mx-auto mb-12">
             <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
                 <div>
-                    <h1 className="mb-4 text-4xl font-bold text-center md:text-left">Market <span className="text-coinlect-accent">Trends</span></h1>
+                    <h1 className="mb-4 text-4xl font-bold text-center md:text-left">Marché <span className="text-coinlect-accent">Crypto</span></h1>
                 </div>
                 <div className="flex items-center gap-4">
                     <button 
@@ -229,8 +229,8 @@ export const Trends: React.FC = () => {
                                     <th className="p-3 pl-4 pr-2 text-left sm:p-3 sm:pl-4 sm:pr-2 md:p-6 md:pl-8 md:pr-6">Asset</th>
                                     <th className="p-3 px-2 text-right sm:p-3 sm:px-2 md:p-6 md:px-6">Price</th>
                                     <th className="p-3 px-2 text-right sm:p-3 sm:px-2 md:p-6 md:px-6">24h Change</th>
-                                    <th className="p-3 px-2 text-right sm:p-3 sm:px-2 md:p-6 md:px-6">24h Volume</th>
-                                    <th className="p-3 pl-2 pr-4 text-right sm:p-3 sm:pl-2 sm:pr-4 md:p-6 md:pl-6 md:pr-8">Market Cap</th>
+                                    <th className="p-3 px-4 text-right sm:p-3 sm:px-2 md:p-6 md:px-6">24h Volume</th>
+                                    <th className="p-3 pl-6 pr-4 text-right sm:p-3 sm:pl-2 sm:pr-4 md:p-6 md:pl-6 md:pr-8">Market Cap</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-white/5">
@@ -271,10 +271,10 @@ export const Trends: React.FC = () => {
                                                     {Math.abs(coin.price_change_percentage_24h).toFixed(2)}%
                                                 </div>
                                             </td>
-                                            <td className="p-3 px-2 sm:p-3 sm:px-2 font-mono text-xs text-right text-gray-400 md:text-sm md:p-6 md:px-6">
+                                            <td className="p-3 px-2 font-mono text-xs text-right text-gray-400 sm:p-3 sm:px-2 md:text-sm md:p-6 md:px-6">
                                                 ${formatCompactNumber(coin.total_volume)}
                                             </td>
-                                            <td className="p-3 pl-2 pr-4 sm:p-3 sm:pl-2 sm:pr-4 font-mono text-xs text-right text-gray-400 md:text-sm md:p-6 md:pl-6 md:pr-8">
+                                            <td className="p-3 pl-2 pr-4 font-mono text-xs text-right text-gray-400 sm:p-3 sm:pl-2 sm:pr-4 md:text-sm md:p-6 md:pl-6 md:pr-8">
                                                 ${formatCompactNumber(coin.market_cap)}
                                             </td>
                                         </tr>
