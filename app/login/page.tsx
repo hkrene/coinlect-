@@ -77,14 +77,14 @@ export default function LoginPage() {
               <div>
                 <label className="block mb-2 text-xs font-medium text-gray-400 sm:text-sm">Password</label>
                 <div className="relative">
-                  <input 
+                <input 
                     type={showPassword ? 'text' : 'password'} 
-                    required
+                  required
                     className="w-full px-3 py-3 pr-10 text-sm text-white transition-colors border rounded-lg sm:px-4 sm:py-3 sm:text-base bg-black/50 border-white/10 focus:outline-none focus:border-coinlect-accent focus:ring-1 focus:ring-coinlect-accent/50" 
-                    placeholder="••••••••"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                  />
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
                   <button 
                     type="button" 
                     onClick={() => setShowPassword(!showPassword)}

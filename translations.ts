@@ -24,8 +24,8 @@ export const translations = {
       donate: "Faire un don",
     },
     hero: {
-      titlePrefix: "Teka Lopango, somba ",
-      subtitle: "La plateforme crypto de référence pour l'Afrique et le monde. Échangez, apprenez et sécurisez vos actifs avec Coinlect.",
+      titlePrefix: "Yekola, Zwà mpe Somba ",
+      subtitle: "La plateforme crypto de référence pour l'Afrique Francophone. Apprenez, maîtrisez et sécurisez votre avenir numérique avec Coinlect Academy.",
       ctaDonation: "Faire un don",
       ctaStart: "Commencer"
     },

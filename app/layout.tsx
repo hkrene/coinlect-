@@ -6,7 +6,7 @@ import { Providers } from './providers';
 const inter = Inter({ subsets: ['latin'], weight: ['300', '400', '600', '700'] });
 
 export const metadata: Metadata = {
-  title: 'Coinlect - Teka Lopango, somba Bitcoin',
+  title: 'Coinlect',
   description: 'Coinlect - Your crypto learning platform',
 };
 
