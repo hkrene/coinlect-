@@ -227,10 +227,10 @@ export const Trends: React.FC = () => {
                             <thead className="text-xs font-semibold tracking-wider text-gray-500 uppercase border-b bg-white/5 border-white/10">
                                 <tr>
                                     <th className="p-3 pl-4 pr-2 text-left sm:p-3 sm:pl-4 sm:pr-2 md:p-6 md:pl-8 md:pr-6">Asset</th>
-                                    <th className="p-3 px-2 text-right sm:p-3 sm:px-2 md:p-6 md:px-6">Price</th>
-                                    <th className="p-3 px-2 text-right sm:p-3 sm:px-2 md:p-6 md:px-6">24h Change</th>
-                                    <th className="p-3 px-4 text-right sm:p-3 sm:px-2 md:p-6 md:px-6">24h Volume</th>
-                                    <th className="p-3 pl-6 pr-4 text-right sm:p-3 sm:pl-2 sm:pr-4 md:p-6 md:pl-6 md:pr-8">Market Cap</th>
+                                    <th className="p-3 px-2 text-left sm:p-3 sm:px-2 md:p-6 md:px-6">Price</th>
+                                    <th className="p-3 px-2 text-left sm:p-3 sm:px-2 md:p-6 md:px-6">24h Change</th>
+                                    <th className="p-3 px-2 text-right sm:p-3 sm:px-2 md:p-6 md:px-6">24h Volume</th>
+                                    <th className="p-3 pl-2 pr-4 text-right sm:p-3 sm:pl-2 sm:pr-4 md:p-6 md:pl-6 md:pr-8">Market Cap</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-white/5">
@@ -292,11 +292,11 @@ export const Trends: React.FC = () => {
         </ScrollReveal>
 
         {/* NEWS SECTION */}
-        <div className="relative">
+        <div id="news"  className="relative">
             <ScrollReveal>
                 <div className="flex flex-col justify-between gap-4 mb-8 md:flex-row md:items-center">
                     <h2 className="flex items-center gap-2 text-2xl font-bold">
-                        <TrendingUp className="text-coinlect-accent" />
+                        <TrendingUp className="text-coinlect-accent" id='news' />
                         Trending <span className="text-white">Crypto News</span>
                     </h2>
                     <Button variant="ghost" withArrow onClick={() => window.open('https://cryptopanic.com/', '_blank')} className="justify-center w-full md:w-auto md:justify-start">View More News</Button>

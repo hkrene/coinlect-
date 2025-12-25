@@ -2,36 +2,72 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ARTICLES_DATA } from '../mockData';
+import { articleService } from '../services/db';
+import { Article } from '../types';
 import { useLanguage } from '../contexts/LanguageContext';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export const About: React.FC = () => {
   const { t } = useLanguage();
   const [currentIndex, setCurrentIndex] = useState(0);
-  
-  // Rotating featured article
-  const featured = ARTICLES_DATA[currentIndex % ARTICLES_DATA.length];
-  // Static latest list or you could rotate this too, but usually list stays constant or paginates separately.
-  // We'll keep the list static for now as "Recent".
-  const latest = ARTICLES_DATA.filter(a => a.id !== featured.id).slice(0, 5);
+  const [featuredArticles, setFeaturedArticles] = useState<Article[]>([]);
+  const [latestArticles, setLatestArticles] = useState<Article[]>([]);
 
-  // Auto-switch articles every 5 seconds
   useEffect(() => {
+    const allArticles = articleService.getAll();
+    const featured = allArticles.filter(a => a.featured);
+    
+    // Ensure we have at least 3 featured articles, if not use regular articles
+    const articlesToShow = featured.length >= 3 ? featured : allArticles.slice(0, Math.max(3, featured.length));
+    setFeaturedArticles(articlesToShow);
+    
+    // Get latest non-featured articles for sidebar
+    const latest = allArticles.filter(a => !a.featured || !articlesToShow.some(f => f.id === a.id)).slice(0, 5);
+    setLatestArticles(latest);
+  }, []);
+
+  // Listen for content updates
+  useEffect(() => {
+    const handleContentUpdate = () => {
+      const allArticles = articleService.getAll();
+      const featured = allArticles.filter(a => a.featured);
+      const articlesToShow = featured.length >= 3 ? featured : allArticles.slice(0, Math.max(3, featured.length));
+      setFeaturedArticles(articlesToShow);
+      const latest = allArticles.filter(a => !a.featured || !articlesToShow.some(f => f.id === a.id)).slice(0, 5);
+      setLatestArticles(latest);
+    };
+
+    window.addEventListener('contentUpdated', handleContentUpdate);
+    return () => window.removeEventListener('contentUpdated', handleContentUpdate);
+  }, []);
+
+  // Rotating featured article
+  const featured = featuredArticles[currentIndex % featuredArticles.length] || featuredArticles[0];
+  
+  // Auto-switch articles every 5 seconds (only if we have articles)
+  useEffect(() => {
+    if (featuredArticles.length === 0) return;
+    
     const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % ARTICLES_DATA.length);
+      setCurrentIndex((prev) => (prev + 1) % featuredArticles.length);
     }, 5000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [featuredArticles.length]);
 
   const nextSlide = () => {
-    setCurrentIndex((prev) => (prev + 1) % ARTICLES_DATA.length);
+    if (featuredArticles.length === 0) return;
+    setCurrentIndex((prev) => (prev + 1) % featuredArticles.length);
   };
 
   const prevSlide = () => {
-    setCurrentIndex((prev) => (prev - 1 + ARTICLES_DATA.length) % ARTICLES_DATA.length);
+    if (featuredArticles.length === 0) return;
+    setCurrentIndex((prev) => (prev - 1 + featuredArticles.length) % featuredArticles.length);
   };
+
+  if (!featured || featuredArticles.length === 0) {
+    return null; // Don't show section if no featured articles
+  }
 
   return (
     <section className="py-24 bg-[#0a0a0a]">
@@ -94,7 +130,7 @@ export const About: React.FC = () => {
                 <h3 className="mb-8 text-xs font-bold tracking-widest text-white uppercase">LATEST</h3>
                 
                 <div className="flex flex-col justify-between flex-1 gap-6">
-                    {latest.map((article) => (
+                    {latestArticles.map((article) => (
                         <Link href={`/academy/article/${article.id}`} key={article.id} className="block group">
                             <h4 className="mb-2 text-base font-bold leading-snug text-white transition-colors group-hover:text-coinlect-accent line-clamp-2">
                                 {article.title}

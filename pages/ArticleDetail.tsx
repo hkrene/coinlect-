@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { ARTICLES_DATA } from '../mockData';
+import { articleService } from '../services/db';
+import { Article } from '../types';
 import { Button } from '../components/Button';
 import { ScrollReveal } from '../components/ScrollReveal';
 import { useLanguage } from '../contexts/LanguageContext';
@@ -12,9 +13,15 @@ import { ArrowLeft, Clock, Calendar, Twitter, Facebook, Link as LinkIcon, Check,
 export const ArticleDetail: React.FC = () => {
   const params = useParams();
   const articleId = params?.articleId as string;
-  const article = ARTICLES_DATA.find(a => a.id === Number(articleId));
+  const [article, setArticle] = useState<Article | null>(null);
   const { t } = useLanguage();
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    const articles = articleService.getAll();
+    const foundArticle = articles.find(a => a.id === Number(articleId));
+    setArticle(foundArticle || null);
+  }, [articleId]);
 
   if (!article) {
     return (
@@ -28,16 +35,29 @@ export const ArticleDetail: React.FC = () => {
   }
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText(window.location.href);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    if (typeof window !== 'undefined') {
+      navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
-  const shareUrl = encodeURIComponent(window.location.href);
+  if (!article) {
+    return (
+      <div className="container flex flex-col items-center justify-center min-h-screen px-6 pt-32 mx-auto text-center">
+        <h2 className="mb-4 text-2xl font-bold">Article Not Found</h2>
+        <Link href="/academy">
+          <Button variant="secondary" withArrow>{t.academy.article.backToAcademy}</Button>
+        </Link>
+      </div>
+    );
+  }
+
+  const shareUrl = typeof window !== 'undefined' ? encodeURIComponent(window.location.href) : '';
   const shareText = encodeURIComponent(article.title);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] pb-24">
+    <div className="min-h-screen pb-24 bg-black">
       {/* Progress Bar (Simulated) */}
       <div className="fixed top-0 left-0 z-50 w-full h-1 bg-white/5">
          <div className="w-1/3 h-full bg-coinlect-accent"></div>
@@ -153,7 +173,7 @@ export const ArticleDetail: React.FC = () => {
       <div className="container max-w-5xl px-6 mx-auto mt-24">
          <h3 className="pl-4 mb-8 text-2xl font-bold text-white border-l-4 border-coinlect-accent">Read Next</h3>
          <div className="grid gap-8 md:grid-cols-2">
-            {ARTICLES_DATA.filter(a => a.id !== article.id).slice(0, 2).map(related => (
+            {articleService.getAll().filter(a => a.id !== article.id).slice(0, 2).map(related => (
                 <Link key={related.id} href={`/academy/article/${related.id}`} className="flex flex-col gap-4 p-4 transition-colors bg-transparent group md:flex-row hover:bg-white/5 rounded-xl">
                     <div className="flex-shrink-0 w-full h-32 overflow-hidden rounded-lg md:w-48">
                         <img src={related.image} alt={related.title} className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110" />

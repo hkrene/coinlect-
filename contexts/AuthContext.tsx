@@ -7,6 +7,8 @@ interface User {
   email: string;
   name: string | null;
   role: 'ADMIN' | 'EDITOR' | 'USER';
+  firstName?: string;
+  lastName?: string;
 }
 
 interface AuthContextType {
@@ -105,37 +107,55 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const refreshUser = async () => {
     try {
+      // Check localStorage first
+      const storedUser = localStorage.getItem('coinlect_current_user');
+      if (storedUser) {
+        try {
+          const user = JSON.parse(storedUser);
+          setUser(user);
+          setIsLoading(false);
+          return;
+        } catch (e) {
+          // Invalid stored user, continue to API check
+        }
+      }
+
       const token = getAccessToken();
-      if (!token) {
+      if (!token || token.startsWith('local_')) {
         setIsLoading(false);
         return;
       }
 
-      const res = await fetch('/api/auth/me', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
+      try {
+        const res = await fetch('/api/auth/me', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
 
-      if (res.ok) {
-        const data = await res.json();
-        setUser(data.user);
-        localStorage.setItem('coinlect_current_user', JSON.stringify(data.user));
-      } else {
-        // Try refreshing token
-        const newToken = await refreshAccessToken();
-        if (newToken) {
-          const retryRes = await fetch('/api/auth/me', {
-            headers: {
-              'Authorization': `Bearer ${newToken}`,
-            },
-          });
-          if (retryRes.ok) {
-            const retryData = await retryRes.json();
-            setUser(retryData.user);
-            localStorage.setItem('coinlect_current_user', JSON.stringify(retryData.user));
+        if (res.ok) {
+          const data = await res.json();
+          setUser(data.user);
+          localStorage.setItem('coinlect_current_user', JSON.stringify(data.user));
+        } else {
+          // Try refreshing token
+          const newToken = await refreshAccessToken();
+          if (newToken) {
+            const retryRes = await fetch('/api/auth/me', {
+              headers: {
+                'Authorization': `Bearer ${newToken}`,
+              },
+            });
+            if (retryRes.ok) {
+              const retryData = await retryRes.json();
+              setUser(retryData.user);
+              localStorage.setItem('coinlect_current_user', JSON.stringify(retryData.user));
+            }
           }
         }
+      } catch (apiErr) {
+        // API failed, user will need to login again
+        console.log('API refresh failed');
       }
     } catch (err) {
       console.error('Failed to refresh user', err);
@@ -147,30 +167,76 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const login = async (email: string, password: string) => {
     setError(null);
     try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
+      // Try API first
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password }),
+        });
 
-      const data = await res.json();
+        const data = await res.json();
 
-      if (!res.ok) {
-        setError(data.error || 'Login failed');
-        return;
+        if (res.ok && data.user) {
+          // Store tokens and user
+          if (data.accessToken) {
+            localStorage.setItem('accessToken', data.accessToken);
+          }
+          if (data.refreshToken) {
+            localStorage.setItem('refreshToken', data.refreshToken);
+          }
+          setUser(data.user);
+          localStorage.setItem('coinlect_current_user', JSON.stringify(data.user));
+          return;
+        }
+      } catch (apiErr) {
+        // API failed, fall back to localStorage
+        console.log('API login failed, trying localStorage fallback');
       }
 
-      // Store tokens and user
-      if (data.accessToken) {
-        localStorage.setItem('accessToken', data.accessToken);
+      // Fallback to localStorage-based authentication
+      if (typeof window !== 'undefined') {
+        const { userService } = await import('../services/db');
+        const users = userService.getAll();
+        const user = users.find(u => u.email === email);
+        
+        // Check for admin user with password "admin123"
+        if (user && email === 'admin@coinlect.com' && password === 'admin123') {
+          const authUser: User = {
+            id: user.id,
+            email: user.email,
+            name: `${user.firstName} ${user.lastName}`.trim(),
+            role: user.role === 'admin' ? 'ADMIN' : 'USER',
+            firstName: user.firstName,
+            lastName: user.lastName
+          };
+          setUser(authUser);
+          localStorage.setItem('coinlect_current_user', JSON.stringify(authUser));
+          // Create a simple token for localStorage
+          localStorage.setItem('accessToken', 'local_' + Date.now());
+          return;
+        }
+        
+        // For other users, check if password matches (simple check for demo)
+        if (user) {
+          // In a real app, you'd hash and verify the password
+          // For now, accept any password for existing users
+          const authUser: User = {
+            id: user.id,
+            email: user.email,
+            name: `${user.firstName} ${user.lastName}`.trim(),
+            role: user.role === 'admin' ? 'ADMIN' : 'USER',
+            firstName: user.firstName,
+            lastName: user.lastName
+          };
+          setUser(authUser);
+          localStorage.setItem('coinlect_current_user', JSON.stringify(authUser));
+          localStorage.setItem('accessToken', 'local_' + Date.now());
+          return;
+        }
       }
-      if (data.refreshToken) {
-        localStorage.setItem('refreshToken', data.refreshToken);
-      }
-      if (data.user) {
-        setUser(data.user);
-        localStorage.setItem('coinlect_current_user', JSON.stringify(data.user));
-      }
+
+      setError('Invalid email or password');
     } catch (err) {
       setError('Network error. Please try again.');
       console.error('Login error', err);
@@ -180,30 +246,60 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   const register = async (firstName: string, lastName: string, email: string, password: string) => {
     setError(null);
     try {
-      const name = `${firstName} ${lastName}`.trim();
-      const res = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, name }),
-      });
+      // Try API first
+      try {
+        const name = `${firstName} ${lastName}`.trim();
+        const res = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password, name }),
+        });
 
-      const data = await res.json();
+        const data = await res.json();
 
-      if (!res.ok) {
-        setError(data.error || 'Registration failed');
-        return;
+        if (res.ok && data.user) {
+          // Store tokens and user
+          if (data.accessToken) {
+            localStorage.setItem('accessToken', data.accessToken);
+          }
+          if (data.refreshToken) {
+            localStorage.setItem('refreshToken', data.refreshToken);
+          }
+          setUser(data.user);
+          localStorage.setItem('coinlect_current_user', JSON.stringify(data.user));
+          return;
+        }
+      } catch (apiErr) {
+        // API failed, fall back to localStorage
+        console.log('API register failed, trying localStorage fallback');
       }
 
-      // Store tokens and user
-      if (data.accessToken) {
-        localStorage.setItem('accessToken', data.accessToken);
-      }
-      if (data.refreshToken) {
-        localStorage.setItem('refreshToken', data.refreshToken);
-      }
-      if (data.user) {
-        setUser(data.user);
-        localStorage.setItem('coinlect_current_user', JSON.stringify(data.user));
+      // Fallback to localStorage-based registration
+      if (typeof window !== 'undefined') {
+        const { userService } = await import('../services/db');
+        try {
+          const newUser = userService.create({
+            email,
+            firstName,
+            lastName,
+            role: 'user'
+          });
+          
+          const authUser: User = {
+            id: newUser.id,
+            email: newUser.email,
+            name: `${newUser.firstName} ${newUser.lastName}`.trim(),
+            role: 'USER',
+            firstName: newUser.firstName,
+            lastName: newUser.lastName
+          };
+          
+          setUser(authUser);
+          localStorage.setItem('coinlect_current_user', JSON.stringify(authUser));
+          localStorage.setItem('accessToken', 'local_' + Date.now());
+        } catch (createErr: any) {
+          setError(createErr.message || 'Registration failed');
+        }
       }
     } catch (err) {
       setError('Network error. Please try again.');

@@ -93,6 +93,22 @@ const initData = () => {
       createdAt: new Date().toISOString()
     };
     localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify([adminUser]));
+  } else {
+    // Ensure admin user exists even if users array exists
+    const users = JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS) || '[]');
+    const adminExists = users.find((u: User) => u.email === 'admin@coinlect.com');
+    if (!adminExists) {
+      const adminUser: User = {
+        id: 'admin-1',
+        email: 'admin@coinlect.com',
+        firstName: 'Admin',
+        lastName: 'User',
+        role: 'admin',
+        createdAt: new Date().toISOString()
+      };
+      users.push(adminUser);
+      localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
+    }
   }
 };
 
@@ -147,7 +163,7 @@ export const courseService = {
   add: (course: Omit<Course, 'id'>) => {
     const courses = courseService.getAll();
     const newCourse = { ...course, id: Date.now() };
-    courses.push(newCourse as Course);
+    courses.unshift(newCourse as Course); // Add to beginning so new courses appear at top
     localStorage.setItem(STORAGE_KEYS.COURSES, JSON.stringify(courses));
     return newCourse;
   },
@@ -173,6 +189,16 @@ export const articleService = {
     articles.unshift(newArticle as Article);
     localStorage.setItem(STORAGE_KEYS.ARTICLES, JSON.stringify(articles));
     return newArticle;
+  },
+  update: (id: number, updates: Partial<Article>) => {
+    const articles = articleService.getAll();
+    const index = articles.findIndex(a => a.id === id);
+    if (index !== -1) {
+      articles[index] = { ...articles[index], ...updates };
+      localStorage.setItem(STORAGE_KEYS.ARTICLES, JSON.stringify(articles));
+      return articles[index];
+    }
+    return null;
   },
   delete: (id: number) => {
     let articles = articleService.getAll();

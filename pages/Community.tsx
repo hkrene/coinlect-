@@ -74,7 +74,7 @@ const COMMUNITIES = [
 
 export const Community: React.FC = () => {
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen pt-24 pb-20 bg-black">
       
       {/* SECTION HEADER: Style Dokploy */}
       <section className="relative w-full pt-48 pb-24 overflow-hidden bg-black">

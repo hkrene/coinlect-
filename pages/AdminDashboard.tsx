@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { userService, courseService, articleService, eventService } from '../services/db';
 import { User, Course, Article, Event } from '../types';
 import { Button } from '../components/Button';
-import { Trash2, Plus, Users, BookOpen, FileText, LayoutDashboard, X, Check, Calendar } from 'lucide-react';
+import { Trash2, Plus, Users, BookOpen, FileText, LayoutDashboard, X, Check, Calendar, Star } from 'lucide-react';
 
 export const AdminDashboard: React.FC = () => {
   const { user, isAdmin } = useAuth();
@@ -27,6 +27,7 @@ export const AdminDashboard: React.FC = () => {
   const [courseForm, setCourseForm] = useState<Omit<Course, 'id'>>({
     title: '',
     description: '',
+    about: '',
     level: 'Débutant',
     duration: '35m',
     modules: 0,
@@ -34,13 +35,14 @@ export const AdminDashboard: React.FC = () => {
     image: '',
     syllabus: [],
     learningObjectives: [],
-    courseType: 'academy'
+    courseType: 'academy',
+    videoLink: ''
   });
 
-  const [articleForm, setArticleForm] = useState<Omit<Article, 'id'>>({
+  const [articleForm, setArticleForm] = useState<Omit<Article, 'id' | 'content'> & { content: string }>({
     title: '',
     excerpt: '',
-    content: [],
+    content: '', // Stored as string in form, converted to array on save
     readTime: '5 min',
     date: new Date().toLocaleDateString('fr-FR'),
     image: '',
@@ -55,7 +57,8 @@ export const AdminDashboard: React.FC = () => {
     date: '',
     location: '',
     type: [],
-    banner: 'africa-blockchain-festival',
+    banner: 'custom',
+    bannerImage: '',
     bannerText: '',
     description: ''
   });
@@ -89,13 +92,25 @@ export const AdminDashboard: React.FC = () => {
     courseService.add({ ...courseForm, modules: courseForm.modules || 0 });
     setIsModalOpen(false);
     setRefreshTrigger(p => p + 1);
+    // Dispatch custom event to notify other components
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('contentUpdated'));
+    }
   };
 
   const handleSaveArticle = (e: React.FormEvent) => {
     e.preventDefault();
-    articleService.add(articleForm);
+    // Split content by newlines to create array of paragraphs
+    const contentArray = typeof articleForm.content === 'string' 
+      ? articleForm.content.split('\n').filter(p => p.trim().length > 0)
+      : articleForm.content;
+    articleService.add({ ...articleForm, content: contentArray });
     setIsModalOpen(false);
     setRefreshTrigger(p => p + 1);
+    // Dispatch custom event to notify other components
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('contentUpdated'));
+    }
   };
 
   const handleSaveEvent = (e: React.FormEvent) => {
@@ -103,12 +118,17 @@ export const AdminDashboard: React.FC = () => {
     eventService.add(eventForm);
     setIsModalOpen(false);
     setRefreshTrigger(p => p + 1);
+    // Dispatch custom event to notify other components
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('contentUpdated'));
+    }
     setEventForm({
       title: '',
       date: '',
       location: '',
       type: [],
-      banner: 'africa-blockchain-festival',
+      banner: 'custom',
+      bannerImage: '',
       bannerText: '',
       description: ''
     });
@@ -234,7 +254,10 @@ export const AdminDashboard: React.FC = () => {
         {activeTab === 'articles' && (
           <div className="space-y-6 animate-in fade-in">
             <div className="flex items-center justify-between">
-              <h1 className="text-3xl font-bold">Articles du Blog</h1>
+              <div>
+                <h1 className="text-3xl font-bold">Articles du Blog</h1>
+                <p className="mt-2 text-sm text-gray-400">Minimum 3 articles doivent être en vedette pour la page d'accueil</p>
+              </div>
               <Button onClick={() => { setModalType('article'); setIsModalOpen(true); }}><Plus size={16} /> Publier un Article</Button>
             </div>
             <div className="grid gap-4">
@@ -251,6 +274,31 @@ export const AdminDashboard: React.FC = () => {
                     </div>
                   </div>
                   <div className="flex gap-2">
+                    <button 
+                      onClick={() => {
+                        const updatedArticles = articleService.getAll();
+                        const article = updatedArticles.find(art => art.id === a.id);
+                        if (article) {
+                          const newFeaturedStatus = !article.featured;
+                          // Ensure at least 3 featured articles
+                          const currentFeaturedCount = updatedArticles.filter(art => art.featured).length;
+                          if (currentFeaturedCount < 3 && !newFeaturedStatus) {
+                            alert('Vous devez avoir au moins 3 articles en vedette sur la page d\'accueil');
+                            return;
+                          }
+                          articleService.update(a.id, { featured: newFeaturedStatus });
+                          setRefreshTrigger(t => t+1);
+                          if (typeof window !== 'undefined') {
+                            window.dispatchEvent(new CustomEvent('contentUpdated'));
+                          }
+                        }
+                      }} 
+                      className={`p-2 transition-colors ${a.featured ? 'text-coinlect-accent hover:text-yellow-500' : 'text-gray-500 hover:text-coinlect-accent'}`}
+                      aria-label={a.featured ? "Retirer de la page d'accueil" : "Mettre en vedette"}
+                      title={a.featured ? "Retirer de la page d'accueil" : "Mettre en vedette"}
+                    >
+                      <Star size={18} fill={a.featured ? "currentColor" : "none"} />
+                    </button>
                     <button onClick={() => { articleService.delete(a.id); setRefreshTrigger(t => t+1); }} className="p-2 text-red-500 transition-colors hover:text-red-400" aria-label="Delete article"><Trash2 size={18} /></button>
                   </div>
                 </div>
@@ -316,14 +364,35 @@ export const AdminDashboard: React.FC = () => {
                       required placeholder="Brève description pour la carte" className="w-full h-24 p-4 text-white bg-black border outline-none border-white/10 rounded-xl focus:border-coinlect-accent"
                       onChange={e => setCourseForm({...courseForm, description: e.target.value})} 
                     />
+                    <textarea 
+                      placeholder="À propos de ce cours (contenu détaillé affiché sur la page du cours)" className="w-full h-32 p-4 text-white bg-black border outline-none border-white/10 rounded-xl focus:border-coinlect-accent"
+                      onChange={e => setCourseForm({...courseForm, about: e.target.value})} 
+                    />
                     <div className="grid gap-4 md:grid-cols-3">
                        <select className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" onChange={e => setCourseForm({...courseForm, level: e.target.value as any})} aria-label="Course level">
                          <option>Débutant</option><option>Intermédiaire</option><option>Avancé</option>
                        </select>
                        <input placeholder="Durée (ex: 35m)" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" onChange={e => setCourseForm({...courseForm, duration: e.target.value})} />
+                       <input type="number" placeholder="Nombre de modules" min="0" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" onChange={e => setCourseForm({...courseForm, modules: parseInt(e.target.value) || 0})} />
+                    </div>
+                    <div className="grid gap-4 md:grid-cols-2">
                        <input placeholder="Catégorie (DeFi, NFT...)" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" onChange={e => setCourseForm({...courseForm, category: e.target.value})} />
+                       <select className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" onChange={e => setCourseForm({...courseForm, courseType: e.target.value as any})} aria-label="Course type">
+                         <option value="academy">Academy</option>
+                         <option value="specialization">Specialization</option>
+                         <option value="university">University</option>
+                       </select>
                     </div>
                     <input placeholder="URL de l'image de couverture" className="w-full p-4 text-white bg-black border outline-none border-white/10 rounded-xl" onChange={e => setCourseForm({...courseForm, image: e.target.value})} />
+                    <input placeholder="Lien vidéo (YouTube/Vimeo/URL directe)" className="w-full p-4 text-white bg-black border outline-none border-white/10 rounded-xl" onChange={e => setCourseForm({...courseForm, videoLink: e.target.value || undefined})} />
+                    <div className="grid gap-4 md:grid-cols-2">
+                       <input placeholder="Nom du partenaire (optionnel)" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" onChange={e => setCourseForm({...courseForm, partnerName: e.target.value || undefined})} />
+                       <input placeholder="URL du logo partenaire (optionnel)" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" onChange={e => setCourseForm({...courseForm, partnerLogo: e.target.value || undefined})} />
+                    </div>
+                    <label className="flex items-center gap-3 px-4 py-2 border cursor-pointer bg-white/5 rounded-xl border-white/10">
+                      <input type="checkbox" checked={courseForm.isPaid || false} onChange={e => setCourseForm({...courseForm, isPaid: e.target.checked})} className="border-gray-600 rounded" />
+                      <span className="text-xs font-bold">Cours payant</span>
+                    </label>
                   </div>
 
                   {/* Learning Objectives */}
@@ -360,9 +429,20 @@ export const AdminDashboard: React.FC = () => {
                    <textarea placeholder="Extrait accrocheur" className="w-full h-20 p-4 text-white bg-black border outline-none border-white/10 rounded-xl" onChange={e => setArticleForm({...articleForm, excerpt: e.target.value})} />
                    <div className="grid grid-cols-2 gap-4">
                      <input placeholder="Catégorie" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" onChange={e => setArticleForm({...articleForm, category: e.target.value})} />
-                     <input placeholder="URL Image" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" onChange={e => setArticleForm({...articleForm, image: e.target.value})} />
+                     <input placeholder="Temps de lecture (ex: 5 min)" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" onChange={e => setArticleForm({...articleForm, readTime: e.target.value})} />
                    </div>
-                   <textarea placeholder="Contenu complet (Séparez les paragraphes par une nouvelle ligne)" className="w-full p-4 text-white bg-black border outline-none border-white/10 rounded-xl h-60" onChange={e => setArticleForm({...articleForm, content: [e.target.value]})} />
+                   <div className="grid grid-cols-2 gap-4">
+                     <input placeholder="URL Image" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" onChange={e => setArticleForm({...articleForm, image: e.target.value})} />
+                     <input type="date" placeholder="Date" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" onChange={e => {
+                       const date = new Date(e.target.value);
+                       setArticleForm({...articleForm, date: date.toLocaleDateString('fr-FR')});
+                     }} />
+                   </div>
+                   <div className="grid grid-cols-2 gap-4">
+                     <input placeholder="Auteur" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={articleForm.author} onChange={e => setArticleForm({...articleForm, author: e.target.value})} />
+                     <input placeholder="URL Image auteur" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={articleForm.authorImage} onChange={e => setArticleForm({...articleForm, authorImage: e.target.value})} />
+                   </div>
+                   <textarea placeholder="Contenu complet (Séparez les paragraphes par une nouvelle ligne)" className="w-full p-4 text-white bg-black border outline-none border-white/10 rounded-xl h-60" onChange={e => setArticleForm({...articleForm, content: e.target.value})} />
                    <div className="flex gap-4 pt-4">
                      <Button type="button" variant="outline" className="w-1/2" onClick={() => setIsModalOpen(false)}>Annuler</Button>
                      <Button type="submit" className="w-1/2">Publier l&apos;Article</Button>
@@ -413,32 +493,41 @@ export const AdminDashboard: React.FC = () => {
                     </div>
                   </div>
                   <div className="space-y-3">
-                    <label className="block text-sm font-bold text-gray-400">Style de bannière</label>
-                    <select 
-                      aria-label="Banner style"
+                    <label className="block text-sm font-bold text-gray-400">Image de bannière</label>
+                    <input 
+                      type="url"
+                      placeholder="URL de l'image de bannière (ex: https://example.com/banner.jpg)" 
                       className="w-full p-4 text-white bg-black border outline-none border-white/10 rounded-xl focus:border-coinlect-accent" 
-                      value={eventForm.banner}
-                      onChange={e => setEventForm({...eventForm, banner: e.target.value})}
-                    >
-                      <option value="africa-blockchain-festival">Africa Blockchain Festival</option>
-                      <option value="blockf3st-africa">Blockf3st Africa</option>
-                      <option value="aptos-meet-build">Aptos Meet & Build</option>
-                      <option value="aptos-bootcamp">Aptos Bootcamp</option>
-                      <option value="mantle-meetup">Mantle Meetup</option>
-                      <option value="stellar-wacon">Stellar WACON</option>
-                    </select>
+                      value={eventForm.bannerImage || ''}
+                      onChange={e => setEventForm({...eventForm, bannerImage: e.target.value, banner: 'custom'})} 
+                      required
+                    />
+                    {eventForm.bannerImage && (
+                      <div className="relative w-full h-48 overflow-hidden border rounded-lg border-white/10">
+                        <img 
+                          src={eventForm.bannerImage} 
+                          alt="Banner preview" 
+                          className="object-cover w-full h-full"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).style.display = 'none';
+                          }}
+                        />
+                      </div>
+                    )}
                   </div>
                   <textarea 
                     placeholder="Texte de la bannière (optionnel, utilisez \\n pour les sauts de ligne)" 
                     className="w-full h-24 p-4 text-white bg-black border outline-none border-white/10 rounded-xl" 
                     value={eventForm.bannerText}
                     onChange={e => setEventForm({...eventForm, bannerText: e.target.value})} 
+                    aria-label="Banner text"
                   />
                   <textarea 
                     placeholder="Description (optionnel)" 
                     className="w-full h-32 p-4 text-white bg-black border outline-none border-white/10 rounded-xl" 
                     value={eventForm.description}
                     onChange={e => setEventForm({...eventForm, description: e.target.value})} 
+                    aria-label="Event description"
                   />
                   <div className="flex gap-4 pt-4">
                     <Button type="button" variant="outline" className="w-1/2" onClick={() => setIsModalOpen(false)}>Annuler</Button>

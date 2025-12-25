@@ -27,6 +27,7 @@ export interface Course {
   id: number;
   title: string;
   description: string;
+  about?: string; // Detailed "À propos de ce cours" content
   level: 'Débutant' | 'Intermédiaire' | 'Avancé';
   duration: string;
   modules: number;
@@ -39,6 +40,7 @@ export interface Course {
   partnerName?: string;
   partnerLogo?: string;
   isPaid?: boolean;
+  videoLink?: string; // YouTube/Vimeo/self-hosted video URL
 }
 
 export interface Article {
@@ -61,7 +63,8 @@ export interface Event {
   date: string;
   location: string;
   type: string[];
-  banner: string;
+  banner: string; // Banner style identifier or image URL
+  bannerImage?: string; // Direct image URL for custom banners
   bannerText?: string;
   description?: string;
 }

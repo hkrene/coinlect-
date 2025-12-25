@@ -1,9 +1,10 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { COURSES_DATA } from '../mockData';
+import { courseService } from '../services/db';
+import { Course } from '../types';
 import { Button } from '../components/Button';
 import { ScrollReveal } from '../components/ScrollReveal';
 import { ArrowLeft, PlayCircle } from 'lucide-react';
@@ -11,7 +12,13 @@ import { ArrowLeft, PlayCircle } from 'lucide-react';
 export const CourseDetail: React.FC = () => {
   const params = useParams();
   const courseId = params?.courseId as string;
-  const course = COURSES_DATA.find(c => c.id === Number(courseId));
+  const [course, setCourse] = useState<Course | null>(null);
+
+  useEffect(() => {
+    const courses = courseService.getAll();
+    const foundCourse = courses.find(c => c.id === Number(courseId));
+    setCourse(foundCourse || null);
+  }, [courseId]);
 
   if (!course) {
     return (
@@ -24,8 +31,25 @@ export const CourseDetail: React.FC = () => {
     );
   }
 
+  // Helper function to extract video ID from YouTube URL
+  const getYouTubeEmbedUrl = (url: string): string => {
+    if (url.includes('youtube.com/watch?v=')) {
+      return url.replace('watch?v=', 'embed/').split('&')[0];
+    }
+    if (url.includes('youtu.be/')) {
+      return `https://www.youtube.com/embed/${url.split('youtu.be/')[1].split('?')[0]}`;
+    }
+    return url;
+  };
+
+  // Helper function to extract video ID from Vimeo URL
+  const getVimeoEmbedUrl = (url: string): string => {
+    const vimeoId = url.split('vimeo.com/')[1]?.split('?')[0];
+    return vimeoId ? `https://player.vimeo.com/video/${vimeoId}` : url;
+  };
+
   return (
-    <div className="min-h-screen pt-24 pb-20 bg-[#0a0a0a]">
+    <div className="min-h-screen pt-24 pb-20 bg-black">
 
       {/* Course Header */}
       <div className="bg-[#111] border-b border-white/5 pb-16 pt-8 relative overflow-hidden">
@@ -58,14 +82,45 @@ export const CourseDetail: React.FC = () => {
               </div>
 
               {/* Video Preview - Style Squared */}
-              <div className="relative overflow-hidden bg-black border rounded-none shadow-2xl aspect-video border-white/10 group">
-                <img src={course.image} alt={course.title} className="object-cover w-full h-full transition-transform duration-700 opacity-60 group-hover:scale-105" />
-                <div className="absolute inset-0 transition-colors bg-black/20 group-hover:bg-black/10"></div>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-20 h-20 rounded-none bg-coinlect-accent text-black flex items-center justify-center shadow-[0_0_30px_rgba(245,158,11,0.3)] transform group-hover:scale-110 transition-transform duration-300">
-                    <PlayCircle size={40} fill="currentColor" className="text-black" />
+              <div className="relative overflow-hidden bg-black border rounded-none shadow-2xl aspect-video border-white/10">
+                {course.videoLink ? (
+                  <div className="relative w-full h-full">
+                    {course.videoLink.includes('youtube.com') || course.videoLink.includes('youtu.be') ? (
+                      <iframe
+                        src={getYouTubeEmbedUrl(course.videoLink)}
+                        className="w-full h-full"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        title={course.title}
+                      />
+                    ) : course.videoLink.includes('vimeo.com') ? (
+                      <iframe
+                        src={getVimeoEmbedUrl(course.videoLink)}
+                        className="w-full h-full"
+                        allow="autoplay; fullscreen; picture-in-picture"
+                        allowFullScreen
+                        title={course.title}
+                      />
+                    ) : (
+                      <video
+                        src={course.videoLink}
+                        controls
+                        className="w-full h-full"
+                        poster={course.image}
+                      />
+                    )}
                   </div>
-                </div>
+                ) : (
+                  <div className="relative group">
+                    <img src={course.image} alt={course.title} className="object-cover w-full h-full transition-transform duration-700 opacity-60 group-hover:scale-105" />
+                    <div className="absolute inset-0 transition-colors bg-black/20 group-hover:bg-black/10"></div>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="w-20 h-20 rounded-none bg-coinlect-accent text-black flex items-center justify-center shadow-[0_0_30px_rgba(245,158,11,0.3)] transform group-hover:scale-110 transition-transform duration-300">
+                        <PlayCircle size={40} fill="currentColor" className="text-black" />
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </ScrollReveal>
@@ -81,14 +136,20 @@ export const CourseDetail: React.FC = () => {
                 À propos de ce cours
               </h3>
               <div className="space-y-6 text-lg font-light leading-relaxed text-left text-gray-400">
-                <p>
-                  Ce cours a été conçu pour vous fournir une compréhension approfondie du sujet. 
-                  Que vous soyez débutant ou que vous cherchiez à affiner vos compétences, 
-                  notre approche structurée vous guidera à travers les concepts clés avec des exemples pratiques.
-                </p>
-                <p>
-                  {course.description}
-                </p>
+                {course.about ? (
+                  <div className="whitespace-pre-line">{course.about}</div>
+                ) : (
+                  <>
+                    <p>
+                      Ce cours a été conçu pour vous fournir une compréhension approfondie du sujet. 
+                      Que vous soyez débutant ou que vous cherchiez à affiner vos compétences, 
+                      notre approche structurée vous guidera à travers les concepts clés avec des exemples pratiques.
+                    </p>
+                    <p>
+                      {course.description}
+                    </p>
+                  </>
+                )}
               </div>
             </section>
           </ScrollReveal>

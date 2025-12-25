@@ -23,11 +23,11 @@ export const Header: React.FC = () => {
     { title: t.academy.megaMenu.education, description: t.academy.megaMenu.educationDesc, href: '/academy?category=education' },
     { title: t.academy.megaMenu.defi, description: t.academy.megaMenu.defiDesc, href: '/academy?category=defi' },
     { title: t.academy.megaMenu.adoption, description: t.academy.megaMenu.adoptionDesc, href: '/academy?category=adoption' },
-    { title: t.academy.megaMenu.reviews, description: t.academy.megaMenu.reviewsDesc, href: '/academy?category=reviews' },
-    { title: t.academy.megaMenu.guides, description: t.academy.megaMenu.guidesDesc, href: '/academy?category=guides' },
+    { title: t.academy.megaMenu.reviews, description: t.academy.megaMenu.reviewsDesc, href: '/academy?tab=articles' },
+    { title: t.academy.megaMenu.guides, description: t.academy.megaMenu.guidesDesc, href: '/academy?tab=articles' },
     { title: t.academy.megaMenu.trading, description: t.academy.megaMenu.tradingDesc, href: '/academy?category=trading' },
     { title: t.academy.megaMenu.mining, description: t.academy.megaMenu.miningDesc, href: '/academy?category=mining' },
-    { title: t.academy.megaMenu.news, description: t.academy.megaMenu.newsDesc, href: '/trends?section=news' },
+    { title: t.academy.megaMenu.news, description: t.academy.megaMenu.newsDesc, href: '/trends#news' },
   ];
 
   const navItems: NavItem[] = [

@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { ScrollReveal } from '../components/ScrollReveal';
 import { Button } from '../components/Button';
 import { AdBanner } from '../components/AdBanner';
-import { Copy, Check, Heart, Wallet } from 'lucide-react';
+import { Copy, Check, Heart, Wallet, Smartphone, Globe, ExternalLink } from 'lucide-react';
 
 export const Donate: React.FC = () => {
     const [copied, setCopied] = useState<string | null>(null);
@@ -30,14 +30,19 @@ export const Donate: React.FC = () => {
         }
     ];
 
-    const handleCopy = (address: string) => {
-        navigator.clipboard.writeText(address);
-        setCopied(address);
+    const mobileMoney = [
+        { name: "Airtel Money (Airtel)", number: "+243971379450" },
+        { name: "M-Pesa (Vodacom)", number: "+243837266193" }
+    ];
+
+    const handleCopy = (text: string) => {
+        navigator.clipboard.writeText(text);
+        setCopied(text);
         setTimeout(() => setCopied(null), 2000);
     };
 
     return (
-        <div className="min-h-screen pt-20 pb-12 bg-[#0a0a0a] sm:pt-24 md:pt-32 md:pb-20">
+        <div className="min-h-screen pt-20 pb-12 bg-black sm:pt-24 md:pt-32 md:pb-20">
             <div className="container max-w-3xl px-4 mx-auto text-center sm:px-6">
                 <ScrollReveal>
                     <h1 className="mb-4 text-2xl font-bold text-white sm:text-3xl md:text-5xl sm:mb-6">
@@ -50,7 +55,27 @@ export const Donate: React.FC = () => {
                     </p>
                 </ScrollReveal>
 
-                <div className="grid gap-4 mb-12 sm:gap-6 sm:mb-16">
+                {/* International Donation Section (MbiyoPay) */}
+                <ScrollReveal delay={100}>
+                    <div className="flex flex-col items-center justify-between gap-6 p-6 mb-8 text-left transition-all border bg-white/5 rounded-2xl border-white/10 md:flex-row hover:border-coinlect-accent/30">
+                        <div className="flex items-center gap-4">
+                            <div>
+                                <h3 className="text-lg font-bold text-white">International Donation</h3>
+                                <p className="text-sm text-gray-400">Card, Mobile Money, or Crypto via MbiyoPay</p>
+                            </div>
+                        </div>
+                        <Button 
+                            variant="primary" 
+                            className="flex items-center w-full gap-2 md:w-auto"
+                            onClick={() => window.open('https://dashboard.mbiyo.africa/pay/create-session/2bb14d4a-664d-4c51-86a6-620cca13578c', '_blank')}
+                        >
+                            Donate via MbiyoPay <ExternalLink size={16} />
+                        </Button>
+                    </div>
+                </ScrollReveal>
+
+                {/* Crypto Wallets Section */}
+                <div className="grid gap-4 mb-8 sm:gap-6">
                     {wallets.map((wallet, idx) => (
                         <ScrollReveal key={idx} delay={idx * 100}>
                             <div className="flex flex-col gap-3 p-4 transition-all duration-300 border bg-[#0F0F0F] rounded-xl border-white/10 sm:gap-4 sm:p-6 md:flex-row md:items-center md:justify-between group hover:border-coinlect-accent/30">
@@ -82,7 +107,31 @@ export const Donate: React.FC = () => {
                     ))}
                 </div>
 
-                <ScrollReveal delay={300}>
+                {/* Local DRC Donation Section */}
+                <ScrollReveal delay={400}>
+                    <div className="mb-12 text-left">
+                        <h3 className="flex items-center gap-2 mb-4 text-xl font-bold text-white"> Local Donations (DRC)
+                        </h3>
+                        <div className="grid gap-4">
+                            {mobileMoney.map((item, idx) => (
+                                <div key={idx} className="flex items-center justify-between p-4 transition-all border bg-white/5 border-white/10 rounded-xl group hover:border-coinlect-accent/30">
+                                    <div>
+                                        <p className="text-xs tracking-wider text-gray-500 uppercase">{item.name}</p>
+                                        <p className="font-mono font-bold text-white">{item.number}</p>
+                                    </div>
+                                    <button 
+                                        onClick={() => handleCopy(item.number)}
+                                        className="p-2 text-gray-400 transition-colors rounded-lg hover:text-white bg-white/5"
+                                    >
+                                        {copied === item.number ? <Check size={16} className="text-green-500" /> : <Copy size={16} />}
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </ScrollReveal>
+
+                <ScrollReveal delay={500}>
                      <div className="p-6 border bg-gradient-to-r from-coinlect-accent/10 to-transparent rounded-2xl border-coinlect-accent/10 sm:p-8">
                         <h3 className="mb-3 text-lg font-bold text-white sm:text-xl sm:mb-4">Other Ways to Support</h3>
                         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-4">

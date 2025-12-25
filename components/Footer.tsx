@@ -5,9 +5,11 @@ import { Button } from './Button';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useAuth } from '../contexts/AuthContext';
 
 export const Footer: React.FC = () => {
   const { t, language, setLanguage } = useLanguage();
+  const { isAuthenticated } = useAuth();
   const pathname = usePathname();
   const isDonatePage = pathname === '/donate';
 
@@ -22,19 +24,43 @@ export const Footer: React.FC = () => {
                 <div className="relative z-10 max-w-xl">
                     {isDonatePage ? (
                         <>
-                            <p className="mb-2 text-gray-400">{t.footer.ready}</p>
-                            <p className="mb-8 text-sm text-gray-500">{t.footer.join}</p>
-                            <Link href="/register">
-                                <Button variant="secondary" withArrow className="text-xs">{t.footer.createAccount}</Button>
-                            </Link>
+                            {isAuthenticated ? (
+                                <>
+                                    <p className="mb-2 text-gray-400">Sponsor Us</p>
+                                    <p className="mb-8 text-sm text-gray-500">Support our mission to provide free Web3 education in Africa.</p>
+                                    <a href="mailto:coinlectacademy@gmail.com?subject=Sponsorship Inquiry" target="_blank" rel="noopener noreferrer">
+                                        <Button variant="primary" withArrow className="text-xs font-bold">Sponsor Us</Button>
+                                    </a>
+                                </>
+                            ) : (
+                                <>
+                                    <p className="mb-2 text-gray-400">{t.footer.ready}</p>
+                                    <p className="mb-8 text-sm text-gray-500">{t.footer.join}</p>
+                                    <Link href="/register">
+                                        <Button variant="secondary" withArrow className="text-xs">{t.footer.createAccount}</Button>
+                                    </Link>
+                                </>
+                            )}
                         </>
                     ) : (
                         <>
-                            <p className="mb-2 text-gray-400">{t.footer.donateTitle}</p>
-                            <p className="mb-8 text-sm text-gray-500">{t.footer.donateDesc}</p>
-                            <Link href="/donate">
-                                <Button variant="primary" withArrow className="text-xs font-bold">{t.footer.donateBtn}</Button>
-                            </Link>
+                            {isAuthenticated ? (
+                                <>
+                                    <p className="mb-2 text-gray-400">Sponsor Us</p>
+                                    <p className="mb-8 text-sm text-gray-500">Support our mission to provide free Web3 education in Africa.</p>
+                                    <a href="mailto:coinlectacademy@gmail.com?subject=Sponsorship Inquiry" target="_blank" rel="noopener noreferrer">
+                                        <Button variant="primary" withArrow className="text-xs font-bold">Sponsor Us</Button>
+                                    </a>
+                                </>
+                            ) : (
+                                <>
+                                    <p className="mb-2 text-gray-400">{t.footer.donateTitle}</p>
+                                    <p className="mb-8 text-sm text-gray-500">{t.footer.donateDesc}</p>
+                                    <Link href="/donate">
+                                        <Button variant="primary" withArrow className="text-xs font-bold">{t.footer.donateBtn}</Button>
+                                    </Link>
+                                </>
+                            )}
                         </>
                     )}
                 </div>
@@ -52,7 +78,7 @@ export const Footer: React.FC = () => {
                         <li><Link href="/academy" className="hover:text-coinlect-accent">{t.nav.academy}</Link></li>
                         <li><Link href="/deals" className="hover:text-coinlect-accent">{t.nav.deals}</Link></li>
                         <li><Link href="/events" className="hover:text-coinlect-accent">{t.nav.events}</Link></li>
-                        <li><Link href="/register" className="hover:text-coinlect-accent">{t.nav.register}</Link></li>
+                        {!isAuthenticated && <li><Link href="/register" className="hover:text-coinlect-accent">{t.nav.register}</Link></li>}
                     </ul>
                 </div>
                 <div>

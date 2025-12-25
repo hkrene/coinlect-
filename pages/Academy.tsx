@@ -18,7 +18,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 export const Academy: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'courses' | 'articles'>('courses');
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeCategory, setActiveCategory] = useState('Tous');
+  const [activeCategory, setActiveCategory] = useState('Tous'); // Default to 'Tous' to show all courses
   const [courses, setCourses] = useState<Course[]>([]);
   const [articles, setArticles] = useState<Article[]>([]);
   const [progressMap, setProgressMap] = useState<Record<number, number>>({});
@@ -26,38 +26,142 @@ export const Academy: React.FC = () => {
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    const tabParam = searchParams?.get('tab');
-    if (tabParam === 'articles') setActiveTab('articles');
+    const refreshData = () => {
+      const fetchedCourses = courseService.getAll();
+      setCourses(fetchedCourses);
+      setArticles(articleService.getAll());
 
+      const newProgressMap: Record<number, number> = {};
+      fetchedCourses.forEach(course => {
+        const saved = localStorage.getItem(`course_${course.id}_progress`);
+        if (saved) {
+          const completed: number[] = JSON.parse(saved);
+          const total = course.syllabus ? course.syllabus.length : course.modules;
+          if (total > 0 && completed.length > 0) {
+              newProgressMap[course.id] = Math.round((completed.length / total) * 100);
+          }
+        }
+      });
+      setProgressMap(newProgressMap);
+    };
+
+    const tabParam = searchParams?.get('tab');
     const categoryParam = searchParams?.get('category');
+    
+    // Handle tab switching
+    if (tabParam === 'articles') {
+      setActiveTab('articles');
+    } else if (categoryParam === 'reviews' || categoryParam === 'guides') {
+      // Reviews and guides should always show articles tab
+      setActiveTab('articles');
+    } else {
+      setActiveTab('courses');
+    }
+
+    // Handle category filtering
     if (categoryParam) {
       const categoryMapping: { [key: string]: string } = {
         'education': 'Tous', 'defi': 'DeFi', 'adoption': 'Tous', 
-        'mining': 'Tous', 'guides': 'Tous', 'trading': 'Trading'
+        'mining': 'Mining', 'guides': 'Guides', 'reviews': 'Reviews', 'trading': 'Trading'
       };
-      setActiveCategory(categoryMapping[categoryParam] || 'Tous');
+      const mappedCategory = categoryMapping[categoryParam] || 'Tous';
+      setActiveCategory(mappedCategory);
+    } else {
+      // If no category param (e.g., /academy), reset to show all courses
+      setActiveCategory('Tous');
+      setActiveTab('courses');
     }
 
-    const fetchedCourses = courseService.getAll();
-    setCourses(fetchedCourses);
-    setArticles(articleService.getAll());
-
-    const newProgressMap: Record<number, number> = {};
-    fetchedCourses.forEach(course => {
-      const saved = localStorage.getItem(`course_${course.id}_progress`);
-      if (saved) {
-        const completed: number[] = JSON.parse(saved);
-        const total = course.syllabus ? course.syllabus.length : course.modules;
-        if (total > 0 && completed.length > 0) {
-            newProgressMap[course.id] = Math.round((completed.length / total) * 100);
-        }
-      }
-    });
-    setProgressMap(newProgressMap);
+    refreshData();
   }, [searchParams]);
 
+  // Listen for storage changes to refresh when new content is added
+  useEffect(() => {
+    let lastCoursesLength = 0;
+    let lastArticlesLength = 0;
+
+    const refreshData = () => {
+      const fetchedCourses = courseService.getAll();
+      const fetchedArticles = articleService.getAll();
+      
+      // Only update if data actually changed
+      if (fetchedCourses.length !== lastCoursesLength || fetchedArticles.length !== lastArticlesLength) {
+        setCourses(fetchedCourses);
+        setArticles(fetchedArticles);
+        lastCoursesLength = fetchedCourses.length;
+        lastArticlesLength = fetchedArticles.length;
+
+        const newProgressMap: Record<number, number> = {};
+        fetchedCourses.forEach(course => {
+          const saved = localStorage.getItem(`course_${course.id}_progress`);
+          if (saved) {
+            const completed: number[] = JSON.parse(saved);
+            const total = course.syllabus ? course.syllabus.length : course.modules;
+            if (total > 0 && completed.length > 0) {
+                newProgressMap[course.id] = Math.round((completed.length / total) * 100);
+            }
+          }
+        });
+        setProgressMap(newProgressMap);
+      }
+    };
+
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'coinlect_courses' || e.key === 'coinlect_articles') {
+        refreshData();
+      }
+    };
+
+    // Listen for custom events (when content is saved in AdminDashboard)
+    const handleContentUpdate = () => {
+      refreshData();
+    };
+
+    // Listen for storage events (when localStorage changes in other tabs/windows)
+    window.addEventListener('storage', handleStorageChange);
+    
+    // Listen for custom content update events
+    window.addEventListener('contentUpdated', handleContentUpdate);
+    
+    // Refresh when page becomes visible (user switches back to tab)
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        refreshData();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Initial check
+    refreshData();
+
+    // Also check periodically for changes (for same-tab updates, less frequent)
+    const interval = setInterval(() => {
+      refreshData();
+    }, 10000); // Check every 10 seconds (reduced frequency)
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('contentUpdated', handleContentUpdate);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      clearInterval(interval);
+    };
+  }, []);
+
   const getFilteredCourses = () => courses.filter(c => (activeCategory === "Tous" || c.category === activeCategory) && c.title.toLowerCase().includes(searchQuery.toLowerCase()));
-  const getFilteredArticles = () => articles.filter(a => a.title.toLowerCase().includes(searchQuery.toLowerCase()) || a.excerpt.toLowerCase().includes(searchQuery.toLowerCase()));
+  const getFilteredArticles = () => {
+    let filtered = articles.filter(a => a.title.toLowerCase().includes(searchQuery.toLowerCase()) || a.excerpt.toLowerCase().includes(searchQuery.toLowerCase()));
+    // Filter by category if not "Tous" and category matches article category
+    if (activeCategory !== "Tous" && activeTab === 'articles') {
+      filtered = filtered.filter(a => {
+        const articleCategory = a.category || '';
+        return articleCategory === activeCategory || 
+               articleCategory.toLowerCase() === activeCategory.toLowerCase() ||
+               (activeCategory === 'Reviews' && articleCategory.toLowerCase().includes('review')) ||
+               (activeCategory === 'Guides' && articleCategory.toLowerCase().includes('guide'));
+      });
+    }
+    return filtered;
+  };
 
   // Sub-components: CourseCard and ArticleCard (Logic unchanged)
   const CourseCard: React.FC<{ course: Course, delay: number }> = ({ course, delay }) => (
@@ -103,7 +207,7 @@ export const Academy: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] pt-24 pb-0">
+    <div className="min-h-screen pt-24 pb-0 bg-black">
     
       {/* SECTION 1: HERO - Académie Web3 (Edge to Edge) */}
       <div className="relative flex flex-col items-center justify-center py-24 overflow-hidden text-center bg-black">
