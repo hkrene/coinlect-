@@ -34,10 +34,14 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    await login(email, password);
-    setIsLoading(false);
-    if (!error) {
+    try {
+      await login(email, password);
       router.push('/academy');
+    } catch (err) {
+      // Error is already handled by the AuthContext
+      console.error('Login failed:', err);
+    } finally {
+      setIsLoading(false);
     }
   };
 

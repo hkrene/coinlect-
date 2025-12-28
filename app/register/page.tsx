@@ -37,9 +37,15 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    await register(`${formData.firstName} ${formData.lastName}`.trim(), formData.email, formData.password);
-    setIsLoading(false);
-    router.push('/academy');
+    try {
+      await register(`${formData.firstName} ${formData.lastName}`.trim(), formData.email, formData.password);
+      router.push('/academy');
+    } catch (err) {
+      // Error is already handled by the AuthContext
+      console.error('Registration failed:', err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (

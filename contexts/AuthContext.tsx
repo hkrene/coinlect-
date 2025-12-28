@@ -189,12 +189,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         }
       } catch (apiErr) {
         console.log('API login failed:', apiErr);
+        throw new Error('Login failed. Please check your credentials and try again.');
       }
-
-      setError('Login failed. Please check your credentials and try again.');
     } catch (err) {
-      setError('Network error. Please try again.');
+      const errorMessage = err instanceof Error ? err.message : 'Network error. Please try again.';
+      setError(errorMessage);
       console.error('Login error', err);
+      throw err;
     }
   };
 
@@ -222,13 +223,18 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           setUser(data.user);
           localStorage.setItem('coinlect_current_user', JSON.stringify(data.user));
           return;
+        } else {
+          throw new Error(data.error || 'Registration failed. Please try again.');
         }
       } catch (apiErr) {
         console.log('API register failed:', apiErr);
+        throw new Error('Registration failed. Please try again.');
       }
     } catch (err) {
-      setError('Network error. Please try again.');
+      const errorMessage = err instanceof Error ? err.message : 'Network error. Please try again.';
+      setError(errorMessage);
       console.error('Register error', err);
+      throw err;
     }
   };
 

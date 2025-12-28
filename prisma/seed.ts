@@ -7,7 +7,7 @@ async function main() {
   // Create the first admin account
   const adminEmail = 'hirwarene6@gmail.com'
   const adminPassword = 'Holimonk.2004'
-  const hashedPassword = await bcrypt.hash(adminPassword, 10)
+  const hashedPassword = await bcrypt.hash(adminPassword, 12)
 
   const admin = await prisma.user.upsert({
     where: { email: adminEmail },
