@@ -42,6 +42,22 @@ export const articleSchema = z.object({
   status: z.enum(['DRAFT', 'PUBLISHED']).optional(),
 });
 
+// Event validators
+export const eventSchema = z.object({
+  title: z.string().min(2),
+  slug: z.string().min(2),
+  date: z.string().min(2),
+  location: z.string().min(2),
+  description: z.string().optional(),
+  banner: z.string().min(1),
+  bannerImage: z.string().url().optional(),
+  bannerText: z.string().optional(),
+  eventTypes: z.array(z.string()).default([]),
+  seoTitle: z.string().optional(),
+  seoDescription: z.string().optional(),
+  status: z.enum(['DRAFT', 'PUBLISHED']).optional(),
+});
+
 // Featured validators
 export const featuredSchema = z.object({
   type: z.enum(['COURSE', 'ARTICLE']),
@@ -61,4 +77,18 @@ export const progressSchema = z.object({
   moduleId: z.string().uuid(),
   completed: z.boolean().default(true),
   progressPct: z.number().int().min(0).max(100).optional(),
+});
+
+// Deal validators
+export const dealSchema = z.object({
+  title: z.string().min(2),
+  description: z.string().min(10),
+  category: z.string().min(2),
+  link: z.string().url(),
+  image: z.string().url().optional(),
+  discount: z.string().optional(),
+  code: z.string().optional(),
+  exclusive: z.boolean().default(false).optional(),
+  verified: z.boolean().default(false).optional(),
+  featured: z.boolean().default(false).optional(),
 });

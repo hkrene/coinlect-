@@ -4,10 +4,11 @@ import { LucideIcon } from "lucide-react";
 export interface User {
   id: string;
   email: string;
-  firstName: string;
-  lastName: string;
-  role: 'user' | 'admin';
+  name?: string;
+  role: 'ADMIN' | 'USER';
   createdAt: string;
+  updatedAt: string;
+  lastActivityAt?: string;
 }
 
 export interface Quiz {
@@ -24,19 +25,29 @@ export interface SyllabusItem {
 }
 
 export interface Course {
-  id: number;
+  id: string;
   title: string;
+  slug: string;
   description: string;
+  seoTitle?: string;
+  seoDescription?: string;
+  status: 'DRAFT' | 'PUBLISHED';
+  publishedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+  authorId?: string;
+  author?: DBUser;
+  // Legacy fields for frontend compatibility
   about?: string; // Detailed "À propos de ce cours" content
-  level: 'Débutant' | 'Intermédiaire' | 'Avancé';
-  duration: string;
-  modules: number;
-  category: string;
-  image: string;
-  syllabus: SyllabusItem[];
-  learningObjectives: string[];
+  level?: 'Débutant' | 'Intermédiaire' | 'Avancé';
+  duration?: string;
+  modules?: number;
+  category?: string;
+  image?: string;
+  syllabus?: SyllabusItem[];
+  learningObjectives?: string[];
   // New categorization fields
-  courseType: 'academy' | 'specialization' | 'university';
+  courseType?: 'academy' | 'specialization' | 'university';
   partnerName?: string;
   partnerLogo?: string;
   isPaid?: boolean;
@@ -44,29 +55,66 @@ export interface Course {
 }
 
 export interface Article {
-  id: number;
+  id: string;
   title: string;
-  excerpt: string;
-  content: string[];
-  readTime: string;
-  date: string;
-  image: string;
-  category: string;
-  author: string;
-  authorImage: string;
-  featured: boolean;
+  slug: string;
+  excerpt?: string;
+  content: string;
+  tags: string[];
+  seoTitle?: string;
+  seoDescription?: string;
+  status: 'DRAFT' | 'PUBLISHED';
+  publishedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+  authorId?: string;
+  author?: DBUser;
+  // Legacy fields for frontend compatibility
+  readTime?: string;
+  date?: string;
+  image?: string;
+  category?: string;
+  authorImage?: string;
+  featured?: boolean;
+}
+
+/**
+ * Database User type (matches Prisma schema)
+ */
+export interface DBUser {
+  id: string;
+  email: string;
+  passwordHash?: string;
+  name?: string;
+  role: 'ADMIN' | 'EDITOR' | 'USER';
+  provider?: string;
+  googleId?: string;
+  createdAt: string;
+  updatedAt: string;
+  lastActivityAt?: string;
 }
 
 export interface Event {
-  id: number;
+  id: string;
   title: string;
+  slug: string;
   date: string;
   location: string;
-  type: string[];
-  banner: string; // Banner style identifier or image URL
-  bannerImage?: string; // Direct image URL for custom banners
-  bannerText?: string;
   description?: string;
+  banner: string;
+  bannerImage?: string;
+  bannerText?: string;
+  eventTypes: string[];
+  seoTitle?: string;
+  seoDescription?: string;
+  status: 'DRAFT' | 'PUBLISHED';
+  publishedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+  authorId?: string;
+  author?: DBUser;
+  // Legacy field for frontend compatibility
+  type?: string[]; // Keep for backward compatibility
 }
 
 /**
@@ -84,4 +132,23 @@ export interface Partner {
   name: string;
   description: string;
   logo: string;
+}
+
+/**
+ * Interface for deals/promotions
+ */
+export interface Deal {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  link: string;
+  image?: string;
+  discount?: string;
+  code?: string;
+  exclusive: boolean;
+  verified: boolean;
+  featured: boolean;
+  createdAt: string;
+  updatedAt: string;
 }

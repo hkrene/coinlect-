@@ -7,7 +7,7 @@ import { ScrollReveal } from '../components/ScrollReveal';
 import { Button } from '../components/Button';
 import { AdBanner } from '../components/AdBanner';
 import { courseService, articleService } from '../services/db';
-import { Course, Article } from '../mockData';
+import { Course, Article } from '../types';
 import { 
   BookOpen, 
   ArrowRight, 
@@ -21,28 +21,37 @@ export const Academy: React.FC = () => {
   const [activeCategory, setActiveCategory] = useState('Tous'); // Default to 'Tous' to show all courses
   const [courses, setCourses] = useState<Course[]>([]);
   const [articles, setArticles] = useState<Article[]>([]);
-  const [progressMap, setProgressMap] = useState<Record<number, number>>({});
+  const [progressMap, setProgressMap] = useState<Record<string, number>>({});
   const { t } = useLanguage();
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    const refreshData = () => {
-      const fetchedCourses = courseService.getAll();
-      setCourses(fetchedCourses);
-      setArticles(articleService.getAll());
+    const refreshData = async () => {
+      try {
+        const [fetchedCourses, fetchedArticles] = await Promise.all([
+          courseService.getAll(),
+          articleService.getAll()
+        ]);
+        setCourses(fetchedCourses);
+        setArticles(fetchedArticles);
 
-      const newProgressMap: Record<number, number> = {};
-      fetchedCourses.forEach(course => {
-        const saved = localStorage.getItem(`course_${course.id}_progress`);
-        if (saved) {
-          const completed: number[] = JSON.parse(saved);
-          const total = course.syllabus ? course.syllabus.length : course.modules;
-          if (total > 0 && completed.length > 0) {
-              newProgressMap[course.id] = Math.round((completed.length / total) * 100);
+        const newProgressMap: Record<string, number> = {};
+        fetchedCourses.forEach(course => {
+          const saved = localStorage.getItem(`course_${course.id}_progress`);
+          if (saved) {
+            const completed: number[] = JSON.parse(saved);
+            const total = course.syllabus ? course.syllabus.length : course.modules;
+            if (total && total > 0 && completed.length > 0) {
+                newProgressMap[course.id] = Math.round((completed.length / total) * 100);
+            }
           }
-        }
-      });
-      setProgressMap(newProgressMap);
+        });
+        setProgressMap(newProgressMap);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        setCourses([]);
+        setArticles([]);
+      }
     };
 
     const tabParam = searchParams?.get('tab');
@@ -80,29 +89,33 @@ export const Academy: React.FC = () => {
     let lastCoursesLength = 0;
     let lastArticlesLength = 0;
 
-    const refreshData = () => {
-      const fetchedCourses = courseService.getAll();
-      const fetchedArticles = articleService.getAll();
-      
-      // Only update if data actually changed
-      if (fetchedCourses.length !== lastCoursesLength || fetchedArticles.length !== lastArticlesLength) {
-        setCourses(fetchedCourses);
-        setArticles(fetchedArticles);
-        lastCoursesLength = fetchedCourses.length;
-        lastArticlesLength = fetchedArticles.length;
+    const refreshData = async () => {
+      try {
+        const fetchedCourses = await courseService.getAll();
+        const fetchedArticles = await articleService.getAll();
 
-        const newProgressMap: Record<number, number> = {};
-        fetchedCourses.forEach(course => {
-          const saved = localStorage.getItem(`course_${course.id}_progress`);
-          if (saved) {
-            const completed: number[] = JSON.parse(saved);
-            const total = course.syllabus ? course.syllabus.length : course.modules;
-            if (total > 0 && completed.length > 0) {
-                newProgressMap[course.id] = Math.round((completed.length / total) * 100);
+        // Only update if data actually changed
+        if (fetchedCourses.length !== lastCoursesLength || fetchedArticles.length !== lastArticlesLength) {
+          setCourses(fetchedCourses);
+          setArticles(fetchedArticles);
+          lastCoursesLength = fetchedCourses.length;
+          lastArticlesLength = fetchedArticles.length;
+
+          const newProgressMap: Record<string, number> = {};
+          fetchedCourses.forEach(course => {
+            const saved = localStorage.getItem(`course_${course.id}_progress`);
+            if (saved) {
+              const completed: number[] = JSON.parse(saved);
+              const total = course.syllabus ? course.syllabus.length : course.modules;
+              if (total && total > 0 && completed.length > 0) {
+                  newProgressMap[course.id] = Math.round((completed.length / total) * 100);
+              }
             }
-          }
-        });
-        setProgressMap(newProgressMap);
+          });
+          setProgressMap(newProgressMap);
+        }
+      } catch (error) {
+        console.error('Error refreshing data:', error);
       }
     };
 
@@ -149,7 +162,7 @@ export const Academy: React.FC = () => {
 
   const getFilteredCourses = () => courses.filter(c => (activeCategory === "Tous" || c.category === activeCategory) && c.title.toLowerCase().includes(searchQuery.toLowerCase()));
   const getFilteredArticles = () => {
-    let filtered = articles.filter(a => a.title.toLowerCase().includes(searchQuery.toLowerCase()) || a.excerpt.toLowerCase().includes(searchQuery.toLowerCase()));
+    let filtered = articles.filter(a => a.title.toLowerCase().includes(searchQuery.toLowerCase()) || (a.excerpt && a.excerpt.toLowerCase().includes(searchQuery.toLowerCase())));
     // Filter by category if not "Tous" and category matches article category
     if (activeCategory !== "Tous" && activeTab === 'articles') {
       filtered = filtered.filter(a => {
@@ -166,7 +179,7 @@ export const Academy: React.FC = () => {
   // Sub-components: CourseCard and ArticleCard (Logic unchanged)
   const CourseCard: React.FC<{ course: Course, delay: number }> = ({ course, delay }) => (
     <ScrollReveal delay={delay}>
-        <Link href={`/academy/${course.id}`} className="block h-full group">
+        <Link href={`/academy/${course.slug}`} className="block h-full group">
             <div className="bg-[#111] rounded-2xl overflow-hidden border border-white/5 group-hover:border-coinlect-accent/30 transition-all duration-300 h-full flex flex-col relative">
                 <div className="relative aspect-video">
                     <img src={course.image} alt={course.title} className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105" />
@@ -192,7 +205,7 @@ export const Academy: React.FC = () => {
 
   const ArticleCard: React.FC<{ article: Article, delay: number }> = ({ article, delay }) => (
     <ScrollReveal delay={delay}>
-        <Link href={`/academy/article/${article.id}`} className="block h-full group">
+        <Link href={`/academy/article/${article.slug}`} className="block h-full group">
             <div className="bg-[#111] rounded-2xl overflow-hidden border border-white/5 group-hover:border-coinlect-accent/30 transition-all duration-300 h-full flex flex-col">
                 <div className="relative overflow-hidden aspect-video">
                     <img src={article.image} alt={article.title} className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105 opacity-80" />
@@ -223,7 +236,7 @@ export const Academy: React.FC = () => {
                         </span>{' '}<span className="text-[#a1a1aa]">facilement</span>
                     </h1>
                     <p className="max-w-3xl mx-auto text-base leading-relaxed text-[#71717a] md:text-xl lg:text-2xl">
-                        Maîtrisez les fondamentaux de la Finance Décentralisée (DeFi), des smart contracts et de l'infrastructure Web3.
+                        Maîtrisez les fondamentaux de la Finance Décentralisée (DeFi), des smart contracts et de l&apos;infrastructure Web3.
                     </p>
                 </div>
             </ScrollReveal>
@@ -263,7 +276,7 @@ export const Academy: React.FC = () => {
         {t.academy.tradingTools.title}
       </h2>
       <p className="max-w-xl text-sm text-slate-400">
-        Scanners de marché, explorateurs et plateformes d'analyse utilisés par les traders actifs.
+        Scanners de marché, explorateurs et plateformes d&apos;analyse utilisés par les traders actifs.
       </p>
   </header>
   <div className="flex gap-4 pb-4 overflow-x-auto scrollbar-hide">
@@ -415,5 +428,11 @@ export const Academy: React.FC = () => {
     </div>
   );
 };
+
+export async function getServerSideProps() {
+  return {
+    props: {},
+  };
+}
 
 export default Academy;

@@ -40,8 +40,12 @@ export function serverError(message = 'Internal Server Error') {
   return NextResponse.json({ error: message }, { status: 500 });
 }
 
+export function notFound(message = 'Not Found') {
+  return NextResponse.json({ error: message }, { status: 404 });
+}
+
 export function requireAdmin(role: UserRole) {
-  if (role !== UserRole.ADMIN && role !== UserRole.EDITOR) {
+  if (role !== UserRole.ADMIN) {
     throw new Error('FORBIDDEN');
   }
 }

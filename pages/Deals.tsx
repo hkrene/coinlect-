@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { ScrollReveal } from '../components/ScrollReveal';
 import { Button } from '../components/Button';
 import { dealService } from '../services/db';
-import { Deal } from '../mockData';
+import { Deal } from '../types';
 import { Tag, ExternalLink, ShieldCheck, AlertTriangle } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { AdBanner } from '../components/AdBanner';
@@ -15,7 +15,16 @@ export const Deals: React.FC = () => {
   const { t } = useLanguage();
 
   useEffect(() => {
-    setDeals(dealService.getAll());
+    const fetchDeals = async () => {
+      try {
+        const fetchedDeals = await dealService.getAll();
+        setDeals(fetchedDeals);
+      } catch (error) {
+        console.error('Error fetching deals:', error);
+      }
+    };
+
+    fetchDeals();
   }, []);
 
   const displayCategories = t.deals.filters;
@@ -81,7 +90,7 @@ export const Deals: React.FC = () => {
                         <div className="relative flex flex-col md:flex-row h-full overflow-hidden transition-all duration-300 border rounded-none bg-[#0a0a0a] border-white/10 hover:border-white/30 group">
                             
                             <div className="relative w-full md:w-[380px] h-56 md:h-auto overflow-hidden bg-black flex items-center justify-center border-b md:border-b-0 md:border-r border-white/10">
-                                <img src={deal.logo} alt={deal.name} className="object-cover w-full h-full transition-all duration-700 opacity-60 group-hover:opacity-100 group-hover:scale-105" />
+                                <img src={deal.image} alt={deal.title} className="object-cover w-full h-full transition-all duration-700 opacity-60 group-hover:opacity-100 group-hover:scale-105" />
                                 {deal.exclusive && (
                                     <div className="absolute top-0 left-0 bg-white text-black text-[10px] font-black uppercase tracking-widest px-3 py-1.5 z-20 flex items-center gap-1 shadow-2xl">{t.deals.exclusive}
                                     </div>
@@ -91,7 +100,7 @@ export const Deals: React.FC = () => {
                             <div className="flex flex-col flex-grow p-8">
                                 <div className="flex flex-col mb-4">
                                     <span className="text-[10px] font-bold text-coinlect-accent uppercase tracking-[0.2em] mb-3">{deal.category}</span>
-                                    <h3 className="text-2xl font-bold tracking-tight text-white md:text-3xl">{deal.name} — {deal.discount}</h3>
+                                    <h3 className="text-2xl font-bold tracking-tight text-white md:text-3xl">{deal.title} {deal.discount && ` — ${deal.discount}`}</h3>
                                 </div>
                                 <p className="mb-6 text-sm leading-relaxed text-[#71717a] max-w-2xl font-medium">{deal.description}</p>
                                 
@@ -122,5 +131,11 @@ export const Deals: React.FC = () => {
     </div>
   );
 };
+
+export async function getServerSideProps() {
+  return {
+    props: {},
+  };
+}
 
 export default Deals;

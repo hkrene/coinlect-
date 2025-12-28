@@ -1,6 +1,7 @@
 import React from 'react';
 
 interface RippleGridProps {
+  children?: React.ReactNode;
   enableRainbow?: boolean;
   gridColor?: string;
   rippleIntensity?: number;

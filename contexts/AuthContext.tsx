@@ -6,9 +6,7 @@ interface User {
   id: string;
   email: string;
   name: string | null;
-  role: 'ADMIN' | 'EDITOR' | 'USER';
-  firstName?: string;
-  lastName?: string;
+  role: 'ADMIN' | 'USER';
 }
 
 interface AuthContextType {
@@ -16,7 +14,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isAdmin: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (firstName: string, lastName: string, email: string, password: string) => Promise<void>;
+  register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => void;
   error: string | null;
   refreshUser: () => Promise<void>;
@@ -190,65 +188,21 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           return;
         }
       } catch (apiErr) {
-        // API failed, fall back to localStorage
-        console.log('API login failed, trying localStorage fallback');
+        console.log('API login failed:', apiErr);
       }
 
-      // Fallback to localStorage-based authentication
-      if (typeof window !== 'undefined') {
-        const { userService } = await import('../services/db');
-        const users = userService.getAll();
-        const user = users.find(u => u.email === email);
-        
-        // Check for admin user with password "admin123"
-        if (user && email === 'admin@coinlect.com' && password === 'admin123') {
-          const authUser: User = {
-            id: user.id,
-            email: user.email,
-            name: `${user.firstName} ${user.lastName}`.trim(),
-            role: user.role === 'admin' ? 'ADMIN' : 'USER',
-            firstName: user.firstName,
-            lastName: user.lastName
-          };
-          setUser(authUser);
-          localStorage.setItem('coinlect_current_user', JSON.stringify(authUser));
-          // Create a simple token for localStorage
-          localStorage.setItem('accessToken', 'local_' + Date.now());
-          return;
-        }
-        
-        // For other users, check if password matches (simple check for demo)
-        if (user) {
-          // In a real app, you'd hash and verify the password
-          // For now, accept any password for existing users
-          const authUser: User = {
-            id: user.id,
-            email: user.email,
-            name: `${user.firstName} ${user.lastName}`.trim(),
-            role: user.role === 'admin' ? 'ADMIN' : 'USER',
-            firstName: user.firstName,
-            lastName: user.lastName
-          };
-          setUser(authUser);
-          localStorage.setItem('coinlect_current_user', JSON.stringify(authUser));
-          localStorage.setItem('accessToken', 'local_' + Date.now());
-          return;
-        }
-      }
-
-      setError('Invalid email or password');
+      setError('Login failed. Please check your credentials and try again.');
     } catch (err) {
       setError('Network error. Please try again.');
       console.error('Login error', err);
     }
   };
 
-  const register = async (firstName: string, lastName: string, email: string, password: string) => {
+  const register = async (name: string, email: string, password: string) => {
     setError(null);
     try {
       // Try API first
       try {
-        const name = `${firstName} ${lastName}`.trim();
         const res = await fetch('/api/auth/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -270,36 +224,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
           return;
         }
       } catch (apiErr) {
-        // API failed, fall back to localStorage
-        console.log('API register failed, trying localStorage fallback');
-      }
-
-      // Fallback to localStorage-based registration
-      if (typeof window !== 'undefined') {
-        const { userService } = await import('../services/db');
-        try {
-          const newUser = userService.create({
-            email,
-            firstName,
-            lastName,
-            role: 'user'
-          });
-          
-          const authUser: User = {
-            id: newUser.id,
-            email: newUser.email,
-            name: `${newUser.firstName} ${newUser.lastName}`.trim(),
-            role: 'USER',
-            firstName: newUser.firstName,
-            lastName: newUser.lastName
-          };
-          
-          setUser(authUser);
-          localStorage.setItem('coinlect_current_user', JSON.stringify(authUser));
-          localStorage.setItem('accessToken', 'local_' + Date.now());
-        } catch (createErr: any) {
-          setError(createErr.message || 'Registration failed');
-        }
+        console.log('API register failed:', apiErr);
       }
     } catch (err) {
       setError('Network error. Please try again.');
@@ -334,7 +259,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     <AuthContext.Provider value={{ 
       user, 
       isAuthenticated: !!user, 
-      isAdmin: user?.role === 'ADMIN' || user?.role === 'EDITOR', 
+      isAdmin: user?.role === 'ADMIN', 
       login, 
       register, 
       logout,

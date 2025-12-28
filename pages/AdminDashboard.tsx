@@ -3,19 +3,19 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
-import { userService, courseService, articleService, eventService } from '../services/db';
-import { User, Course, Article, Event } from '../types';
+import { courseService, articleService, eventService } from '../services/db';
+import { Course, Article, Event, User } from '../types';
 import { Button } from '../components/Button';
-import { Trash2, Plus, Users, BookOpen, FileText, LayoutDashboard, X, Check, Calendar, Star } from 'lucide-react';
+import { Trash2, Plus, BookOpen, FileText, LayoutDashboard, X, Check, Calendar, Star } from 'lucide-react';
 
 export const AdminDashboard: React.FC = () => {
   const { user, isAdmin } = useAuth();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'courses' | 'articles' | 'events'>('overview');
-  const [users, setUsers] = useState<User[]>([]);
+  const [activeTab, setActiveTab] = useState<'overview' | 'courses' | 'articles' | 'events' | 'users'>('overview');
   const [courses, setCourses] = useState<Course[]>([]);
   const [articles, setArticles] = useState<Article[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // Modals
@@ -23,10 +23,19 @@ export const AdminDashboard: React.FC = () => {
   const [modalType, setModalType] = useState<'course' | 'article' | 'event' | null>(null);
 
   // Complex Form State
-  // Added courseType: 'academy' to satisfy missing property requirement in Omit<Course, 'id'>
-  const [courseForm, setCourseForm] = useState<Omit<Course, 'id'>>({
+  const [courseForm, setCourseForm] = useState<Omit<Course, 'id' | 'slug'> & { slug: string }>({
     title: '',
+    slug: '',
     description: '',
+    seoTitle: '',
+    seoDescription: '',
+    status: 'DRAFT',
+    publishedAt: undefined,
+    createdAt: '',
+    updatedAt: '',
+    authorId: undefined,
+    author: undefined,
+    // Legacy fields for frontend compatibility
     about: '',
     level: 'Débutant',
     duration: '35m',
@@ -34,108 +43,191 @@ export const AdminDashboard: React.FC = () => {
     category: 'Blockchain',
     image: '',
     syllabus: [],
-    learningObjectives: [],
     courseType: 'academy',
     videoLink: ''
   });
 
-  const [articleForm, setArticleForm] = useState<Omit<Article, 'id' | 'content'> & { content: string }>({
+  const [articleForm, setArticleForm] = useState<Omit<Article, 'id' | 'slug'> & { slug: string }>({
     title: '',
+    slug: '',
     excerpt: '',
-    content: '', // Stored as string in form, converted to array on save
+    content: '',
+    tags: [],
+    seoTitle: '',
+    seoDescription: '',
+    status: 'DRAFT',
+    publishedAt: undefined,
+    createdAt: '',
+    updatedAt: '',
+    authorId: undefined,
+    author: undefined,
+    // Legacy fields for frontend compatibility
     readTime: '5 min',
     date: new Date().toLocaleDateString('fr-FR'),
     image: '',
     category: 'News',
-    author: user?.name || 'Admin',
     authorImage: 'https://randomuser.me/api/portraits/lego/1.jpg',
     featured: false
   });
 
-  const [eventForm, setEventForm] = useState<Omit<Event, 'id'>>({
+  const [eventForm, setEventForm] = useState<Omit<Event, 'id' | 'slug'> & { slug: string }>({
     title: '',
+    slug: '',
     date: '',
     location: '',
-    type: [],
+    description: '',
     banner: 'custom',
     bannerImage: '',
     bannerText: '',
-    description: ''
+    eventTypes: [],
+    seoTitle: '',
+    seoDescription: '',
+    status: 'DRAFT',
+    publishedAt: undefined,
+    createdAt: '',
+    updatedAt: '',
+    authorId: undefined,
+    author: undefined,
+    // Legacy field for compatibility
+    type: []
   });
 
   useEffect(() => {
-    if (!isAdmin) router.push('/');
-    setUsers(userService.getAll());
-    setCourses(courseService.getAll());
-    setArticles(articleService.getAll());
-    setEvents(eventService.getAll());
+    const loadData = async () => {
+      if (!isAdmin) {
+        router.push('/');
+        return;
+      }
+
+      try {
+        const [coursesData, articlesData, eventsData, usersData] = await Promise.all([
+          courseService.getAll(),
+          articleService.getAll(),
+          eventService.getAll(),
+          fetchUsers()
+        ]);
+        setCourses(coursesData);
+        setArticles(articlesData);
+        setEvents(eventsData);
+        setUsers(usersData);
+      } catch (error) {
+        console.error('Error loading admin data:', error);
+      }
+    };
+
+    loadData();
   }, [isAdmin, router, refreshTrigger]);
 
-  const toggleUserRole = (id: string) => {
-    userService.toggleRole(id);
-    setRefreshTrigger(p => p + 1);
-  };
-
-
-  const handleAddObjective = () => {
-    setCourseForm(prev => ({ ...prev, learningObjectives: [...prev.learningObjectives, ''] }));
-  };
-
-  const updateObjective = (index: number, value: string) => {
-    const newObj = [...courseForm.learningObjectives];
-    newObj[index] = value;
-    setCourseForm(prev => ({ ...prev, learningObjectives: newObj }));
-  };
-
-  const handleSaveCourse = (e: React.FormEvent) => {
-    e.preventDefault();
-    courseService.add({ ...courseForm, modules: courseForm.modules || 0 });
-    setIsModalOpen(false);
-    setRefreshTrigger(p => p + 1);
-    // Dispatch custom event to notify other components
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('contentUpdated'));
+  const fetchUsers = async (): Promise<User[]> => {
+    try {
+      const response = await fetch('/api/users');
+      if (!response.ok) throw new Error('Failed to fetch users');
+      const data = await response.json();
+      return data.users;
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      return [];
     }
   };
 
-  const handleSaveArticle = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Split content by newlines to create array of paragraphs
-    const contentArray = typeof articleForm.content === 'string' 
-      ? articleForm.content.split('\n').filter(p => p.trim().length > 0)
-      : articleForm.content;
-    articleService.add({ ...articleForm, content: contentArray });
-    setIsModalOpen(false);
-    setRefreshTrigger(p => p + 1);
-    // Dispatch custom event to notify other components
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('contentUpdated'));
+  const handleRoleChange = async (userId: string, action: 'promote' | 'demote') => {
+    try {
+      const response = await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, action }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        alert(error.error || 'Failed to update user role');
+        return;
+      }
+
+      // Refresh users list
+      const updatedUsers = await fetchUsers();
+      setUsers(updatedUsers);
+    } catch (error) {
+      console.error('Error updating user role:', error);
+      alert('Error updating user role. Please try again.');
     }
   };
 
-  const handleSaveEvent = (e: React.FormEvent) => {
+  const handleSaveCourse = async (e: React.FormEvent) => {
     e.preventDefault();
-    eventService.add(eventForm);
-    setIsModalOpen(false);
-    setRefreshTrigger(p => p + 1);
-    // Dispatch custom event to notify other components
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('contentUpdated'));
+    try {
+      await courseService.add(courseForm);
+      setIsModalOpen(false);
+      setRefreshTrigger(p => p + 1);
+      // Dispatch custom event to notify other components
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('contentUpdated'));
+      }
+    } catch (error) {
+      console.error('Error saving course:', error);
+      alert('Error saving course. Please try again.');
     }
-    setEventForm({
-      title: '',
-      date: '',
-      location: '',
-      type: [],
-      banner: 'custom',
-      bannerImage: '',
-      bannerText: '',
-      description: ''
-    });
+  };
+
+  const handleSaveArticle = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await articleService.add(articleForm);
+      setIsModalOpen(false);
+      setRefreshTrigger(p => p + 1);
+      // Dispatch custom event to notify other components
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('contentUpdated'));
+      }
+    } catch (error) {
+      console.error('Error saving article:', error);
+      alert('Error saving article. Please try again.');
+    }
+  };
+
+  const handleSaveEvent = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      // Map the legacy 'type' field to 'eventTypes' for the API
+      const eventData = {
+        ...eventForm,
+        eventTypes: eventForm.type || []
+      };
+      await eventService.add(eventData);
+      setIsModalOpen(false);
+      setRefreshTrigger(p => p + 1);
+      // Dispatch custom event to notify other components
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('contentUpdated'));
+      }
+      setEventForm({
+        title: '',
+        slug: '',
+        date: '',
+        location: '',
+        description: '',
+        banner: 'custom',
+        bannerImage: '',
+        bannerText: '',
+        eventTypes: [],
+        seoTitle: '',
+        seoDescription: '',
+        status: 'DRAFT',
+        publishedAt: undefined,
+        createdAt: '',
+        updatedAt: '',
+        authorId: undefined,
+        author: undefined,
+        type: []
+      });
+    } catch (error) {
+      console.error('Error saving event:', error);
+      alert('Error saving event. Please try again.');
+    }
   };
 
   const toggleEventType = (type: string) => {
-    const types = eventForm.type;
+    const types = eventForm.type || [];
     if (types.includes(type)) {
       setEventForm({ ...eventForm, type: types.filter(t => t !== type) });
     } else {
@@ -153,9 +245,6 @@ export const AdminDashboard: React.FC = () => {
           <button onClick={() => setActiveTab('overview')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${activeTab === 'overview' ? 'bg-coinlect-accent text-black font-bold' : 'text-gray-400 hover:bg-white/5'}`}>
             <LayoutDashboard size={18} /> Vue d&apos;ensemble
           </button>
-          <button onClick={() => setActiveTab('users')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${activeTab === 'users' ? 'bg-coinlect-accent text-black font-bold' : 'text-gray-400 hover:bg-white/5'}`}>
-            <Users size={18} /> Utilisateurs
-          </button>
           <button onClick={() => setActiveTab('courses')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${activeTab === 'courses' ? 'bg-coinlect-accent text-black font-bold' : 'text-gray-400 hover:bg-white/5'}`}>
             <BookOpen size={18} /> Cours
           </button>
@@ -164,6 +253,9 @@ export const AdminDashboard: React.FC = () => {
           </button>
           <button onClick={() => setActiveTab('events')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${activeTab === 'events' ? 'bg-coinlect-accent text-black font-bold' : 'text-gray-400 hover:bg-white/5'}`}>
             <Calendar size={18} /> Événements
+          </button>
+          <button onClick={() => setActiveTab('users')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${activeTab === 'users' ? 'bg-coinlect-accent text-black font-bold' : 'text-gray-400 hover:bg-white/5'}`}>
+            <Star size={18} /> Utilisateurs
           </button>
         </div>
       </aside>
@@ -174,7 +266,6 @@ export const AdminDashboard: React.FC = () => {
             <h1 className="text-3xl font-bold">Admin Dashboard</h1>
             <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
               {[
-                { label: 'Utilisateurs', val: users.length, icon: <Users />, color: 'text-blue-500' },
                 { label: 'Cours', val: courses.length, icon: <BookOpen />, color: 'text-coinlect-accent' },
                 { label: 'Articles', val: articles.length, icon: <FileText />, color: 'text-purple-500' },
                 { label: 'Événements', val: events.length, icon: <Calendar />, color: 'text-green-500' }
@@ -191,42 +282,6 @@ export const AdminDashboard: React.FC = () => {
           </div>
         )}
 
-        {activeTab === 'users' && (
-          <div className="space-y-6 animate-in fade-in">
-            <h1 className="text-3xl font-bold">Gestion des Utilisateurs</h1>
-            <div className="bg-[#111] rounded-xl border border-white/10 overflow-hidden">
-              <table className="w-full text-left">
-                <thead className="text-xs text-gray-400 uppercase bg-white/5">
-                  <tr>
-                    <th className="p-4">Nom</th>
-                    <th className="p-4">Email</th>
-                    <th className="p-4">Role</th>
-                    <th className="p-4 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="text-sm divide-y divide-white/5">
-                  {users.map(u => (
-                    <tr key={u.id} className="hover:bg-white/5">
-                      <td className="p-4 font-medium text-white">{u.firstName} {u.lastName}</td>
-                      <td className="p-4 text-gray-400">{u.email}</td>
-                      <td className="p-4">
-                        <button 
-                          onClick={() => toggleUserRole(u.id)}
-                          className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase transition-colors ${u.role === 'admin' ? 'bg-purple-500/20 text-purple-400' : 'bg-gray-500/20 text-gray-400'}`}
-                        >
-                          {u.role}
-                        </button>
-                      </td>
-                      <td className="p-4 text-right">
-                        <button onClick={() => {userService.delete(u.id); setRefreshTrigger(t => t+1)}} className="text-red-500 transition-colors hover:text-red-400" aria-label="Delete user"><Trash2 size={16} /></button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        )}
 
         {activeTab === 'courses' && (
           <div className="space-y-6 animate-in fade-in">
@@ -256,7 +311,7 @@ export const AdminDashboard: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-3xl font-bold">Articles du Blog</h1>
-                <p className="mt-2 text-sm text-gray-400">Minimum 3 articles doivent être en vedette pour la page d'accueil</p>
+                <p className="mt-2 text-sm text-gray-400">Minimum 3 articles doivent être en vedette pour la page d&apos;accueil</p>
               </div>
               <Button onClick={() => { setModalType('article'); setIsModalOpen(true); }}><Plus size={16} /> Publier un Article</Button>
             </div>
@@ -274,23 +329,28 @@ export const AdminDashboard: React.FC = () => {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <button 
-                      onClick={() => {
-                        const updatedArticles = articleService.getAll();
-                        const article = updatedArticles.find(art => art.id === a.id);
-                        if (article) {
-                          const newFeaturedStatus = !article.featured;
-                          // Ensure at least 3 featured articles
-                          const currentFeaturedCount = updatedArticles.filter(art => art.featured).length;
-                          if (currentFeaturedCount < 3 && !newFeaturedStatus) {
-                            alert('Vous devez avoir au moins 3 articles en vedette sur la page d\'accueil');
-                            return;
+                    <button
+                      onClick={async () => {
+                        try {
+                          const updatedArticles = await articleService.getAll();
+                          const article = updatedArticles.find(art => art.id === a.id);
+                          if (article) {
+                            const newFeaturedStatus = !article.featured;
+                            // Ensure at least 3 featured articles
+                            const currentFeaturedCount = updatedArticles.filter(art => art.featured).length;
+                            if (currentFeaturedCount < 3 && !newFeaturedStatus) {
+                              alert('Vous devez avoir au moins 3 articles en vedette sur la page d\'accueil');
+                              return;
+                            }
+                            await articleService.update(a.id, { featured: newFeaturedStatus });
+                            setRefreshTrigger(t => t+1);
+                            if (typeof window !== 'undefined') {
+                              window.dispatchEvent(new CustomEvent('contentUpdated'));
+                            }
                           }
-                          articleService.update(a.id, { featured: newFeaturedStatus });
-                          setRefreshTrigger(t => t+1);
-                          if (typeof window !== 'undefined') {
-                            window.dispatchEvent(new CustomEvent('contentUpdated'));
-                          }
+                        } catch (error) {
+                          console.error('Error updating article:', error);
+                          alert('Error updating article. Please try again.');
                         }
                       }} 
                       className={`p-2 transition-colors ${a.featured ? 'text-coinlect-accent hover:text-yellow-500' : 'text-gray-500 hover:text-coinlect-accent'}`}
@@ -318,7 +378,7 @@ export const AdminDashboard: React.FC = () => {
                 <div key={e.id} className="bg-[#111] p-4 rounded-xl border border-white/10 flex justify-between items-center group">
                   <div className="flex items-center gap-4">
                     <div className="flex flex-wrap gap-1">
-                      {e.type.map((t, idx) => (
+                      {(e.type || []).map((t, idx) => (
                         <span key={idx} className="px-2 py-1 text-[10px] font-bold text-gray-400 uppercase bg-white/5 rounded">{t}</span>
                       ))}
                     </div>
@@ -329,6 +389,53 @@ export const AdminDashboard: React.FC = () => {
                   </div>
                   <div className="flex gap-2">
                     <button onClick={() => { eventService.delete(e.id); setRefreshTrigger(t => t+1); }} className="p-2 text-red-500 transition-colors hover:text-red-400" aria-label="Delete event"><Trash2 size={18} /></button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'users' && (
+          <div className="space-y-6 animate-in fade-in">
+            <div className="flex items-center justify-between">
+              <h1 className="text-3xl font-bold">Gestion des Utilisateurs</h1>
+            </div>
+            <div className="grid gap-4">
+              {users.map(u => (
+                <div key={u.id} className="bg-[#111] p-4 rounded-xl border border-white/10 flex justify-between items-center group">
+                  <div className="flex items-center gap-4">
+                    <div>
+                      <h4 className="font-bold text-white">{u.name || 'No name'}</h4>
+                      <p className="text-sm text-gray-400">{u.email}</p>
+                      <p className="text-xs text-gray-500">
+                        Rôle: <span className={`font-semibold ${u.role === 'ADMIN' ? 'text-coinlect-accent' : 'text-gray-400'}`}>{u.role === 'ADMIN' ? 'Admin' : 'Utilisateur'}</span>
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    {u.role === 'USER' && (
+                      <Button
+                        onClick={() => handleRoleChange(u.id, 'promote')}
+                        variant="outline"
+                        size="sm"
+                        className="text-xs"
+                      >
+                        <Star size={14} className="mr-1" />
+                        Promouvoir Admin
+                      </Button>
+                    )}
+                    {u.role === 'ADMIN' && u.id !== user?.id && (
+                      <Button
+                        onClick={() => handleRoleChange(u.id, 'demote')}
+                        variant="outline"
+                        size="sm"
+                        className="text-xs text-red-400 border-red-400 hover:bg-red-400 hover:text-black"
+                      >
+                        <X size={14} className="mr-1" />
+                        Rétrograder
+                      </Button>
+                    )}
                   </div>
                 </div>
               ))}
@@ -356,9 +463,13 @@ export const AdminDashboard: React.FC = () => {
                   {/* Basic Meta */}
                   <div className="space-y-4">
                     <h3 className="text-sm font-bold tracking-widest uppercase text-coinlect-accent">1. Informations Générales</h3>
-                    <input 
+                    <input
                       required placeholder="Titre du cours" className="w-full p-4 text-white bg-black border outline-none border-white/10 rounded-xl focus:border-coinlect-accent"
-                      onChange={e => setCourseForm({...courseForm, title: e.target.value})} 
+                      onChange={e => setCourseForm({...courseForm, title: e.target.value})}
+                    />
+                    <input
+                      required placeholder="Slug (ex: introduction-blockchain)" className="w-full p-4 text-white bg-black border outline-none border-white/10 rounded-xl focus:border-coinlect-accent"
+                      onChange={e => setCourseForm({...courseForm, slug: e.target.value})}
                     />
                     <textarea 
                       required placeholder="Brève description pour la carte" className="w-full h-24 p-4 text-white bg-black border outline-none border-white/10 rounded-xl focus:border-coinlect-accent"
@@ -396,20 +507,6 @@ export const AdminDashboard: React.FC = () => {
                   </div>
 
                   {/* Learning Objectives */}
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-bold tracking-widest uppercase text-coinlect-accent">2. Objectifs d&apos;Apprentissage</h3>
-                      <button type="button" onClick={handleAddObjective} className="flex items-center gap-1 text-xs font-bold text-coinlect-accent hover:underline"><Plus size={14}/> Ajouter un point</button>
-                    </div>
-                    <div className="space-y-2">
-                       {courseForm.learningObjectives.map((obj, i) => (
-                         <div key={i} className="flex gap-2">
-                           <Check className="mt-3 text-green-500" size={16} />
-                           <input placeholder="Ex: Comprendre le consensus PoW" className="flex-1 p-3 text-sm bg-black border rounded-lg outline-none border-white/5" value={obj} onChange={e => updateObjective(i, e.target.value)} />
-                         </div>
-                       ))}
-                    </div>
-                  </div>
 
 
                   <div className="flex gap-4 pt-10">
@@ -426,6 +523,7 @@ export const AdminDashboard: React.FC = () => {
                       </label>
                    </div>
                    <input required placeholder="Titre de l'article" className="w-full p-4 text-xl font-bold text-white bg-black border outline-none border-white/10 rounded-xl focus:border-coinlect-accent" onChange={e => setArticleForm({...articleForm, title: e.target.value})} />
+                   <input required placeholder="Slug (ex: blockchain-101)" className="w-full p-4 text-white bg-black border outline-none border-white/10 rounded-xl focus:border-coinlect-accent" onChange={e => setArticleForm({...articleForm, slug: e.target.value})} />
                    <textarea placeholder="Extrait accrocheur" className="w-full h-20 p-4 text-white bg-black border outline-none border-white/10 rounded-xl" onChange={e => setArticleForm({...articleForm, excerpt: e.target.value})} />
                    <div className="grid grid-cols-2 gap-4">
                      <input placeholder="Catégorie" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" onChange={e => setArticleForm({...articleForm, category: e.target.value})} />
@@ -438,10 +536,7 @@ export const AdminDashboard: React.FC = () => {
                        setArticleForm({...articleForm, date: date.toLocaleDateString('fr-FR')});
                      }} />
                    </div>
-                   <div className="grid grid-cols-2 gap-4">
-                     <input placeholder="Auteur" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={articleForm.author} onChange={e => setArticleForm({...articleForm, author: e.target.value})} />
-                     <input placeholder="URL Image auteur" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={articleForm.authorImage} onChange={e => setArticleForm({...articleForm, authorImage: e.target.value})} />
-                   </div>
+                    <input placeholder="URL Image auteur" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={articleForm.authorImage} onChange={e => setArticleForm({...articleForm, authorImage: e.target.value})} />
                    <textarea placeholder="Contenu complet (Séparez les paragraphes par une nouvelle ligne)" className="w-full p-4 text-white bg-black border outline-none border-white/10 rounded-xl h-60" onChange={e => setArticleForm({...articleForm, content: e.target.value})} />
                    <div className="flex gap-4 pt-4">
                      <Button type="button" variant="outline" className="w-1/2" onClick={() => setIsModalOpen(false)}>Annuler</Button>
@@ -450,12 +545,19 @@ export const AdminDashboard: React.FC = () => {
                 </form>
               ) : (
                 <form onSubmit={handleSaveEvent} className="space-y-6">
-                  <input 
-                    required 
-                    placeholder="Titre de l'événement" 
-                    className="w-full p-4 text-xl font-bold text-white bg-black border outline-none border-white/10 rounded-xl focus:border-coinlect-accent" 
+                  <input
+                    required
+                    placeholder="Titre de l'événement"
+                    className="w-full p-4 text-xl font-bold text-white bg-black border outline-none border-white/10 rounded-xl focus:border-coinlect-accent"
                     value={eventForm.title}
-                    onChange={e => setEventForm({...eventForm, title: e.target.value})} 
+                    onChange={e => setEventForm({...eventForm, title: e.target.value})}
+                  />
+                  <input
+                    required
+                    placeholder="Slug (ex: blockchain-conference-2025)"
+                    className="w-full p-4 text-white bg-black border outline-none border-white/10 rounded-xl focus:border-coinlect-accent"
+                    value={eventForm.slug}
+                    onChange={e => setEventForm({...eventForm, slug: e.target.value})}
                   />
                   <div className="grid grid-cols-2 gap-4">
                     <input 
@@ -474,7 +576,7 @@ export const AdminDashboard: React.FC = () => {
                     />
                   </div>
                   <div className="space-y-3">
-                    <label className="block text-sm font-bold text-gray-400">Type d'événement</label>
+                    <label className="block text-sm font-bold text-gray-400">Type d&apos;événement</label>
                     <div className="flex flex-wrap gap-2">
                       {['CONFERENCE', 'MEETUP', 'WEB3', 'WORKSHOP', 'HACKATHON', 'MIXER'].map(type => (
                         <button
@@ -482,7 +584,7 @@ export const AdminDashboard: React.FC = () => {
                           type="button"
                           onClick={() => toggleEventType(type)}
                           className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${
-                            eventForm.type.includes(type)
+                            (eventForm.type || []).includes(type)
                               ? 'bg-coinlect-accent text-black'
                               : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
                           }`}
@@ -542,5 +644,11 @@ export const AdminDashboard: React.FC = () => {
     </div>
   );
 };
+
+export async function getServerSideProps() {
+  return {
+    props: {},
+  };
+}
 
 export default AdminDashboard;

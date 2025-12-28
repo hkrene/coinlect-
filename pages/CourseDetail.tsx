@@ -11,21 +11,32 @@ import { ArrowLeft, PlayCircle } from 'lucide-react';
 
 export const CourseDetail: React.FC = () => {
   const params = useParams();
-  const courseId = params?.courseId as string;
+  const courseSlug = params?.courseId as string;
   const [course, setCourse] = useState<Course | null>(null);
 
   useEffect(() => {
-    const courses = courseService.getAll();
-    const foundCourse = courses.find(c => c.id === Number(courseId));
-    setCourse(foundCourse || null);
-  }, [courseId]);
+    const fetchCourse = async () => {
+      try {
+        const courses = await courseService.getAll();
+        const foundCourse = courses.find(c => c.slug === courseSlug);
+        setCourse(foundCourse || null);
+      } catch (error) {
+        console.error('Error fetching course:', error);
+        setCourse(null);
+      }
+    };
+
+    if (courseSlug) {
+      fetchCourse();
+    }
+  }, [courseSlug]);
 
   if (!course) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-4 px-6 text-center">
         <h1 className="text-2xl font-bold tracking-tighter text-white uppercase">Cours non trouvé</h1>
         <Link href="/academy">
-          <Button variant="secondary" className="rounded-none" withArrow>Retour à l'Académie</Button>
+          <Button variant="secondary" className="rounded-none" withArrow>Retour à l&apos;Académie</Button>
         </Link>
       </div>
     );
@@ -56,7 +67,7 @@ export const CourseDetail: React.FC = () => {
         <div className="container relative z-10 px-6 mx-auto">
           <div className="flex items-start justify-between">
             <Link href="/academy" className="inline-flex items-center gap-2 mb-8 text-[11px] font-black uppercase tracking-widest text-gray-500 transition-colors hover:text-white">
-                <ArrowLeft size={14} /> Retour à l'Académie
+                <ArrowLeft size={14} /> Retour à l&apos;Académie
             </Link>
           </div>
           
@@ -158,5 +169,11 @@ export const CourseDetail: React.FC = () => {
     </div>
   );
 };
+
+export async function getServerSideProps() {
+  return {
+    props: {},
+  };
+}
 
 export default CourseDetail;

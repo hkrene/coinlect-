@@ -16,7 +16,16 @@ export const Events: React.FC = () => {
   const itemsPerPage = 6;
 
   useEffect(() => {
-    setEvents(eventService.getAll());
+    const fetchEvents = async () => {
+      try {
+        const fetchedEvents = await eventService.getAll();
+        setEvents(fetchedEvents);
+      } catch (error) {
+        console.error('Error fetching events:', error);
+      }
+    };
+
+    fetchEvents();
   }, []);
 
   const filteredEvents = useMemo(() => {
@@ -31,7 +40,7 @@ export const Events: React.FC = () => {
 
     if (activeFilter !== 'All') {
       filtered = filtered.filter(event =>
-        event.type.some(t => t.toLowerCase() === activeFilter.toLowerCase())
+        event.eventTypes.some(t => t.toLowerCase() === activeFilter.toLowerCase())
       );
     }
 
@@ -200,7 +209,7 @@ export const Events: React.FC = () => {
                 {renderBanner(event)}
                 <div className="p-6">
                   <div className="flex flex-wrap gap-2 mb-4">
-                    {event.type.map((type, idx) => (
+                    {event.eventTypes.map((type, idx) => (
                       <span key={idx} className="px-3 py-1 text-xs font-bold tracking-wider text-gray-400 uppercase border rounded-full bg-white/5 border-white/10">
                         {type}
                       </span>

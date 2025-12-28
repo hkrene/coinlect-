@@ -77,4 +77,10 @@ export const Terms: React.FC = () => {
   );
 };
 
+export async function getServerSideProps() {
+  return {
+    props: {},
+  };
+}
+
 export default Terms;

@@ -14,27 +14,41 @@ export const About: React.FC = () => {
   const [latestArticles, setLatestArticles] = useState<Article[]>([]);
 
   useEffect(() => {
-    const allArticles = articleService.getAll();
-    const featured = allArticles.filter(a => a.featured);
-    
-    // Ensure we have at least 3 featured articles, if not use regular articles
-    const articlesToShow = featured.length >= 3 ? featured : allArticles.slice(0, Math.max(3, featured.length));
-    setFeaturedArticles(articlesToShow);
-    
-    // Get latest non-featured articles for sidebar
-    const latest = allArticles.filter(a => !a.featured || !articlesToShow.some(f => f.id === a.id)).slice(0, 5);
-    setLatestArticles(latest);
+    const loadArticles = async () => {
+      try {
+        const allArticles = await articleService.getAll();
+        const featured = allArticles.filter(a => a.featured);
+
+        // Ensure we have at least 3 featured articles, if not use regular articles
+        const articlesToShow = featured.length >= 3 ? featured : allArticles.slice(0, Math.max(3, featured.length));
+        setFeaturedArticles(articlesToShow);
+
+        // Get latest non-featured articles for sidebar
+        const latest = allArticles.filter(a => !a.featured || !articlesToShow.some(f => f.id === a.id)).slice(0, 5);
+        setLatestArticles(latest);
+      } catch (error) {
+        console.error('Error loading articles:', error);
+        setFeaturedArticles([]);
+        setLatestArticles([]);
+      }
+    };
+
+    loadArticles();
   }, []);
 
   // Listen for content updates
   useEffect(() => {
-    const handleContentUpdate = () => {
-      const allArticles = articleService.getAll();
-      const featured = allArticles.filter(a => a.featured);
-      const articlesToShow = featured.length >= 3 ? featured : allArticles.slice(0, Math.max(3, featured.length));
-      setFeaturedArticles(articlesToShow);
-      const latest = allArticles.filter(a => !a.featured || !articlesToShow.some(f => f.id === a.id)).slice(0, 5);
-      setLatestArticles(latest);
+    const handleContentUpdate = async () => {
+      try {
+        const allArticles = await articleService.getAll();
+        const featured = allArticles.filter(a => a.featured);
+        const articlesToShow = featured.length >= 3 ? featured : allArticles.slice(0, Math.max(3, featured.length));
+        setFeaturedArticles(articlesToShow);
+        const latest = allArticles.filter(a => !a.featured || !articlesToShow.some(f => f.id === a.id)).slice(0, 5);
+        setLatestArticles(latest);
+      } catch (error) {
+        console.error('Error updating articles:', error);
+      }
     };
 
     window.addEventListener('contentUpdated', handleContentUpdate);

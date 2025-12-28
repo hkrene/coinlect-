@@ -12,7 +12,6 @@ datasource db {
 // Enums
 enum UserRole {
   ADMIN
-  EDITOR
   USER
 }
 
@@ -42,6 +41,7 @@ model User {
 
   courses        Course[]        @relation("CourseAuthor")
   articles       Article[]       @relation("ArticleAuthor")
+  events         Event[]         @relation("EventAuthor")
   enrollments    Enrollment[]
   progress       Progress[]
   refreshTokens  RefreshToken[]
@@ -102,6 +102,28 @@ model Article {
   featuredItems  FeaturedItem[]
 }
 
+model Event {
+  id             String        @id @default(uuid())
+  title          String
+  slug           String        @unique
+  date           String
+  location       String
+  description    String?
+  banner         String
+  bannerImage    String?
+  bannerText     String?
+  eventTypes     String[]
+  seoTitle       String?
+  seoDescription String?
+  status         PublishStatus @default(DRAFT)
+  publishedAt    DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  authorId       String?
+  author         User?         @relation("EventAuthor", fields: [authorId], references: [id])
+}
+
 model FeaturedItem {
   id        String       @id @default(uuid())
   type      FeaturedType
@@ -141,6 +163,22 @@ model Progress {
   module        CourseModule @relation(fields: [moduleId], references: [id], onDelete: Cascade)
 
   @@unique([userId, moduleId])
+}
+
+model Deal {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  category    String
+  link        String
+  image       String?
+  discount    String?
+  code        String?
+  exclusive   Boolean  @default(false)
+  verified    Boolean  @default(false)
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model RefreshToken {

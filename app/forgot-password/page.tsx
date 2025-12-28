@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/Button';
 import { ScrollReveal } from '@/components/ScrollReveal';
-import { useAuth } from '@/contexts/AuthContext';
+// import { useAuth } from '@/contexts/AuthContext';
 import { ComponentsLayout } from '../components-layout';
 
 export default function ForgotPasswordPage() {
@@ -12,7 +12,7 @@ export default function ForgotPasswordPage() {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const { forgotPassword } = useAuth(); // Assuming useAuth has a forgotPassword function
+  // const { forgotPassword } = useAuth(); // TODO: Implement forgot password functionality
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

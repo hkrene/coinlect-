@@ -1,23 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { courseSchema } from '@/lib/validators';
-import { getAuthContext, unauthorized, forbidden } from '@/lib/api';
+import { getAuthUser, requireAuth, requireAdmin } from '@/lib/auth-utils';
 import { UserRole, PublishStatus } from '@prisma/client';
 
 export async function GET(req: NextRequest) {
-  const auth = await getAuthContext(req);
-  const includeDrafts = auth && (auth.role === UserRole.ADMIN || auth.role === UserRole.EDITOR);
+  const auth = await getAuthUser(req);
+  const includeDrafts = auth?.role === UserRole.ADMIN;
   const courses = await prisma.course.findMany({
     where: includeDrafts ? {} : { status: PublishStatus.PUBLISHED },
     orderBy: { createdAt: 'desc' },
+    include: { author: true },
   });
   return NextResponse.json({ courses });
 }
 
-export async function POST(req: NextRequest) {
-  const auth = await getAuthContext(req);
-  if (!auth) return unauthorized();
-  if (auth.role !== UserRole.ADMIN && auth.role !== UserRole.EDITOR) return forbidden();
+export const POST = requireAdmin(async (req: NextRequest, user) => {
 
   try {
     const body = await req.json();
@@ -35,7 +33,7 @@ export async function POST(req: NextRequest) {
         seoDescription: data.seoDescription,
         status: data.status ?? PublishStatus.DRAFT,
         publishedAt: data.status === PublishStatus.PUBLISHED ? new Date() : null,
-        authorId: auth.userId,
+        authorId: user.id,
       },
     });
     return NextResponse.json({ course }, { status: 201 });
@@ -43,5 +41,5 @@ export async function POST(req: NextRequest) {
     console.error('Course create error', err);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
-}
+});
 

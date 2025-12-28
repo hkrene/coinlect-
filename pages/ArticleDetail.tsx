@@ -12,21 +12,57 @@ import { ArrowLeft, Clock, Calendar, Twitter, Facebook, Link as LinkIcon, Check,
 
 export const ArticleDetail: React.FC = () => {
   const params = useParams();
-  const articleId = params?.articleId as string;
+  const articleSlug = params?.articleId as string;
   const [article, setArticle] = useState<Article | null>(null);
+  const [relatedArticles, setRelatedArticles] = useState<Article[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { t } = useLanguage();
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    const articles = articleService.getAll();
-    const foundArticle = articles.find(a => a.id === Number(articleId));
-    setArticle(foundArticle || null);
-  }, [articleId]);
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
 
-  if (!article) {
+        const articles = await articleService.getAll();
+        const foundArticle = articles.find(a => a.slug === articleSlug);
+
+        if (foundArticle) {
+          setArticle(foundArticle);
+          // Get related articles (excluding current article)
+          const related = articles.filter(a => a.id !== foundArticle.id).slice(0, 2);
+          setRelatedArticles(related);
+        } else {
+          setError('Article not found');
+        }
+      } catch (error) {
+        console.error('Error fetching article:', error);
+        setError('Failed to load article');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (articleSlug) {
+      fetchData();
+    }
+  }, [articleSlug]);
+
+  if (loading) {
     return (
       <div className="container flex flex-col items-center justify-center min-h-screen px-6 pt-32 mx-auto text-center">
-        <h2 className="mb-4 text-2xl font-bold">Article Not Found</h2>
+        <div className="w-8 h-8 border-4 border-coinlect-accent border-t-transparent rounded-full animate-spin"></div>
+        <p className="mt-4 text-gray-400">Loading article...</p>
+      </div>
+    );
+  }
+
+  if (error || !article) {
+    return (
+      <div className="container flex flex-col items-center justify-center min-h-screen px-6 pt-32 mx-auto text-center">
+        <h2 className="mb-4 text-2xl font-bold">{error || 'Article Not Found'}</h2>
         <Link href="/academy">
           <Button variant="secondary" withArrow>{t.academy.article.backToAcademy}</Button>
         </Link>
@@ -41,17 +77,6 @@ export const ArticleDetail: React.FC = () => {
       setTimeout(() => setCopied(false), 2000);
     }
   };
-
-  if (!article) {
-    return (
-      <div className="container flex flex-col items-center justify-center min-h-screen px-6 pt-32 mx-auto text-center">
-        <h2 className="mb-4 text-2xl font-bold">Article Not Found</h2>
-        <Link href="/academy">
-          <Button variant="secondary" withArrow>{t.academy.article.backToAcademy}</Button>
-        </Link>
-      </div>
-    );
-  }
 
   const shareUrl = typeof window !== 'undefined' ? encodeURIComponent(window.location.href) : '';
   const shareText = encodeURIComponent(article.title);
@@ -91,9 +116,9 @@ export const ArticleDetail: React.FC = () => {
 
          <div className="flex items-center justify-between py-6 border-y border-white/10">
              <div className="flex items-center gap-4">
-                <img src={article.authorImage} alt={article.author} className="w-12 h-12 rounded-full border-2 border-[#0a0a0a] ring-2 ring-white/10" />
+                <img src={article.authorImage} alt={article.author?.name ?? 'Author'} className="w-12 h-12 rounded-full border-2 border-[#0a0a0a] ring-2 ring-white/10" />
                 <div>
-                    <p className="text-sm font-bold text-white">{article.author}</p>
+                    <p className="text-sm font-bold text-white">{article.author?.name ?? 'Author'}</p>
                     <p className="text-xs text-gray-500">{t.academy.article.writtenBy}</p>
                 </div>
              </div>
@@ -143,10 +168,12 @@ export const ArticleDetail: React.FC = () => {
                      {article.excerpt}
                  </p>
                  
-                 {article.content.map((paragraph, idx) => (
-                     <p key={idx} className="mb-6 leading-relaxed text-gray-300">
-                         {paragraph}
-                     </p>
+                 {(article.content as string).split('\n').map((paragraph, idx) => (
+                     paragraph.trim() && (
+                         <p key={idx} className="mb-6 leading-relaxed text-gray-300">
+                             {paragraph.trim()}
+                         </p>
+                     )
                  ))}
 
                  <h3 className="mt-12 mb-6 text-2xl font-bold text-white">Key Takeaways</h3>
@@ -173,8 +200,8 @@ export const ArticleDetail: React.FC = () => {
       <div className="container max-w-5xl px-6 mx-auto mt-24">
          <h3 className="pl-4 mb-8 text-2xl font-bold text-white border-l-4 border-coinlect-accent">Read Next</h3>
          <div className="grid gap-8 md:grid-cols-2">
-            {articleService.getAll().filter(a => a.id !== article.id).slice(0, 2).map(related => (
-                <Link key={related.id} href={`/academy/article/${related.id}`} className="flex flex-col gap-4 p-4 transition-colors bg-transparent group md:flex-row hover:bg-white/5 rounded-xl">
+            {relatedArticles.map(related => (
+                <Link key={related.id} href={`/academy/article/${related.slug}`} className="flex flex-col gap-4 p-4 transition-colors bg-transparent group md:flex-row hover:bg-white/5 rounded-xl">
                     <div className="flex-shrink-0 w-full h-32 overflow-hidden rounded-lg md:w-48">
                         <img src={related.image} alt={related.title} className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110" />
                     </div>
@@ -190,5 +217,11 @@ export const ArticleDetail: React.FC = () => {
     </div>
   );
 };
+
+export async function getServerSideProps() {
+  return {
+    props: {},
+  };
+}
 
 export default ArticleDetail;

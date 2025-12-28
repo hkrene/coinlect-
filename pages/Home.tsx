@@ -31,4 +31,10 @@ export const Home: React.FC = () => {
   );
 };
 
+export async function getServerSideProps() {
+  return {
+    props: {},
+  };
+}
+
 export default Home;

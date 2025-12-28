@@ -1,14 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { moduleSchema } from '@/lib/validators';
-import { getAuthContext, unauthorized, forbidden } from '@/lib/api';
-import { UserRole } from '@prisma/client';
+import { requireAdmin } from '@/lib/auth-utils';
 
-export async function PATCH(req: NextRequest, { params }: { params: Promise<{ moduleId: string }> }) {
-  const { moduleId } = await params;
-  const auth = await getAuthContext(req);
-  if (!auth) return unauthorized();
-  if (auth.role !== UserRole.ADMIN && auth.role !== UserRole.EDITOR) return forbidden();
+export const PATCH = requireAdmin(async (req: NextRequest, user, moduleId?: string) => {
+  if (!moduleId) return NextResponse.json({ error: 'Module ID required' }, { status: 400 });
 
   try {
     const body = await req.json();
@@ -26,13 +22,10 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ mo
     console.error('Module update error', err);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
-}
+});
 
-export async function DELETE(req: NextRequest, { params }: { params: Promise<{ moduleId: string }> }) {
-  const { moduleId } = await params;
-  const auth = await getAuthContext(req);
-  if (!auth) return unauthorized();
-  if (auth.role !== UserRole.ADMIN && auth.role !== UserRole.EDITOR) return forbidden();
+export const DELETE = requireAdmin(async (req: NextRequest, user, moduleId?: string) => {
+  if (!moduleId) return NextResponse.json({ error: 'Module ID required' }, { status: 400 });
 
   try {
     await prisma.courseModule.delete({ where: { id: moduleId } });
@@ -41,5 +34,5 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ m
     console.error('Module delete error', err);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
-}
+});
 

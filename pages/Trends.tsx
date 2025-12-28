@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { ScrollReveal } from '../components/ScrollReveal';
 import { Ticker } from '../components/Ticker';
 import { AdBanner } from '../components/AdBanner';
@@ -80,16 +80,16 @@ export const Trends: React.FC = () => {
     return "Just now";
   };
 
-  const fetchNews = async (isBackground = false) => {
+  const fetchNews = useCallback(async (isBackground = false) => {
     if (!isBackground) setNewsLoading(true);
     try {
         // Using CryptoCompare API which is more reliable for public news feeds than CoinGecko
         const response = await fetch('https://min-api.cryptocompare.com/data/v2/news/?lang=EN');
-        
+
         if (!response.ok) throw new Error("API Limit or Error");
 
         const data = await response.json();
-        
+
         if (data.Data && data.Data.length > 0) {
             const formattedNews = data.Data.slice(0, 9).map((item: any) => ({
                 id: item.id,
@@ -97,7 +97,7 @@ export const Trends: React.FC = () => {
                 summary: item.body, // CryptoCompare uses 'body' for summary
                 source: item.source_info?.name || 'CryptoNews',
                 time: getRelativeTime(item.published_on),
-                imageUrl: item.imageurl, 
+                imageUrl: item.imageurl,
                 category: item.categories?.split('|')[0] || "Crypto",
                 url: item.url
             }));
@@ -114,7 +114,7 @@ export const Trends: React.FC = () => {
     } finally {
         if (!isBackground) setNewsLoading(false);
     }
-  };
+  }, [news.length]);
 
   const fetchMarketData = async () => {
     try {

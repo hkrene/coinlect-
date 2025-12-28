@@ -37,7 +37,7 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    await register(formData.firstName, formData.lastName, formData.email, formData.password);
+    await register(`${formData.firstName} ${formData.lastName}`.trim(), formData.email, formData.password);
     setIsLoading(false);
     router.push('/academy');
   };
