@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
 /* postcss-ignore */
 @tailwind base;
 /* postcss-ignore */
@@ -52,4 +54,3 @@ body {
 .progress-bar {
   width: var(--progress-width, 0%);
 }
-

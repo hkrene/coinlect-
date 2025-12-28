@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyToken } from '@/lib/auth';
 import { UserRole } from '@prisma/client';
+import { prisma } from '@/lib/prisma';
 
 export interface AuthUser {
   id: string;
@@ -9,24 +9,26 @@ export interface AuthUser {
 
 export async function getAuthUser(req: NextRequest): Promise<AuthUser | null> {
   try {
-    const authHeader = req.headers.get('authorization');
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    const sessionId = req.cookies.get('__session')?.value;
+    if (!sessionId) {
       return null;
     }
 
-    const token = authHeader.substring(7);
-    const payload = await verifyToken(token);
+    const session = await prisma.session.findUnique({
+      where: { id: sessionId, expiresAt: { gt: new Date() } },
+      include: { user: true },
+    });
 
-    if (!payload || typeof payload.sub !== 'string' || !payload.role) {
+    if (!session || !session.user) {
       return null;
     }
 
     return {
-      id: payload.sub,
-      role: payload.role as UserRole,
+      id: session.user.id,
+      role: session.user.role,
     };
   } catch (error) {
-    console.error('Auth verification failed:', error);
+    console.error('Session verification failed:', error);
     return null;
   }
 }
@@ -41,8 +43,8 @@ export function requireAuth(handler: (req: NextRequest, user: AuthUser) => Promi
   };
 }
 
-export function requireAdmin(handler: (req: NextRequest, user: AuthUser) => Promise<NextResponse>) {
-  return async (req: NextRequest) => {
+export function requireAdmin(handler: (req: NextRequest, user: AuthUser, params: { id: string }) => Promise<NextResponse>) {
+  return async (req: NextRequest, { params }: { params: { id: string } }) => {
     const user = await getAuthUser(req);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -50,27 +52,24 @@ export function requireAdmin(handler: (req: NextRequest, user: AuthUser) => Prom
     if (user.role !== UserRole.ADMIN) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
-    return handler(req, user);
+    return handler(req, user, params);
   };
 }
 
-export function requireAdminOrSelf(handler: (req: NextRequest, user: AuthUser, targetUserId?: string) => Promise<NextResponse>) {
-  return async (req: NextRequest) => {
+export function requireAdminOrSelf(handler: (req: NextRequest, user: AuthUser, params: { id: string }) => Promise<NextResponse>) {
+  return async (req: NextRequest, { params }: { params: { id: string } }) => {
     const user = await getAuthUser(req);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Extract user ID from URL if it's a path parameter
-    const url = new URL(req.url);
-    const pathParts = url.pathname.split('/');
-    const targetUserId = pathParts[pathParts.length - 1];
+    const targetUserId = params.id;
 
     // Admin can access anyone's data, users can only access their own
     if (user.role !== UserRole.ADMIN && user.id !== targetUserId) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    return handler(req, user, targetUserId);
+    return handler(req, user, params);
   };
 }

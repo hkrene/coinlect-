@@ -3,24 +3,26 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
-import { courseService, articleService, eventService } from '../services/db';
-import { Course, Article, Event, User } from '../types';
+import { courseService, articleService, eventService, dealService } from '../services/db';
+import { Course, Article, Event, User, Deal } from '../types';
+import { PublishStatus } from '@prisma/client';
 import { Button } from '../components/Button';
 import { Trash2, Plus, BookOpen, FileText, LayoutDashboard, X, Check, Calendar, Star } from 'lucide-react';
 
 export const AdminDashboard: React.FC = () => {
   const { user, isAdmin } = useAuth();
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState<'overview' | 'courses' | 'articles' | 'events' | 'users'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'courses' | 'articles' | 'events' | 'users' | 'deals'>('overview');
   const [courses, setCourses] = useState<Course[]>([]);
   const [articles, setArticles] = useState<Article[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
+  const [deals, setDeals] = useState<Deal[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   // Modals
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalType, setModalType] = useState<'course' | 'article' | 'event' | null>(null);
+  const [modalType, setModalType] = useState<'course' | 'article' | 'event' | 'deal' | null>(null);
 
   // Complex Form State
   const [courseForm, setCourseForm] = useState<Omit<Course, 'id' | 'slug'> & { slug: string }>({
@@ -92,6 +94,22 @@ export const AdminDashboard: React.FC = () => {
     type: []
   });
 
+  const [dealForm, setDealForm] = useState<Omit<Deal, 'id'> & { status: PublishStatus }>({
+    title: '',
+    description: '',
+    category: '',
+    link: '',
+    image: '',
+    discount: '',
+    code: '',
+    exclusive: false,
+    verified: false,
+    featured: false,
+    createdAt: '',
+    updatedAt: '',
+    status: 'DRAFT',
+  });
+
   useEffect(() => {
     const loadData = async () => {
       if (!isAdmin) {
@@ -100,16 +118,18 @@ export const AdminDashboard: React.FC = () => {
       }
 
       try {
-        const [coursesData, articlesData, eventsData, usersData] = await Promise.all([
+        const [coursesData, articlesData, eventsData, usersData, dealsData] = await Promise.all([
           courseService.getAll(),
           articleService.getAll(),
           eventService.getAll(),
-          fetchUsers()
+          fetchUsers(),
+          dealService.getAll()
         ]);
         setCourses(coursesData);
         setArticles(articlesData);
         setEvents(eventsData);
         setUsers(usersData);
+        setDeals(dealsData);
       } catch (error) {
         console.error('Error loading admin data:', error);
       }
@@ -188,7 +208,6 @@ export const AdminDashboard: React.FC = () => {
   const handleSaveEvent = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // Map the legacy 'type' field to 'eventTypes' for the API
       const eventData = {
         ...eventForm,
         eventTypes: eventForm.type || []
@@ -226,6 +245,21 @@ export const AdminDashboard: React.FC = () => {
     }
   };
 
+  const handleSaveDeal = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await dealService.add(dealForm);
+      setIsModalOpen(false);
+      setRefreshTrigger(p => p + 1);
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('contentUpdated'));
+      }
+    } catch (error) {
+      console.error('Error saving deal:', error);
+      alert('Error saving deal. Please try again.');
+    }
+  };
+
   const toggleEventType = (type: string) => {
     const types = eventForm.type || [];
     if (types.includes(type)) {
@@ -257,6 +291,9 @@ export const AdminDashboard: React.FC = () => {
           <button onClick={() => setActiveTab('users')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${activeTab === 'users' ? 'bg-coinlect-accent text-black font-bold' : 'text-gray-400 hover:bg-white/5'}`}>
             <Star size={18} /> Utilisateurs
           </button>
+          <button onClick={() => setActiveTab('deals')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${activeTab === 'deals' ? 'bg-coinlect-accent text-black font-bold' : 'text-gray-400 hover:bg-white/5'}`}>
+            <FileText size={18} /> Deals
+          </button>
         </div>
       </aside>
 
@@ -264,21 +301,22 @@ export const AdminDashboard: React.FC = () => {
         {activeTab === 'overview' && (
           <div className="space-y-8 animate-in fade-in">
             <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
-              {[
-                { label: 'Cours', val: courses.length, icon: <BookOpen />, color: 'text-coinlect-accent' },
-                { label: 'Articles', val: articles.length, icon: <FileText />, color: 'text-purple-500' },
-                { label: 'Événements', val: events.length, icon: <Calendar />, color: 'text-green-500' }
-              ].map((card, i) => (
-                <div key={i} className="bg-[#111] p-6 rounded-xl border border-white/10 flex items-center justify-between">
-                  <div>
-                    <h3 className="mb-1 text-sm text-gray-400">{card.label}</h3>
-                    <p className="text-3xl font-bold">{card.val}</p>
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
+                {[
+                  { label: 'Cours', val: courses.length, icon: <BookOpen />, color: 'text-coinlect-accent' },
+                  { label: 'Articles', val: articles.length, icon: <FileText />, color: 'text-purple-500' },
+                  { label: 'Événements', val: events.length, icon: <Calendar />, color: 'text-green-500' },
+                  { label: 'Utilisateurs', val: users.length, icon: <Star />, color: 'text-yellow-500' }
+                ].map((card, i) => (
+                  <div key={i} className="bg-[#111] p-6 rounded-xl border border-white/10 flex items-center justify-between">
+                    <div>
+                      <h3 className="mb-1 text-sm text-gray-400">{card.label}</h3>
+                      <p className="text-3xl font-bold">{card.val}</p>
+                    </div>
+                    <div className={`${card.color}`}>{card.icon}</div>
                   </div>
-                  <div className={`${card.color}`}>{card.icon}</div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
           </div>
         )}
 
@@ -442,6 +480,33 @@ export const AdminDashboard: React.FC = () => {
             </div>
           </div>
         )}
+
+        {activeTab === 'deals' && (
+          <div className="space-y-6 animate-in fade-in">
+            <div className="flex items-center justify-between">
+              <h1 className="text-3xl font-bold">Gestion des Deals</h1>
+              <Button onClick={() => { setModalType('deal'); setIsModalOpen(true); }}><Plus size={16} /> Créer un Deal</Button>
+            </div>
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+              {deals.map(d => (
+                <div key={d.id} className="bg-[#111] p-4 rounded-xl border border-white/10 flex justify-between items-center group">
+                  <div className="flex items-center gap-4">
+                    <img src={d.image || 'https://via.placeholder.com/60x40'} className="object-cover w-20 h-12 rounded shadow" alt="Deal image" />
+                    <div>
+                      <h4 className="font-bold text-white transition-colors group-hover:text-coinlect-accent">{d.title}</h4>
+                      <p className="text-[10px] text-gray-500 uppercase tracking-widest">{d.category} • {d.discount}</p>
+                    </div>
+                  </div>
+                  <div className="flex gap-2">
+                    {d.featured && <Star className="text-coinlect-accent" size={18} fill="currentColor" />}
+                    {d.verified && <Check className="text-green-500" size={18} />}
+                    <button onClick={() => { /* dealService.delete(d.id); */ setRefreshTrigger(t => t+1); }} className="p-2 text-red-500 hover:text-red-400" aria-label="Delete deal"><Trash2 size={18} /></button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </main>
 
       {/* MODAL SYSTEM */}
@@ -452,6 +517,7 @@ export const AdminDashboard: React.FC = () => {
               <h2 className="flex items-center gap-2 text-xl font-bold">
                 {modalType === 'course' ? <><BookOpen className="text-coinlect-accent" /> Nouveau Cours Expert</> : 
                  modalType === 'article' ? <><FileText className="text-purple-500" /> Nouvel Article</> :
+                 modalType === 'deal' ? <><FileText className="text-yellow-500" /> Nouveau Deal</> :
                  <><Calendar className="text-green-500" /> Nouvel Événement</>}
               </h2>
               <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-white" aria-label="Close modal"><X size={24} /></button>
@@ -504,6 +570,20 @@ export const AdminDashboard: React.FC = () => {
                       <input type="checkbox" checked={courseForm.isPaid || false} onChange={e => setCourseForm({...courseForm, isPaid: e.target.checked})} className="border-gray-600 rounded" />
                       <span className="text-xs font-bold">Cours payant</span>
                     </label>
+
+                    <label className="flex items-center gap-3 px-4 py-2 border cursor-pointer bg-white/5 rounded-xl border-white/10">
+                      <input
+                        type="checkbox"
+                        checked={courseForm.status === 'PUBLISHED'}
+                        onChange={e => setCourseForm({
+                          ...courseForm,
+                          status: e.target.checked ? 'PUBLISHED' : 'DRAFT',
+                          publishedAt: e.target.checked ? new Date().toISOString() : undefined
+                        })}
+                        className="border-gray-600 rounded"
+                      />
+                      <span className="text-xs font-bold">Publier le cours</span>
+                    </label>
                   </div>
 
                   {/* Learning Objectives */}
@@ -511,7 +591,9 @@ export const AdminDashboard: React.FC = () => {
 
                   <div className="flex gap-4 pt-10">
                     <Button type="button" variant="outline" className="w-1/2" onClick={() => setIsModalOpen(false)}>Annuler</Button>
-                    <Button type="submit" className="w-1/2 shadow-xl shadow-coinlect-accent/20">Publier le Cours</Button>
+                    <Button type="submit" className="w-1/2 shadow-xl shadow-coinlect-accent/20">
+                      {courseForm.status === 'PUBLISHED' ? 'Mettre à jour le Cours' : 'Publier le Cours'}
+                    </Button>
                   </div>
                 </form>
               ) : modalType === 'article' ? (
@@ -522,6 +604,20 @@ export const AdminDashboard: React.FC = () => {
                         <span className="text-xs font-bold">Mettre en avant sur l&apos;accueil</span>
                       </label>
                    </div>
+
+                   <label className="flex items-center gap-3 px-4 py-2 mb-6 border cursor-pointer bg-white/5 rounded-xl border-white/10">
+                     <input
+                       type="checkbox"
+                       checked={articleForm.status === 'PUBLISHED'}
+                       onChange={e => setArticleForm({
+                         ...articleForm,
+                         status: e.target.checked ? 'PUBLISHED' : 'DRAFT',
+                         publishedAt: e.target.checked ? new Date().toISOString() : undefined
+                       })}
+                       className="border-gray-600 rounded"
+                     />
+                     <span className="text-xs font-bold">Publier l&apos;article</span>
+                   </label>
                    <input required placeholder="Titre de l'article" className="w-full p-4 text-xl font-bold text-white bg-black border outline-none border-white/10 rounded-xl focus:border-coinlect-accent" onChange={e => setArticleForm({...articleForm, title: e.target.value})} />
                    <input required placeholder="Slug (ex: blockchain-101)" className="w-full p-4 text-white bg-black border outline-none border-white/10 rounded-xl focus:border-coinlect-accent" onChange={e => setArticleForm({...articleForm, slug: e.target.value})} />
                    <textarea placeholder="Extrait accrocheur" className="w-full h-20 p-4 text-white bg-black border outline-none border-white/10 rounded-xl" onChange={e => setArticleForm({...articleForm, excerpt: e.target.value})} />
@@ -540,7 +636,9 @@ export const AdminDashboard: React.FC = () => {
                    <textarea placeholder="Contenu complet (Séparez les paragraphes par une nouvelle ligne)" className="w-full p-4 text-white bg-black border outline-none border-white/10 rounded-xl h-60" onChange={e => setArticleForm({...articleForm, content: e.target.value})} />
                    <div className="flex gap-4 pt-4">
                      <Button type="button" variant="outline" className="w-1/2" onClick={() => setIsModalOpen(false)}>Annuler</Button>
-                     <Button type="submit" className="w-1/2">Publier l&apos;Article</Button>
+                     <Button type="submit" className="w-1/2">
+                       {articleForm.status === 'PUBLISHED' ? 'Mettre à jour l\'Article' : 'Publier l\'Article'}
+                     </Button>
                    </div>
                 </form>
               ) : (
@@ -631,9 +729,25 @@ export const AdminDashboard: React.FC = () => {
                     onChange={e => setEventForm({...eventForm, description: e.target.value})} 
                     aria-label="Event description"
                   />
+
+                  <label className="flex items-center gap-3 px-4 py-2 border cursor-pointer bg-white/5 rounded-xl border-white/10">
+                    <input
+                      type="checkbox"
+                      checked={eventForm.status === 'PUBLISHED'}
+                      onChange={e => setEventForm({
+                        ...eventForm,
+                        status: e.target.checked ? 'PUBLISHED' : 'DRAFT',
+                        publishedAt: e.target.checked ? new Date().toISOString() : undefined
+                      })}
+                      className="border-gray-600 rounded"
+                    />
+                    <span className="text-xs font-bold">Publier l&apos;événement</span>
+                  </label>
                   <div className="flex gap-4 pt-4">
                     <Button type="button" variant="outline" className="w-1/2" onClick={() => setIsModalOpen(false)}>Annuler</Button>
-                    <Button type="submit" className="w-1/2">Créer l&apos;Événement</Button>
+                    <Button type="submit" className="w-1/2">
+                      {eventForm.status === 'PUBLISHED' ? 'Mettre à jour l\'Événement' : 'Créer l\'Événement'}
+                    </Button>
                   </div>
                 </form>
               )}

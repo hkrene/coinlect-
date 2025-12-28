@@ -4,8 +4,7 @@ import { articleSchema } from '@/lib/validators';
 import { getAuthUser, requireAdmin } from '@/lib/auth-utils';
 import { UserRole, PublishStatus } from '@prisma/client';
 
-export async function GET(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+export async function GET(req: NextRequest, { params: { id } }: { params: { id: string } }) {
   const auth = await getAuthUser(req);
   const article = await prisma.article.findUnique({
     where: { id },
@@ -21,9 +20,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   return NextResponse.json({ article });
 }
 
-export const PATCH = requireAdmin(async (req: NextRequest, user) => {
-  const url = new URL(req.url);
-  const id = url.pathname.split('/').pop();
+export const PATCH = requireAdmin(async (req: NextRequest, user, params: { id: string }) => {
+  const { id } = params;
   if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
 
   try {
@@ -47,9 +45,8 @@ export const PATCH = requireAdmin(async (req: NextRequest, user) => {
   }
 });
 
-export const DELETE = requireAdmin(async (req: NextRequest, user) => {
-  const url = new URL(req.url);
-  const id = url.pathname.split('/').pop();
+export const DELETE = requireAdmin(async (req: NextRequest, user, params: { id: string }) => {
+  const { id } = params;
   if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
 
   try {

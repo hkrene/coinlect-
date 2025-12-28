@@ -35,11 +35,12 @@ export default function LoginPage() {
     e.preventDefault();
     setIsLoading(true);
     try {
+      console.log('LoginPage: Attempting login with email:', email);
       await login(email, password);
+      console.log('LoginPage: Login function completed, attempting redirect to /academy');
       router.push('/academy');
     } catch (err) {
-      // Error is already handled by the AuthContext
-      console.error('Login failed:', err);
+      console.error('LoginPage: Login failed in catch block:', err);
     } finally {
       setIsLoading(false);
     }

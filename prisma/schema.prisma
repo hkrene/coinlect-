@@ -45,6 +45,7 @@ model User {
   enrollments    Enrollment[]
   progress       Progress[]
   refreshTokens  RefreshToken[]
+  sessions       Session[]
 }
 
 model Course {
@@ -187,6 +188,15 @@ model RefreshToken {
   token     String   @unique
   expiresAt DateTime
   revokedAt DateTime?
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  userId    String
+  expiresAt DateTime
   createdAt DateTime @default(now())
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)

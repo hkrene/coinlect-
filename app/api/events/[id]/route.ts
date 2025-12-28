@@ -6,9 +6,8 @@ import { UserRole, PublishStatus } from '@prisma/client';
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params: { id } }: { params: { id: string } }
 ) {
-  const { id } = await params;
   const auth = await getAuthUser(req);
 
   const event = await prisma.event.findUnique({
@@ -26,9 +25,8 @@ export async function GET(
   return NextResponse.json({ event });
 }
 
-export const PUT = requireAdmin(async (req: NextRequest, user) => {
-  const url = new URL(req.url);
-  const id = url.pathname.split('/').pop();
+export const PUT = requireAdmin(async (req: NextRequest, user, params: { id: string }) => {
+  const { id } = params;
   if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
 
   try {
@@ -71,9 +69,8 @@ export const PUT = requireAdmin(async (req: NextRequest, user) => {
   }
 });
 
-export const DELETE = requireAdmin(async (req: NextRequest, user) => {
-  const url = new URL(req.url);
-  const id = url.pathname.split('/').pop();
+export const DELETE = requireAdmin(async (req: NextRequest, user, params: { id: string }) => {
+  const { id } = params;
   if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
 
   try {

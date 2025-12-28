@@ -80,7 +80,7 @@ export const articleService = {
   update: async (id: string, updates: Partial<Article>): Promise<Article | null> => {
     try {
       const response = await fetch(`/api/articles/${id}`, {
-        method: 'PUT',
+        method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
