@@ -4,7 +4,8 @@ import { courseSchema } from '@/lib/validators';
 import { getAuthUser, requireAdmin } from '@/lib/auth-utils';
 import { UserRole, PublishStatus } from '@prisma/client';
 
-export async function GET(req: NextRequest, { params: { id } }: { params: { id: string } }) {
+export async function GET(req: NextRequest, context: { params: { id: string } }) {
+  const { id } = context.params;
   const auth = await getAuthUser(req);
   const course = await prisma.course.findUnique({
     where: { id },
@@ -23,8 +24,7 @@ export async function GET(req: NextRequest, { params: { id } }: { params: { id: 
   return NextResponse.json({ course });
 }
 
-export const PATCH = requireAdmin(async (req: NextRequest, user, params: { id: string }) => {
-  const { id } = params;
+export const PATCH = requireAdmin(async (req: NextRequest, user, { id }: { id: string }) => {
   if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
 
   try {
@@ -48,8 +48,7 @@ export const PATCH = requireAdmin(async (req: NextRequest, user, params: { id: s
   }
 });
 
-export const DELETE = requireAdmin(async (req: NextRequest, user, params: { id: string }) => {
-  const { id } = params;
+export const DELETE = requireAdmin(async (req: NextRequest, user, { id }: { id: string }) => {
   if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
 
   try {

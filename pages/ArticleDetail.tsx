@@ -27,7 +27,7 @@ export const ArticleDetail: React.FC = () => {
         setError(null);
 
         const articles = await articleService.getAll();
-        const foundArticle = articles.find(a => a.slug === articleSlug);
+        const foundArticle = articles.find(a => a.id === articleSlug);
 
         if (foundArticle) {
           setArticle(foundArticle);
@@ -53,7 +53,7 @@ export const ArticleDetail: React.FC = () => {
   if (loading) {
     return (
       <div className="container flex flex-col items-center justify-center min-h-screen px-6 pt-32 mx-auto text-center">
-        <div className="w-8 h-8 border-4 border-coinlect-accent border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-8 h-8 border-4 rounded-full border-coinlect-accent border-t-transparent animate-spin"></div>
         <p className="mt-4 text-gray-400">Loading article...</p>
       </div>
     );

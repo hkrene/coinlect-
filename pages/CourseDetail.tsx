@@ -17,12 +17,15 @@ export const CourseDetail: React.FC = () => {
   useEffect(() => {
     const fetchCourse = async () => {
       try {
+        setLoading(true);
         const courses = await courseService.getAll();
-        const foundCourse = courses.find(c => c.slug === courseSlug);
+        const foundCourse = courses.find(c => c.id === courseSlug);
         setCourse(foundCourse || null);
       } catch (error) {
         console.error('Error fetching course:', error);
         setCourse(null);
+      } finally {
+        setLoading(false);
       }
     };
 

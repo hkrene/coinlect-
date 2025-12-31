@@ -1,59 +1,61 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { articleSchema } from '@/lib/validators';
+import { courseSchema } from '@/lib/validators';
 import { getAuthUser, requireAdmin } from '@/lib/auth-utils';
 import { UserRole, PublishStatus } from '@prisma/client';
 
-export async function GET(req: NextRequest, { params: { id } }: { params: { id: string } }) {
+export async function GET(req: NextRequest, context: { params: { id: string } }) {
+  const { id } = context.params;
   const auth = await getAuthUser(req);
-  const article = await prisma.article.findUnique({
+  const course = await prisma.course.findUnique({
     where: { id },
-    include: { author: true }
+    include: {
+      modules: { orderBy: { order: 'asc' } },
+      author: true
+    },
   });
-  if (!article) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  if (!course) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
-  // Only show published articles to non-admin users
-  if (auth?.role !== UserRole.ADMIN && article.status !== PublishStatus.PUBLISHED) {
+  // Only show published courses to non-admin users
+  if (auth?.role !== UserRole.ADMIN && course.status !== PublishStatus.PUBLISHED) {
     return NextResponse.json({ error: 'Not found' }, { status: 404 });
   }
 
-  return NextResponse.json({ article });
+  return NextResponse.json({ course });
 }
 
-export const PATCH = requireAdmin(async (req: NextRequest, user, params: { id: string }) => {
-  const { id } = params;
+export const PATCH = requireAdmin(async (req: NextRequest, user, { id }: { id: string }) => {
   if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
 
   try {
     const body = await req.json();
-    const parsed = articleSchema.partial().safeParse(body);
+    const parsed = courseSchema.partial().safeParse(body);
     if (!parsed.success) {
       return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
     }
     const data = parsed.data;
-    const article = await prisma.article.update({
+    const course = await prisma.course.update({
       where: { id },
       data: {
         ...data,
         publishedAt: data.status === PublishStatus.PUBLISHED ? new Date() : undefined,
       },
     });
-    return NextResponse.json({ article });
+    return NextResponse.json({ course });
   } catch (err) {
-    console.error('Article update error', err);
+    console.error('Course update error', err);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 });
 
-export const DELETE = requireAdmin(async (req: NextRequest, user, params: { id: string }) => {
-  const { id } = params;
+export const DELETE = requireAdmin(async (req: NextRequest, user, { id }: { id: string }) => {
   if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
 
   try {
-    await prisma.article.delete({ where: { id } });
+    await prisma.course.delete({ where: { id } });
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error('Article delete error', err);
+    console.error('Course delete error', err);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 });

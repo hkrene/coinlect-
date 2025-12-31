@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { articleService } from '../services/db';
+import { useArticles } from '../hooks/useArticles';
 import { Article } from '../types';
 import { useLanguage } from '../contexts/LanguageContext';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -10,64 +10,39 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 export const About: React.FC = () => {
   const { t } = useLanguage();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [featuredArticles, setFeaturedArticles] = useState<Article[]>([]);
-  const [latestArticles, setLatestArticles] = useState<Article[]>([]);
 
-  useEffect(() => {
-    const loadArticles = async () => {
-      try {
-        const allArticles = await articleService.getAll();
-        const featured = allArticles.filter(a => a.featured);
+  // Use React Query hook for articles
+  const { data: allArticles = [], isLoading } = useArticles({ featured: true });
 
-        // Ensure we have at least 3 featured articles, if not use regular articles
-        const articlesToShow = featured.length >= 3 ? featured : allArticles.slice(0, Math.max(3, featured.length));
-        setFeaturedArticles(articlesToShow);
+  // Process articles when data changes
+  const featuredArticles = React.useMemo(() => {
+    if (!allArticles.length) return [];
+    const featured = allArticles.filter(a => a.featured);
+    // Ensure we have at least 3 featured articles, if not use regular articles
+    return featured.length >= 3 ? featured : allArticles.slice(0, Math.max(3, featured.length));
+  }, [allArticles]);
 
-        // Get latest non-featured articles for sidebar
-        const latest = allArticles.filter(a => !a.featured || !articlesToShow.some(f => f.id === a.id)).slice(0, 5);
-        setLatestArticles(latest);
-      } catch (error) {
-        console.error('Error loading articles:', error);
-        setFeaturedArticles([]);
-        setLatestArticles([]);
-      }
-    };
+  const latestArticles = React.useMemo(() => {
+    if (!allArticles.length) return [];
+    // Get latest non-featured articles for sidebar
+    return allArticles.filter(a => !a.featured || !featuredArticles.some(f => f.id === a.id)).slice(0, 5);
+  }, [allArticles, featuredArticles]);
 
-    loadArticles();
-  }, []);
-
-  // Listen for content updates
-  useEffect(() => {
-    const handleContentUpdate = async () => {
-      try {
-        const allArticles = await articleService.getAll();
-        const featured = allArticles.filter(a => a.featured);
-        const articlesToShow = featured.length >= 3 ? featured : allArticles.slice(0, Math.max(3, featured.length));
-        setFeaturedArticles(articlesToShow);
-        const latest = allArticles.filter(a => !a.featured || !articlesToShow.some(f => f.id === a.id)).slice(0, 5);
-        setLatestArticles(latest);
-      } catch (error) {
-        console.error('Error updating articles:', error);
-      }
-    };
-
-    window.addEventListener('contentUpdated', handleContentUpdate);
-    return () => window.removeEventListener('contentUpdated', handleContentUpdate);
-  }, []);
+    // React Query handles content updates automatically
 
   // Rotating featured article
-  const featured = featuredArticles[currentIndex % featuredArticles.length] || featuredArticles[0];
-  
-  // Auto-switch articles every 5 seconds (only if we have articles)
+  const featured = featuredArticles.length > 0 ? featuredArticles[currentIndex % featuredArticles.length] : null;
+
+  // Auto-switch articles every 5 seconds (only if we have articles and not loading)
   useEffect(() => {
-    if (featuredArticles.length === 0) return;
-    
+    if (featuredArticles.length === 0 || isLoading) return;
+
     const interval = setInterval(() => {
       setCurrentIndex((prev) => (prev + 1) % featuredArticles.length);
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [featuredArticles.length]);
+  }, [featuredArticles.length, isLoading]);
 
   const nextSlide = () => {
     if (featuredArticles.length === 0) return;
@@ -78,6 +53,20 @@ export const About: React.FC = () => {
     if (featuredArticles.length === 0) return;
     setCurrentIndex((prev) => (prev - 1 + featuredArticles.length) % featuredArticles.length);
   };
+
+  // Show loading state or nothing if no articles
+  if (isLoading) {
+    return (
+      <section className="py-24 bg-[#0a0a0a]">
+        <div className="container px-6 mx-auto">
+          <div className="text-center">
+            <div className="w-8 h-8 mx-auto mb-4 border-4 rounded-full border-coinlect-accent border-t-transparent animate-spin"></div>
+            <p className="text-gray-400">Loading featured articles...</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   if (!featured || featuredArticles.length === 0) {
     return null; // Don't show section if no featured articles

@@ -6,7 +6,8 @@ import { useSearchParams } from 'next/navigation';
 import { ScrollReveal } from '../components/ScrollReveal';
 import { Button } from '../components/Button';
 import { AdBanner } from '../components/AdBanner';
-import { courseService, articleService } from '../services/db';
+import { useCourses } from '../hooks/useCourses';
+import { useArticles } from '../hooks/useArticles';
 import { Course, Article } from '../types';
 import { 
   BookOpen, 
@@ -19,44 +20,37 @@ export const Academy: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'courses' | 'articles'>('courses');
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('Tous'); // Default to 'Tous' to show all courses
-  const [courses, setCourses] = useState<Course[]>([]);
-  const [articles, setArticles] = useState<Article[]>([]);
   const [progressMap, setProgressMap] = useState<Record<string, number>>({});
   const { t } = useLanguage();
   const searchParams = useSearchParams();
 
+  // Use React Query hooks
+  const { data: courses = [], isLoading: coursesLoading, error: coursesError } = useCourses();
+  const { data: articles = [], isLoading: articlesLoading, error: articlesError } = useArticles();
+
+  // Calculate progress map when courses data changes
   useEffect(() => {
-    const refreshData = async () => {
-      try {
-        const [fetchedCourses, fetchedArticles] = await Promise.all([
-          courseService.getAll(),
-          articleService.getAll()
-        ]);
-        setCourses(fetchedCourses);
-        setArticles(fetchedArticles);
-
-        const newProgressMap: Record<string, number> = {};
-        fetchedCourses.forEach(course => {
-          const saved = localStorage.getItem(`course_${course.id}_progress`);
-          if (saved) {
-            const completed: number[] = JSON.parse(saved);
-            const total = course.syllabus ? course.syllabus.length : course.modules;
-            if (total && total > 0 && completed.length > 0) {
-                newProgressMap[course.id] = Math.round((completed.length / total) * 100);
-            }
+    if (courses.length > 0) {
+      const newProgressMap: Record<string, number> = {};
+      courses.forEach(course => {
+        const saved = localStorage.getItem(`course_${course.id}_progress`);
+        if (saved) {
+          const completed: number[] = JSON.parse(saved);
+          const total = course.syllabus ? course.syllabus.length : course.modules;
+          if (total && total > 0 && completed.length > 0) {
+              newProgressMap[course.id] = Math.round((completed.length / total) * 100);
           }
-        });
-        setProgressMap(newProgressMap);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setCourses([]);
-        setArticles([]);
-      }
-    };
+        }
+      });
+      setProgressMap(newProgressMap);
+    }
+  }, [courses]);
 
+  // Handle URL parameters for tab and category
+  useEffect(() => {
     const tabParam = searchParams?.get('tab');
     const categoryParam = searchParams?.get('category');
-    
+
     // Handle tab switching
     if (tabParam === 'articles') {
       setActiveTab('articles');
@@ -70,7 +64,7 @@ export const Academy: React.FC = () => {
     // Handle category filtering
     if (categoryParam) {
       const categoryMapping: { [key: string]: string } = {
-        'education': 'Tous', 'defi': 'DeFi', 'adoption': 'Tous', 
+        'education': 'Tous', 'defi': 'DeFi', 'adoption': 'Tous',
         'mining': 'Mining', 'guides': 'Guides', 'reviews': 'Reviews', 'trading': 'Trading'
       };
       const mappedCategory = categoryMapping[categoryParam] || 'Tous';
@@ -80,85 +74,9 @@ export const Academy: React.FC = () => {
       setActiveCategory('Tous');
       setActiveTab('courses');
     }
-
-    refreshData();
   }, [searchParams]);
 
-  // Listen for storage changes to refresh when new content is added
-  useEffect(() => {
-    let lastCoursesLength = 0;
-    let lastArticlesLength = 0;
-
-    const refreshData = async () => {
-      try {
-        const fetchedCourses = await courseService.getAll();
-        const fetchedArticles = await articleService.getAll();
-
-        // Only update if data actually changed
-        if (fetchedCourses.length !== lastCoursesLength || fetchedArticles.length !== lastArticlesLength) {
-          setCourses(fetchedCourses);
-          setArticles(fetchedArticles);
-          lastCoursesLength = fetchedCourses.length;
-          lastArticlesLength = fetchedArticles.length;
-
-          const newProgressMap: Record<string, number> = {};
-          fetchedCourses.forEach(course => {
-            const saved = localStorage.getItem(`course_${course.id}_progress`);
-            if (saved) {
-              const completed: number[] = JSON.parse(saved);
-              const total = course.syllabus ? course.syllabus.length : course.modules;
-              if (total && total > 0 && completed.length > 0) {
-                  newProgressMap[course.id] = Math.round((completed.length / total) * 100);
-              }
-            }
-          });
-          setProgressMap(newProgressMap);
-        }
-      } catch (error) {
-        console.error('Error refreshing data:', error);
-      }
-    };
-
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === 'coinlect_courses' || e.key === 'coinlect_articles') {
-        refreshData();
-      }
-    };
-
-    // Listen for custom events (when content is saved in AdminDashboard)
-    const handleContentUpdate = () => {
-      refreshData();
-    };
-
-    // Listen for storage events (when localStorage changes in other tabs/windows)
-    window.addEventListener('storage', handleStorageChange);
-    
-    // Listen for custom content update events
-    window.addEventListener('contentUpdated', handleContentUpdate);
-    
-    // Refresh when page becomes visible (user switches back to tab)
-    const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        refreshData();
-      }
-    };
-    document.addEventListener('visibilitychange', handleVisibilityChange);
-
-    // Initial check
-    refreshData();
-
-    // Also check periodically for changes (for same-tab updates, less frequent)
-    const interval = setInterval(() => {
-      refreshData();
-    }, 10000); // Check every 10 seconds (reduced frequency)
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-      window.removeEventListener('contentUpdated', handleContentUpdate);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      clearInterval(interval);
-    };
-  }, []);
+  // React Query handles all data fetching and invalidation automatically
 
   const getFilteredCourses = () => courses.filter(c => (activeCategory === "Tous" || c.category === activeCategory) && c.title.toLowerCase().includes(searchQuery.toLowerCase()));
   const getFilteredArticles = () => {
