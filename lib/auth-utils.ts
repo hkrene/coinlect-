@@ -43,8 +43,8 @@ export function requireAuth(handler: (req: NextRequest, user: AuthUser) => Promi
   };
 }
 
-export function requireAdmin(handler: (req: NextRequest, user: AuthUser, params: { id: string }) => Promise<NextResponse>) {
-  return async (req: NextRequest, { params }: { params: { id: string } }) => {
+export function requireAdmin(handler: (req: NextRequest, user: AuthUser, params: Promise<{ id: string }>) => Promise<NextResponse>) {
+  return async (req: NextRequest, context: { params: Promise<{ id: string }> }) => {
     const user = await getAuthUser(req);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -52,12 +52,12 @@ export function requireAdmin(handler: (req: NextRequest, user: AuthUser, params:
     if (user.role !== UserRole.ADMIN) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
-    return handler(req, user, params);
+    return handler(req, user, context.params);
   };
 }
 
-export function requireAdminSlug(handler: (req: NextRequest, user: AuthUser, params: { slug: string }) => Promise<NextResponse>) {
-  return async (req: NextRequest, { params }: { params: { slug: string } }) => {
+export function requireAdminSlug(handler: (req: NextRequest, user: AuthUser, params: Promise<{ slug: string }>) => Promise<NextResponse>) {
+  return async (req: NextRequest, context: { params: Promise<{ slug: string }> }) => {
     const user = await getAuthUser(req);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -65,17 +65,18 @@ export function requireAdminSlug(handler: (req: NextRequest, user: AuthUser, par
     if (user.role !== UserRole.ADMIN) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
-    return handler(req, user, params);
+    return handler(req, user, context.params);
   };
 }
 
-export function requireAdminOrSelf(handler: (req: NextRequest, user: AuthUser, params: { id: string }) => Promise<NextResponse>) {
-  return async (req: NextRequest, { params }: { params: { id: string } }) => {
+export function requireAdminOrSelf(handler: (req: NextRequest, user: AuthUser, params: Promise<{ id: string }>) => Promise<NextResponse>) {
+  return async (req: NextRequest, context: { params: Promise<{ id: string }> }) => {
     const user = await getAuthUser(req);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const params = await context.params;
     const targetUserId = params.id;
 
     // Admin can access anyone's data, users can only access their own
@@ -83,6 +84,6 @@ export function requireAdminOrSelf(handler: (req: NextRequest, user: AuthUser, p
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    return handler(req, user, params);
+    return handler(req, user, context.params);
   };
 }

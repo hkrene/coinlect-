@@ -4,8 +4,8 @@ import { articleSchema } from '@/lib/validators';
 import { getAuthUser, requireAdmin, requireAdminSlug } from '@/lib/auth-utils';
 import { UserRole, PublishStatus } from '@prisma/client';
 
-export async function GET(req: NextRequest, context: { params: { slug: string } }) {
-  const { slug } = context.params;
+export async function GET(req: NextRequest, context: { params: Promise<{ slug: string }> }) {
+  const { slug } = await context.params;
   const auth = await getAuthUser(req);
   const article = await prisma.article.findUnique({
     where: { slug },
@@ -23,8 +23,8 @@ export async function GET(req: NextRequest, context: { params: { slug: string } 
   return NextResponse.json({ article });
 }
 
-export const PATCH = requireAdminSlug(async (req: NextRequest, user, params: { slug: string }) => {
-  const { slug } = params;
+export const PATCH = requireAdminSlug(async (req: NextRequest, user, params: Promise<{ slug: string }>) => {
+  const { slug } = await params;
   if (!slug) return NextResponse.json({ error: 'Slug required' }, { status: 400 });
 
   try {
@@ -48,8 +48,8 @@ export const PATCH = requireAdminSlug(async (req: NextRequest, user, params: { s
   }
 });
 
-export const DELETE = requireAdminSlug(async (req: NextRequest, user, params: { slug: string }) => {
-  const { slug } = params;
+export const DELETE = requireAdminSlug(async (req: NextRequest, user, params: Promise<{ slug: string }>) => {
+  const { slug } = await params;
   if (!slug) return NextResponse.json({ error: 'Slug required' }, { status: 400 });
 
   try {

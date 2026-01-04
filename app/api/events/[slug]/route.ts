@@ -6,9 +6,9 @@ import { UserRole, PublishStatus } from '@prisma/client';
 
 export async function GET(
   req: NextRequest,
-  context: { params: { slug: string } }
+  context: { params: Promise<{ slug: string }> }
 ) {
-  const { slug } = context.params;
+  const { slug } = await context.params;
   const auth = await getAuthUser(req);
 
   const event = await prisma.event.findUnique({
@@ -26,8 +26,8 @@ export async function GET(
   return NextResponse.json({ event });
 }
 
-export const PATCH = requireAdminSlug(async (req: NextRequest, user, params: { slug: string }) => {
-  const { slug } = params;
+export const PATCH = requireAdminSlug(async (req: NextRequest, user, params: Promise<{ slug: string }>) => {
+  const { slug } = await params;
   if (!slug) return NextResponse.json({ error: 'Slug required' }, { status: 400 });
 
   try {
@@ -70,8 +70,8 @@ export const PATCH = requireAdminSlug(async (req: NextRequest, user, params: { s
   }
 });
 
-export const DELETE = requireAdminSlug(async (req: NextRequest, user, params: { slug: string }) => {
-  const { slug } = params;
+export const DELETE = requireAdminSlug(async (req: NextRequest, user, params: Promise<{ slug: string }>) => {
+  const { slug } = await params;
   if (!slug) return NextResponse.json({ error: 'Slug required' }, { status: 400 });
 
   try {

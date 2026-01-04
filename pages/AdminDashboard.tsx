@@ -491,7 +491,7 @@ export const AdminDashboard: React.FC = () => {
           <div className="space-y-6 animate-in fade-in">
             <div className="flex items-center justify-between">
               <h1 className="text-3xl font-bold">Catalogue des Cours</h1>
-              <Button onClick={() => { setModalType('course'); setIsModalOpen(true); }}><Plus size={16} /> Créer un Cours</Button>
+              <Button onClick={() => { setEditingItem(null); setModalType('course'); setIsModalOpen(true); }}><Plus size={16} /> Créer un Cours</Button>
             </div>
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
               {courses.map(c => (
@@ -550,7 +550,7 @@ export const AdminDashboard: React.FC = () => {
                 <h1 className="text-3xl font-bold">Articles du Blog</h1>
                 <p className="mt-2 text-sm text-gray-400">Minimum 3 articles doivent être en vedette pour la page d&apos;accueil</p>
               </div>
-              <Button onClick={() => { setModalType('article'); setIsModalOpen(true); }}><Plus size={16} /> Publier un Article</Button>
+              <Button onClick={() => { setEditingItem(null); setModalType('article'); setIsModalOpen(true); }}><Plus size={16} /> Publier un Article</Button>
             </div>
             <div className="grid gap-4">
               {articles.map(a => (
@@ -636,7 +636,7 @@ export const AdminDashboard: React.FC = () => {
           <div className="space-y-6 animate-in fade-in">
             <div className="flex items-center justify-between">
               <h1 className="text-3xl font-bold">Gestion des Événements</h1>
-              <Button onClick={() => { setModalType('event'); setIsModalOpen(true); }}><Plus size={16} /> Créer un Événement</Button>
+              <Button onClick={() => { setEditingItem(null); setModalType('event'); setIsModalOpen(true); }}><Plus size={16} /> Créer un Événement</Button>
             </div>
             <div className="grid gap-4">
               {events.map(e => (
@@ -739,7 +739,7 @@ export const AdminDashboard: React.FC = () => {
           <div className="space-y-6 animate-in fade-in">
             <div className="flex items-center justify-between">
               <h1 className="text-3xl font-bold">Gestion des Deals</h1>
-              <Button onClick={() => { setModalType('deal'); setIsModalOpen(true); }}><Plus size={16} /> Créer un Deal</Button>
+              <Button onClick={() => { setEditingItem(null); setModalType('deal'); setIsModalOpen(true); }}><Plus size={16} /> Créer un Deal</Button>
             </div>
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
               {deals.map(d => (
