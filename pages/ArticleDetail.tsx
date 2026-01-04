@@ -119,12 +119,12 @@ export const ArticleDetail: React.FC = () => {
          <div className="flex items-center justify-between py-6 border-y border-white/10">
              <div className="flex items-center gap-4">
                 <img
-                  src={article.authorImage}
-                  alt={article.author?.name ?? 'Author'}
+                  src={article.authorImage || 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765185502/clclogo_p2v5bp.jpg'}
+                  alt={article.author?.name ?? 'CoinLect'}
                   className="w-12 h-12 rounded-full border-2 border-[#0a0a0a] ring-2 ring-white/10"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
-                    target.src = 'https://via.placeholder.com/48x48/333/666?text=Author';
+                    target.src = 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765185502/clclogo_p2v5bp.jpg';
                   }}
                 />
                 <div>
@@ -172,7 +172,7 @@ export const ArticleDetail: React.FC = () => {
                 className="object-cover w-full h-full"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
-                  target.src = 'https://via.placeholder.com/800x400/333/666?text=No+Image';
+                  target.src = 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765185502/clclogo_p2v5bp.jpg';
                 }}
               />
           </div>
@@ -196,9 +196,7 @@ export const ArticleDetail: React.FC = () => {
 
                  <h3 className="mt-12 mb-6 text-2xl font-bold text-white">Key Takeaways</h3>
                  <ul className="space-y-2 text-gray-300">
-                    <li>• Understanding market cycles is crucial for long-term success.</li>
-                    <li>• Risk management should always be the priority.</li>
-                    <li>• Fundamental analysis helps identify undervalued assets.</li>
+                    <li>Not Financial Advice</li>
                  </ul>
              </div>
          </ScrollReveal>

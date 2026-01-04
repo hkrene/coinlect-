@@ -79,10 +79,14 @@ export const About: React.FC = () => {
              
              {/* Featured Main Card */}
              <div className="lg:col-span-2 relative min-h-[500px] rounded-xl overflow-hidden group cursor-pointer border border-white/5">
-                <img 
-                    src={featured.image} 
-                    alt={featured.title} 
+                <img
+                    src={featured.image}
+                    alt={featured.title}
                     className="absolute inset-0 object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
+                    onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765185502/clclogo_p2v5bp.jpg';
+                    }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
                 
@@ -97,7 +101,7 @@ export const About: React.FC = () => {
                     
                     <div className="flex items-center gap-4 mb-8 text-sm font-medium text-gray-300">
                         <div className="flex items-center gap-2">
-                             <img src="https://res.cloudinary.com/drsd8adkq/image/upload/v1765187097/coinlect-0_denz8g.jpg" className="w-5 h-5 rounded-full" alt="Coinlect" />
+                             <img src="https://res.cloudinary.com/drsd8adkq/image/upload/v1765185502/clclogo_p2v5bp.jpg" className="w-5 h-5 rounded-full" alt="Coinlect" />
                              <span>Coinlect</span>
                         </div>
                         <span className="w-1 h-1 bg-gray-500 rounded-full"></span>

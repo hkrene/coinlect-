@@ -129,24 +129,65 @@ export const Academy: React.FC = () => {
     </ScrollReveal>
   );
 
+  // const ArticleCard: React.FC<{ article: Article, delay: number }> = ({ article, delay }) => (
+  //   <ScrollReveal delay={delay}>
+  //       <Link href={`/academy/article/${article.slug}`} className="block h-full group">
+  //           <div className="bg-[#111] rounded-2xl overflow-hidden border border-white/5 group-hover:border-coinlect-accent/30 transition-all duration-300 h-full flex flex-col">
+  //               <div className="relative overflow-hidden aspect-video">
+  //                   <img
+  //                       src={article.image}
+  //                       alt={article.title}
+  //                       className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105 opacity-80"
+  //                       onError={(e) => {
+  //                           const target = e.target as HTMLImageElement;
+  //                           target.src = 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765185502/clclogo_p2v5bp.jpg';
+  //                       }}
+  //                   />
+  //               </div>
+  //               <div className="flex flex-col flex-grow p-6">
+  //                   <h3 className="mb-3 text-lg font-bold leading-tight text-white transition-colors line-clamp-2 group-hover:text-coinlect-accent">{article.title}</h3>
+  //                   <p className="mb-4 text-sm text-gray-400 line-clamp-2">{article.excerpt}</p>
+  //               </div>
+  //           </div>
+  //       </Link>
+  //   </ScrollReveal>
+  // );
   const ArticleCard: React.FC<{ article: Article, delay: number }> = ({ article, delay }) => (
     <ScrollReveal delay={delay}>
         <Link href={`/academy/article/${article.slug}`} className="block h-full group">
             <div className="bg-[#111] rounded-2xl overflow-hidden border border-white/5 group-hover:border-coinlect-accent/30 transition-all duration-300 h-full flex flex-col">
-                <div className="relative overflow-hidden aspect-video">
+                <div className="relative overflow-hidden aspect-video bg-[#1a1a1a]">
                     <img
-                        src={article.image || 'https://via.placeholder.com/400x225/333/666?text=No+Image'}
+                        /* This pulls directly from your database/API */
+                        src={article.image || 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765185502/clclogo_p2v5bp.jpg'}
                         alt={article.title}
-                        className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105 opacity-80"
+                        /* Removed opacity-80 to show full quality image from DB */
+                        className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
                         onError={(e) => {
                             const target = e.target as HTMLImageElement;
-                            target.src = 'https://via.placeholder.com/400x225/333/666?text=No+Image';
+                            /* Fallback if the database URL is 404/broken */
+                            target.src = 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765185502/clclogo_p2v5bp.jpg';
                         }}
                     />
                 </div>
                 <div className="flex flex-col flex-grow p-6">
-                    <h3 className="mb-3 text-lg font-bold leading-tight text-white transition-colors line-clamp-2 group-hover:text-coinlect-accent">{article.title}</h3>
-                    <p className="mb-4 text-sm text-gray-400 line-clamp-2">{article.excerpt}</p>
+                    <div className="flex items-center gap-2 mb-3">
+                        <span className="text-coinlect-accent text-[10px] font-bold uppercase tracking-widest">
+                            {article.category || 'Analyse'}
+                        </span>
+                    </div>
+                    <h3 className="mb-3 text-lg font-bold leading-tight text-white transition-colors line-clamp-2 group-hover:text-coinlect-accent">
+                        {article.title}
+                    </h3>
+                    <p className="mb-4 text-sm text-gray-400 line-clamp-2">
+                        {article.excerpt}
+                    </p>
+                    <div className="flex items-center justify-between mt-auto">
+                        <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">
+                             {t.academy?.readMore || 'Lire la suite'}
+                        </span>
+                        <ArrowRight size={18} className="text-white transition-transform group-hover:translate-x-1" />
+                    </div>
                 </div>
             </div>
         </Link>
