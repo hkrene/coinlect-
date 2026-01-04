@@ -20,6 +20,7 @@ export const courseSchema = z.object({
   seoTitle: z.string().optional(),
   seoDescription: z.string().optional(),
   status: z.enum(['DRAFT', 'PUBLISHED']).optional(),
+  image: z.string().optional(),
 });
 
 // Module validators
@@ -40,6 +41,7 @@ export const articleSchema = z.object({
   seoTitle: z.string().optional(),
   seoDescription: z.string().optional(),
   status: z.enum(['DRAFT', 'PUBLISHED']).optional(),
+  featured: z.boolean().default(false).optional(),
 });
 
 // Event validators

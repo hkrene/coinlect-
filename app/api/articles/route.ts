@@ -7,8 +7,19 @@ import { UserRole, PublishStatus } from '@prisma/client';
 export async function GET(req: NextRequest) {
   const auth = await getAuthUser(req);
   const includeDrafts = auth?.role === UserRole.ADMIN;
+  const url = new URL(req.url);
+  const featured = url.searchParams.get('featured');
+
+  const where: any = {};
+  if (!includeDrafts) {
+    where.status = PublishStatus.PUBLISHED;
+  }
+  if (featured === 'true') {
+    where.featured = true;
+  }
+
   const articles = await prisma.article.findMany({
-    where: includeDrafts ? {} : { status: PublishStatus.PUBLISHED },
+    where,
     orderBy: { createdAt: 'desc' },
     include: { author: true },
   });
@@ -35,6 +46,7 @@ export const POST = requireAdmin(async (req: NextRequest, user) => {
         seoDescription: data.seoDescription,
         status: data.status ?? PublishStatus.DRAFT,
         publishedAt: data.status === PublishStatus.PUBLISHED ? new Date() : null,
+        featured: data.featured ?? false,
         authorId: user.id,
       },
     });
