@@ -162,6 +162,10 @@ export const About: React.FC = () => {
                 src="https://res.cloudinary.com/drsd8adkq/image/upload/v1766400615/coinlect-fest_hreelt.jpg"
                 alt="CoinLect Academy"
                 className="w-2/3 h-auto"
+                onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = 'https://via.placeholder.com/400x300/333/666?text=CoinLect+Academy';
+                }}
               />
             </div>
           </div>
@@ -175,6 +179,10 @@ export const About: React.FC = () => {
                 src="https://res.cloudinary.com/drsd8adkq/image/upload/v1766395262/aboutcb_mmdavv.svg"
                 alt="Notre mission"
                 className="w-2/3 h-auto"
+                onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = 'https://via.placeholder.com/400x300/333/666?text=Mission';
+                }}
               />
             </div>
 
@@ -219,6 +227,10 @@ export const About: React.FC = () => {
                     src={member.image}
                     alt={member.name}
                     className="object-cover w-32 h-32 mb-4 rounded-full shadow-lg"
+                    onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = 'https://via.placeholder.com/128x128/333/666?text=' + member.name.split(' ').map(n => n[0]).join('');
+                    }}
                   />
                   <h3 className="text-lg font-bold text-white">{member.name}</h3>
                   <p className="mb-3 text-sm text-gray-400">{member.title}</p>
@@ -263,6 +275,10 @@ export const About: React.FC = () => {
             src={volunteer.image}
             alt={volunteer.name}
             className="object-cover w-32 h-32 mb-4 rounded-full shadow-lg"
+            onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.src = 'https://via.placeholder.com/128x128/333/666?text=' + volunteer.name.split(' ').map(n => n[0]).join('');
+            }}
           />
           <h3 className="text-lg font-bold text-white">{volunteer.name}</h3>
           <p className="mb-3 text-sm text-gray-400">{volunteer.title}</p>

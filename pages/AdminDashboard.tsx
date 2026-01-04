@@ -84,7 +84,7 @@ export const AdminDashboard: React.FC = () => {
     date: new Date().toLocaleDateString('fr-FR'),
     image: '',
     category: 'News',
-    authorImage: 'https://randomuser.me/api/portraits/lego/1.jpg',
+    authorImage: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765185502/clclogo_p2v5bp.jpg',
     featured: false
   });
 
