@@ -65,7 +65,15 @@ export const Events: React.FC = () => {
     if (event.bannerImage || (event.banner === 'custom' && event.bannerImage)) {
       return (
         <div className="relative h-48 overflow-hidden rounded-t-xl">
-          <img src={event.bannerImage} alt={event.title} className="object-cover w-full h-full" />
+          <img
+            src={event.bannerImage}
+            alt={event.title}
+            className="object-cover w-full h-full"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = 'https://via.placeholder.com/800x400/333/666?text=No+Image';
+            }}
+          />
           {event.bannerText && (
             <div className="absolute inset-0 flex items-center justify-center p-6 text-white">
               <div className="text-center whitespace-pre-line">{event.bannerText}</div>
@@ -168,7 +176,7 @@ export const Events: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-black pt-24 pb-20">
+    <div className="min-h-screen pt-24 pb-20 bg-black">
       <div className="container px-6 mx-auto max-w-7xl">
         <div className="mb-8">
           <div className="flex flex-col gap-6 mb-6 md:flex-row md:items-center md:justify-between">

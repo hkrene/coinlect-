@@ -29,6 +29,16 @@ export const AdminDashboard: React.FC = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<{ type: string; item: any } | null>(null);
 
+  // Helper functions for video previews
+  const getYouTubeVideoId = (url: string): string => {
+    const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+    return match ? match[1] : '';
+  };
+
+  const getVimeoVideoId = (url: string): string => {
+    const match = url.match(/vimeo\.com\/(\d+)/);
+    return match ? match[1] : '';
+  };
 
   // Complex Form State
   const [courseForm, setCourseForm] = useState<Omit<Course, 'id' | 'slug'> & { slug: string }>({
@@ -487,7 +497,10 @@ export const AdminDashboard: React.FC = () => {
               {courses.map(c => (
                 <div key={c.id} className="bg-[#111] p-4 rounded-xl border border-white/10 flex justify-between items-center group">
                   <div className="flex items-center gap-4">
-                    <img src={c.image} className="object-cover w-20 h-12 rounded shadow" alt="" />
+                    <img src={c.image || 'https://via.placeholder.com/80x48/333/666?text=No+Image'} className="object-cover w-20 h-12 rounded shadow" alt="" onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.src = 'https://via.placeholder.com/80x48/333/666?text=No+Image';
+                    }} />
                     <div>
                       <h4 className="font-bold text-white transition-colors group-hover:text-coinlect-accent">{c.title}</h4>
                       <p className="text-[10px] text-gray-500 uppercase tracking-widest">{c.category} • {c.level} • {c.modules} Mod.</p>
@@ -544,7 +557,10 @@ export const AdminDashboard: React.FC = () => {
                 <div key={a.id} className="bg-[#111] p-4 rounded-xl border border-white/10 flex justify-between items-center group">
                   <div className="flex items-center gap-4">
                     <div className="relative">
-                      <img src={a.image} className="object-cover w-20 h-12 rounded shadow" alt="" />
+                      <img src={a.image || 'https://via.placeholder.com/80x48/333/666?text=No+Image'} className="object-cover w-20 h-12 rounded shadow" alt="" onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = 'https://via.placeholder.com/80x48/333/666?text=No+Image';
+                      }} />
                       {a.featured && <Star className="absolute -top-2 -left-2 text-coinlect-accent" size={16} fill="currentColor" />}
                     </div>
                     <div>
@@ -729,7 +745,15 @@ export const AdminDashboard: React.FC = () => {
               {deals.map(d => (
                 <div key={d.id} className="bg-[#111] p-4 rounded-xl border border-white/10 flex justify-between items-center group">
                   <div className="flex items-center gap-4">
-                    <img src={d.image || 'https://via.placeholder.com/60x40'} className="object-cover w-20 h-12 rounded shadow" alt="Deal image" />
+                    <img
+                      src={d.image || 'https://via.placeholder.com/60x40'}
+                      className="object-cover w-20 h-12 rounded shadow"
+                      alt="Deal image"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = 'https://via.placeholder.com/60x40/333/666?text=No+Image';
+                      }}
+                    />
                     <div>
                       <h4 className="font-bold text-white transition-colors group-hover:text-coinlect-accent">{d.title}</h4>
                       <p className="text-[10px] text-gray-500 uppercase tracking-widest">{d.category} • {d.discount}</p>
@@ -824,7 +848,96 @@ export const AdminDashboard: React.FC = () => {
                        </select>
                     </div>
                     <input placeholder="URL de l'image de couverture" className="w-full p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={courseForm.image || ''} onChange={e => setCourseForm({...courseForm, image: e.target.value})} />
+                    {courseForm.image && (
+                      <div className="relative w-full h-48 overflow-hidden border rounded-lg border-white/10">
+                        <img
+                          src={courseForm.image}
+                          alt="Course image preview"
+                          className="object-cover w-full h-full"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            const parent = target.parentElement;
+                            if (parent && !parent.querySelector('.error-message')) {
+                              const errorMsg = document.createElement('div');
+                              errorMsg.className = 'flex items-center justify-center h-full text-sm text-gray-400 error-message';
+                              errorMsg.textContent = 'Image failed to load';
+                              parent.appendChild(errorMsg);
+                            }
+                          }}
+                          onLoad={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            const parent = target.parentElement;
+                            if (parent) {
+                              const errorMsg = parent.querySelector('.error-message');
+                              if (errorMsg) {
+                                errorMsg.remove();
+                              }
+                            }
+                          }}
+                        />
+                      </div>
+                    )}
                     <input placeholder="Lien vidéo (YouTube/Vimeo/URL directe)" className="w-full p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={courseForm.videoLink || ''} onChange={e => setCourseForm({...courseForm, videoLink: e.target.value || undefined})} />
+                    {courseForm.videoLink && (
+                      <div className="relative w-full h-48 overflow-hidden border rounded-lg video-preview border-white/10">
+                        {courseForm.videoLink.includes('youtube.com') || courseForm.videoLink.includes('youtu.be') ? (
+                          <iframe
+                            src={`https://www.youtube.com/embed/${getYouTubeVideoId(courseForm.videoLink)}`}
+                            className="w-full h-full"
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            onError={() => {
+                              const container = document.querySelector('.video-preview') as HTMLElement;
+                              if (container) {
+                                container.innerHTML = '<div class="flex items-center justify-center w-full h-full bg-gray-800 text-white text-sm">Video preview unavailable</div>';
+                              }
+                            }}
+                          />
+                        ) : courseForm.videoLink.includes('vimeo.com') ? (
+                          <iframe
+                            src={`https://player.vimeo.com/video/${getVimeoVideoId(courseForm.videoLink)}`}
+                            className="w-full h-full"
+                            frameBorder="0"
+                            allow="autoplay; fullscreen; picture-in-picture"
+                            allowFullScreen
+                            onError={() => {
+                              const container = document.querySelector('.video-preview') as HTMLElement;
+                              if (container) {
+                                container.innerHTML = '<div class="flex items-center justify-center w-full h-full bg-gray-800 text-white text-sm">Video preview unavailable</div>';
+                              }
+                            }}
+                          />
+                        ) : (
+                          <video
+                            src={courseForm.videoLink}
+                            className="object-cover w-full h-full"
+                            controls
+                            onError={(e) => {
+                              const target = e.target as HTMLVideoElement;
+                              target.style.display = 'none';
+                              const parent = target.parentElement;
+                              if (parent && !parent.querySelector('.error-message')) {
+                                const errorMsg = document.createElement('div');
+                                errorMsg.className = 'flex items-center justify-center h-full text-sm text-gray-400 error-message';
+                                errorMsg.textContent = 'Video failed to load';
+                                parent.appendChild(errorMsg);
+                              }
+                            }}
+                            onLoadStart={() => {
+                              const parent = document.querySelector('.video-preview');
+                              if (parent) {
+                                const errorMsg = parent.querySelector('.error-message');
+                                if (errorMsg) {
+                                  errorMsg.remove();
+                                }
+                              }
+                            }}
+                          />
+                        )}
+                      </div>
+                    )}
                     <div className="grid gap-4 md:grid-cols-2">
                        <input placeholder="Nom du partenaire (optionnel)" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={courseForm.partnerName || ''} onChange={e => setCourseForm({...courseForm, partnerName: e.target.value || undefined})} />
                        <input placeholder="URL du logo partenaire (optionnel)" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={courseForm.partnerLogo || ''} onChange={e => setCourseForm({...courseForm, partnerLogo: e.target.value || undefined})} />
@@ -895,7 +1008,67 @@ export const AdminDashboard: React.FC = () => {
                        setArticleForm({...articleForm, date: date.toLocaleDateString('fr-FR')});
                      }} />
                    </div>
+                   {articleForm.image && (
+                     <div className="relative w-full h-48 overflow-hidden border rounded-lg border-white/10">
+                       <img
+                         src={articleForm.image}
+                         alt="Article image preview"
+                         className="object-cover w-full h-full"
+                         onError={(e) => {
+                           const target = e.target as HTMLImageElement;
+                           target.style.display = 'none';
+                           const parent = target.parentElement;
+                           if (parent && !parent.querySelector('.error-message')) {
+                             const errorMsg = document.createElement('div');
+                             errorMsg.className = 'flex items-center justify-center h-full text-sm text-gray-400 error-message';
+                             errorMsg.textContent = 'Image failed to load';
+                             parent.appendChild(errorMsg);
+                           }
+                         }}
+                         onLoad={(e) => {
+                           const target = e.target as HTMLImageElement;
+                           const parent = target.parentElement;
+                           if (parent) {
+                             const errorMsg = parent.querySelector('.error-message');
+                             if (errorMsg) {
+                               errorMsg.remove();
+                             }
+                           }
+                         }}
+                       />
+                     </div>
+                   )}
                     <input placeholder="URL Image auteur" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={articleForm.authorImage || ''} onChange={e => setArticleForm({...articleForm, authorImage: e.target.value})} />
+                   {articleForm.authorImage && (
+                     <div className="relative w-24 h-24 overflow-hidden border rounded-full border-white/10">
+                       <img
+                         src={articleForm.authorImage}
+                         alt="Author image preview"
+                         className="object-cover w-full h-full"
+                         onError={(e) => {
+                           const target = e.target as HTMLImageElement;
+                           target.style.display = 'none';
+                           const parent = target.parentElement;
+                           if (parent && !parent.querySelector('.error-message')) {
+                             const errorMsg = document.createElement('div');
+                             errorMsg.className = 'flex items-center justify-center w-full h-full text-xs text-gray-400 rounded-full error-message';
+                             errorMsg.textContent = 'Failed to load';
+                             parent.appendChild(errorMsg);
+                           }
+                         }}
+                         onLoad={(e) => {
+                           const target = e.target as HTMLImageElement;
+                           const parent = target.parentElement;
+                           if (parent) {
+                             const errorMsg = parent.querySelector('.error-message');
+                             if (errorMsg) {
+                               errorMsg.remove();
+                             }
+                           }
+                         }}
+                       />
+                     </div>
+                   )}
                    <textarea placeholder="Contenu complet (Séparez les paragraphes par une nouvelle ligne)" className="w-full p-4 text-white bg-black border outline-none border-white/10 rounded-xl h-60" value={articleForm.content} onChange={e => setArticleForm({...articleForm, content: e.target.value})} />
                    <div className="flex gap-4 pt-4">
                      <Button type="button" variant="outline" className="w-1/2" onClick={() => setIsModalOpen(false)}>Annuler</Button>
@@ -967,12 +1140,30 @@ export const AdminDashboard: React.FC = () => {
                     />
                     {eventForm.bannerImage && (
                       <div className="relative w-full h-48 overflow-hidden border rounded-lg border-white/10">
-                        <img 
-                          src={eventForm.bannerImage} 
-                          alt="Banner preview" 
+                        <img
+                          src={eventForm.bannerImage}
+                          alt="Banner preview"
                           className="object-cover w-full h-full"
                           onError={(e) => {
-                            (e.target as HTMLImageElement).style.display = 'none';
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            const parent = target.parentElement;
+                            if (parent && !parent.querySelector('.error-message')) {
+                              const errorMsg = document.createElement('div');
+                              errorMsg.className = 'flex items-center justify-center h-full text-sm text-gray-400 error-message';
+                              errorMsg.textContent = 'Image failed to load';
+                              parent.appendChild(errorMsg);
+                            }
+                          }}
+                          onLoad={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            const parent = target.parentElement;
+                            if (parent) {
+                              const errorMsg = parent.querySelector('.error-message');
+                              if (errorMsg) {
+                                errorMsg.remove();
+                              }
+                            }
                           }}
                         />
                       </div>
@@ -1057,6 +1248,36 @@ export const AdminDashboard: React.FC = () => {
                       value={dealForm.image || ''}
                       onChange={e => setDealForm({...dealForm, image: e.target.value})}
                     />
+                    {dealForm.image && (
+                      <div className="relative w-full h-24 overflow-hidden border rounded-lg border-white/10">
+                        <img
+                          src={dealForm.image}
+                          alt="Deal image preview"
+                          className="object-cover w-full h-full"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            const parent = target.parentElement;
+                            if (parent && !parent.querySelector('.error-message')) {
+                              const errorMsg = document.createElement('div');
+                              errorMsg.className = 'flex items-center justify-center h-full text-xs text-gray-400 error-message';
+                              errorMsg.textContent = 'Failed to load';
+                              parent.appendChild(errorMsg);
+                            }
+                          }}
+                          onLoad={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            const parent = target.parentElement;
+                            if (parent) {
+                              const errorMsg = parent.querySelector('.error-message');
+                              if (errorMsg) {
+                                errorMsg.remove();
+                              }
+                            }
+                          }}
+                        />
+                      </div>
+                    )}
                     <input
                       placeholder="Code promo (optionnel)"
                       className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl focus:border-yellow-500"

@@ -90,7 +90,15 @@ export const Deals: React.FC = () => {
                         <div className="relative flex flex-col md:flex-row h-full overflow-hidden transition-all duration-300 border rounded-none bg-[#0a0a0a] border-white/10 hover:border-white/30 group">
                             
                             <div className="relative w-full md:w-[380px] h-56 md:h-auto overflow-hidden bg-black flex items-center justify-center border-b md:border-b-0 md:border-r border-white/10">
-                                <img src={deal.image} alt={deal.title} className="object-cover w-full h-full transition-all duration-700 opacity-60 group-hover:opacity-100 group-hover:scale-105" />
+                                <img
+                                  src={deal.image}
+                                  alt={deal.title}
+                                  className="object-cover w-full h-full transition-all duration-700 opacity-60 group-hover:opacity-100 group-hover:scale-105"
+                                  onError={(e) => {
+                                    const target = e.target as HTMLImageElement;
+                                    target.src = 'https://via.placeholder.com/400x300/333/666?text=No+Image';
+                                  }}
+                                />
                                 {deal.exclusive && (
                                     <div className="absolute top-0 left-0 bg-white text-black text-[10px] font-black uppercase tracking-widest px-3 py-1.5 z-20 flex items-center gap-1 shadow-2xl">{t.deals.exclusive}
                                     </div>

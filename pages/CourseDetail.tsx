@@ -113,9 +113,16 @@ export const CourseDetail: React.FC = () => {
               </div>
 
               {/* Video Preview - Style Squared */}
-              <div className="relative overflow-hidden bg-black border rounded-none shadow-2xl aspect-video border-white/10">
+              <div className="relative overflow-hidden bg-black border rounded-none shadow-2xl cursor-pointer aspect-video border-white/10 group">
                 {course.videoLink ? (
-                  <div className="relative w-full h-full">
+                  <div className="relative w-full h-full video-container group">
+                    {/* Play Button Overlay */}
+                    <div className="absolute inset-0 z-10 flex flex-col items-center justify-center transition-opacity duration-300 opacity-0 bg-black/20 group-hover:opacity-100">
+                      <div className="p-4 mb-2 transition-transform duration-300 transform scale-75 rounded-full shadow-lg bg-coinlect-accent group-hover:scale-100">
+                        <PlayCircle size={48} className="ml-1 text-black" fill="currentColor" />
+                      </div>
+                      <p className="text-sm font-medium text-white opacity-90">Cliquer pour regarder</p>
+                    </div>
                     {course.videoLink.includes('youtube.com') || course.videoLink.includes('youtu.be') ? (
                       <iframe
                         src={getYouTubeEmbedUrl(course.videoLink)}
@@ -123,6 +130,13 @@ export const CourseDetail: React.FC = () => {
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen
                         title={course.title}
+                        onError={() => {
+                          // Fallback to placeholder if iframe fails
+                          const container = document.querySelector('.video-container') as HTMLElement;
+                          if (container) {
+                            container.innerHTML = '<div class="flex items-center justify-center w-full h-full bg-gray-800 text-white">Video unavailable</div>';
+                          }
+                        }}
                       />
                     ) : course.videoLink.includes('vimeo.com') ? (
                       <iframe
@@ -131,6 +145,13 @@ export const CourseDetail: React.FC = () => {
                         allow="autoplay; fullscreen; picture-in-picture"
                         allowFullScreen
                         title={course.title}
+                        onError={() => {
+                          // Fallback to placeholder if iframe fails
+                          const container = document.querySelector('.video-container') as HTMLElement;
+                          if (container) {
+                            container.innerHTML = '<div class="flex items-center justify-center w-full h-full bg-gray-800 text-white">Video unavailable</div>';
+                          }
+                        }}
                       />
                     ) : (
                       <video
@@ -138,12 +159,28 @@ export const CourseDetail: React.FC = () => {
                         controls
                         className="w-full h-full"
                         poster={course.image}
+                        onError={(e) => {
+                          const target = e.target as HTMLVideoElement;
+                          target.style.display = 'none';
+                          const container = target.parentElement;
+                          if (container) {
+                            container.innerHTML = '<div class="flex items-center justify-center w-full h-full bg-gray-800 text-white">Video unavailable</div>';
+                          }
+                        }}
                       />
                     )}
                   </div>
                 ) : (
                   <div className="relative group">
-                    <img src={course.image} alt={course.title} className="object-cover w-full h-full transition-transform duration-700 opacity-60 group-hover:scale-105" />
+                    <img
+                      src={course.image}
+                      alt={course.title}
+                      className="object-cover w-full h-full transition-transform duration-700 opacity-60 group-hover:scale-105"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = 'https://via.placeholder.com/800x600/333/666?text=No+Image';
+                      }}
+                    />
                     <div className="absolute inset-0 transition-colors bg-black/20 group-hover:bg-black/10"></div>
                     <div className="absolute inset-0 flex items-center justify-center">
                       <div className="w-20 h-20 rounded-none bg-coinlect-accent text-black flex items-center justify-center shadow-[0_0_30px_rgba(245,158,11,0.3)] transform group-hover:scale-110 transition-transform duration-300">
@@ -172,12 +209,10 @@ export const CourseDetail: React.FC = () => {
                 ) : (
                   <>
                     <p>
-                      Ce cours a été conçu pour vous fournir une compréhension approfondie du sujet. 
-                      Que vous soyez débutant ou que vous cherchiez à affiner vos compétences, 
-                      notre approche structurée vous guidera à travers les concepts clés avec des exemples pratiques.
+                      {course.description}
                     </p>
                     <p>
-                      {course.description}
+                      Not financial advice
                     </p>
                   </>
                 )}

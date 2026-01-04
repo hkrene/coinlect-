@@ -118,7 +118,15 @@ export const ArticleDetail: React.FC = () => {
 
          <div className="flex items-center justify-between py-6 border-y border-white/10">
              <div className="flex items-center gap-4">
-                <img src={article.authorImage} alt={article.author?.name ?? 'Author'} className="w-12 h-12 rounded-full border-2 border-[#0a0a0a] ring-2 ring-white/10" />
+                <img
+                  src={article.authorImage}
+                  alt={article.author?.name ?? 'Author'}
+                  className="w-12 h-12 rounded-full border-2 border-[#0a0a0a] ring-2 ring-white/10"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = 'https://via.placeholder.com/48x48/333/666?text=Author';
+                  }}
+                />
                 <div>
                     <p className="text-sm font-bold text-white">{article.author?.name ?? 'Author'}</p>
                     <p className="text-xs text-gray-500">{t.academy.article.writtenBy}</p>
@@ -158,7 +166,15 @@ export const ArticleDetail: React.FC = () => {
       {/* Featured Image */}
       <div className="container max-w-5xl px-6 mx-auto mb-12">
           <div className="relative aspect-video md:aspect-[21/9] rounded-2xl overflow-hidden shadow-2xl border border-white/10">
-              <img src={article.image} alt={article.title} className="object-cover w-full h-full" />
+              <img
+                src={article.image}
+                alt={article.title}
+                className="object-cover w-full h-full"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = 'https://via.placeholder.com/800x400/333/666?text=No+Image';
+                }}
+              />
           </div>
       </div>
 
@@ -205,7 +221,15 @@ export const ArticleDetail: React.FC = () => {
             {relatedArticles.map(related => (
                 <Link key={related.id} href={`/academy/article/${related.slug}`} className="flex flex-col gap-4 p-4 transition-colors bg-transparent group md:flex-row hover:bg-white/5 rounded-xl">
                     <div className="flex-shrink-0 w-full h-32 overflow-hidden rounded-lg md:w-48">
-                        <img src={related.image} alt={related.title} className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110" />
+                        <img
+                          src={related.image}
+                          alt={related.title}
+                          className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = 'https://via.placeholder.com/300x200/333/666?text=No+Image';
+                          }}
+                        />
                     </div>
                     <div className="flex flex-col justify-center">
                         <span className="mb-2 text-xs font-bold uppercase text-coinlect-accent">{related.category}</span>
