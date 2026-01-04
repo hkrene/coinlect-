@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { moduleSchema } from '@/lib/validators';
-import { requireAdmin } from '@/lib/auth-utils';
+import { requireAdminSlug } from '@/lib/auth-utils';
 
-export const POST = requireAdmin(async (req: NextRequest, user) => {
-  const url = new URL(req.url);
-  const courseId = url.pathname.split('/')[3]; // Extract course ID from /api/courses/[id]/modules
+export const POST = requireAdminSlug(async (req: NextRequest, user, params: { slug: string }) => {
+  const { slug } = params;
 
   try {
     const body = await req.json();
@@ -14,10 +13,19 @@ export const POST = requireAdmin(async (req: NextRequest, user) => {
       return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
     }
 
+    // Find course by slug to get its ID
+    const course = await prisma.course.findUnique({
+      where: { slug },
+    });
+
+    if (!course) {
+      return NextResponse.json({ error: 'Course not found' }, { status: 404 });
+    }
+
     const data = parsed.data;
     const courseModule = await prisma.courseModule.create({
       data: {
-        courseId: courseId,
+        courseId: course.id,
         title: data.title,
         content: data.content,
         order: data.order,

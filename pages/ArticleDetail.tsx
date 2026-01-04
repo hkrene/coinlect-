@@ -12,7 +12,7 @@ import { ArrowLeft, Clock, Calendar, Twitter, Facebook, Link as LinkIcon, Check,
 
 export const ArticleDetail: React.FC = () => {
   const params = useParams();
-  const articleSlug = params?.articleId as string;
+  const articleSlug = params?.articleSlug as string;
   const [article, setArticle] = useState<Article | null>(null);
   const [relatedArticles, setRelatedArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
@@ -26,13 +26,15 @@ export const ArticleDetail: React.FC = () => {
         setLoading(true);
         setError(null);
 
-        const articles = await articleService.getAll();
-        const foundArticle = articles.find(a => a.id === articleSlug);
+        // Fetch article directly by slug from API
+        const response = await fetch(`/api/articles/${articleSlug}`);
+        if (response.ok) {
+          const data = await response.json();
+          setArticle(data.article);
 
-        if (foundArticle) {
-          setArticle(foundArticle);
-          // Get related articles (excluding current article)
-          const related = articles.filter(a => a.id !== foundArticle.id).slice(0, 2);
+          // Get related articles
+          const articles = await articleService.getAll();
+          const related = articles.filter(a => a.id !== data.article.id).slice(0, 2);
           setRelatedArticles(related);
         } else {
           setError('Article not found');

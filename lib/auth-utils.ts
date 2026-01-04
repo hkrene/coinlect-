@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { UserRole } from '@prisma/client';
+import { UserRole, PrismaClient } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 
 export interface AuthUser {
@@ -14,7 +14,7 @@ export async function getAuthUser(req: NextRequest): Promise<AuthUser | null> {
       return null;
     }
 
-    const session = await prisma.session.findUnique({
+    const session = await (prisma as any).session.findUnique({
       where: { id: sessionId, expiresAt: { gt: new Date() } },
       include: { user: true },
     });
@@ -45,6 +45,19 @@ export function requireAuth(handler: (req: NextRequest, user: AuthUser) => Promi
 
 export function requireAdmin(handler: (req: NextRequest, user: AuthUser, params: { id: string }) => Promise<NextResponse>) {
   return async (req: NextRequest, { params }: { params: { id: string } }) => {
+    const user = await getAuthUser(req);
+    if (!user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    if (user.role !== UserRole.ADMIN) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+    return handler(req, user, params);
+  };
+}
+
+export function requireAdminSlug(handler: (req: NextRequest, user: AuthUser, params: { slug: string }) => Promise<NextResponse>) {
+  return async (req: NextRequest, { params }: { params: { slug: string } }) => {
     const user = await getAuthUser(req);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

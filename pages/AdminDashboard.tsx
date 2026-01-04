@@ -23,6 +23,92 @@ export const AdminDashboard: React.FC = () => {
   // Modals
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState<'course' | 'article' | 'event' | 'deal' | null>(null);
+  const [editingItem, setEditingItem] = useState<any>(null);
+
+  // Delete confirmation dialog
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<{ type: string; item: any } | null>(null);
+
+  // Pre-populate forms when editing
+  useEffect(() => {
+    if (editingItem && modalType) {
+      if (modalType === 'course') {
+        setCourseForm({
+          title: editingItem.title || '',
+          slug: editingItem.slug || '',
+          description: editingItem.description || '',
+          seoTitle: editingItem.seoTitle || '',
+          seoDescription: editingItem.seoDescription || '',
+          status: editingItem.status || 'DRAFT',
+          publishedAt: editingItem.publishedAt || undefined,
+          createdAt: editingItem.createdAt || '',
+          updatedAt: editingItem.updatedAt || '',
+          authorId: editingItem.authorId || undefined,
+          author: editingItem.author || undefined,
+          about: editingItem.about || '',
+          level: editingItem.level || 'Débutant',
+          duration: editingItem.duration || '35m',
+          modules: editingItem.modules || 0,
+          category: editingItem.category || 'Blockchain',
+          image: editingItem.image || '',
+          syllabus: editingItem.syllabus || [],
+          courseType: editingItem.courseType || 'academy',
+          videoLink: editingItem.videoLink || ''
+        });
+      } else if (modalType === 'article') {
+        setArticleForm({
+          title: editingItem.title || '',
+          slug: editingItem.slug || '',
+          excerpt: editingItem.excerpt || '',
+          content: editingItem.content || '',
+          tags: editingItem.tags || [],
+          seoTitle: editingItem.seoTitle || '',
+          seoDescription: editingItem.seoDescription || '',
+          status: editingItem.status || 'DRAFT',
+          publishedAt: editingItem.publishedAt || undefined,
+          createdAt: editingItem.createdAt || '',
+          updatedAt: editingItem.updatedAt || '',
+          authorId: editingItem.authorId || undefined,
+          author: editingItem.author || undefined,
+          authorImage: editingItem.authorImage || '',
+          featured: editingItem.featured || false
+        });
+      } else if (modalType === 'event') {
+        setEventForm({
+          title: editingItem.title || '',
+          slug: editingItem.slug || '',
+          date: editingItem.date || '',
+          location: editingItem.location || '',
+          description: editingItem.description || '',
+          banner: editingItem.banner || '',
+          bannerImage: editingItem.bannerImage || '',
+          bannerText: editingItem.bannerText || '',
+          eventTypes: editingItem.eventTypes || [],
+          seoTitle: editingItem.seoTitle || '',
+          seoDescription: editingItem.seoDescription || '',
+          status: editingItem.status || 'DRAFT',
+          publishedAt: editingItem.publishedAt || undefined,
+          createdAt: editingItem.createdAt || '',
+          updatedAt: editingItem.updatedAt || '',
+          authorId: editingItem.authorId || undefined,
+          author: editingItem.author || undefined
+        });
+      } else if (modalType === 'deal') {
+        // setDealForm({
+        //   title: editingItem.title || '',
+        //   description: editingItem.description || '',
+        //   category: editingItem.category || '',
+        //   link: editingItem.link || '',
+        //   image: editingItem.image || '',
+        //   discount: editingItem.discount || '',
+        //   code: editingItem.code || '',
+        //   exclusive: editingItem.exclusive || false,
+        //   verified: editingItem.verified || false,
+        //   featured: editingItem.featured || false
+        // });
+      }
+    }
+  }, [editingItem, modalType]);
 
   // Complex Form State
   const [courseForm, setCourseForm] = useState<Omit<Course, 'id' | 'slug'> & { slug: string }>({
@@ -176,9 +262,56 @@ export const AdminDashboard: React.FC = () => {
   const handleSaveCourse = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await courseService.add(courseForm);
+      if (editingItem) {
+        // Update existing course
+        const response = await fetch(`/api/courses/${editingItem.slug}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          },
+          body: JSON.stringify(courseForm),
+        });
+        if (!response.ok) throw new Error('Failed to update course');
+      } else {
+        // Create new course
+        const response = await fetch('/api/courses', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          },
+          body: JSON.stringify(courseForm),
+        });
+        if (!response.ok) throw new Error('Failed to create course');
+      }
       setIsModalOpen(false);
+      setEditingItem(null);
+      setEditingItem(null);
       setRefreshTrigger(p => p + 1);
+      // Reset form
+      setCourseForm({
+        title: '',
+        slug: '',
+        description: '',
+        seoTitle: '',
+        seoDescription: '',
+        status: 'DRAFT',
+        publishedAt: undefined,
+        createdAt: '',
+        updatedAt: '',
+        authorId: undefined,
+        author: undefined,
+        about: '',
+        level: 'Débutant',
+        duration: '35m',
+        modules: 0,
+        category: 'Blockchain',
+        image: '',
+        syllabus: [],
+        courseType: 'academy',
+        videoLink: ''
+      });
       // Dispatch custom event to notify other components
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('contentUpdated'));
@@ -192,9 +325,51 @@ export const AdminDashboard: React.FC = () => {
   const handleSaveArticle = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await articleService.add(articleForm);
+      if (editingItem) {
+        // Update existing article
+        const response = await fetch(`/api/articles/${editingItem.slug}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          },
+          body: JSON.stringify(articleForm),
+        });
+        if (!response.ok) throw new Error('Failed to update article');
+      } else {
+        // Create new article
+        const response = await fetch('/api/articles', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          },
+          body: JSON.stringify(articleForm),
+        });
+        if (!response.ok) throw new Error('Failed to create article');
+      }
       setIsModalOpen(false);
+      setEditingItem(null);
+      setEditingItem(null);
       setRefreshTrigger(p => p + 1);
+      // Reset form
+      setArticleForm({
+        title: '',
+        slug: '',
+        excerpt: '',
+        content: '',
+        tags: [],
+        seoTitle: '',
+        seoDescription: '',
+        status: 'DRAFT',
+        publishedAt: undefined,
+        createdAt: '',
+        updatedAt: '',
+        authorId: undefined,
+        author: undefined,
+        authorImage: '',
+        featured: false
+      });
       // Dispatch custom event to notify other components
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('contentUpdated'));
@@ -210,10 +385,34 @@ export const AdminDashboard: React.FC = () => {
     try {
       const eventData = {
         ...eventForm,
-        eventTypes: eventForm.type || []
+        eventTypes: eventForm.eventTypes || []
       };
-      await eventService.add(eventData);
+      if (editingItem) {
+        // Update existing event
+        const response = await fetch(`/api/events/${editingItem.slug}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          },
+          body: JSON.stringify(eventData),
+        });
+        if (!response.ok) throw new Error('Failed to update event');
+      } else {
+        // Create new event
+        const response = await fetch('/api/events', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          },
+          body: JSON.stringify(eventData),
+        });
+        if (!response.ok) throw new Error('Failed to create event');
+      }
       setIsModalOpen(false);
+      setEditingItem(null);
+      setEditingItem(null);
       setRefreshTrigger(p => p + 1);
       // Dispatch custom event to notify other components
       if (typeof window !== 'undefined') {
@@ -248,9 +447,46 @@ export const AdminDashboard: React.FC = () => {
   const handleSaveDeal = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await dealService.add(dealForm);
+      if (editingItem) {
+        // Update existing deal
+        const response = await fetch(`/api/deals/${editingItem.id}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          },
+          body: JSON.stringify(dealForm),
+        });
+        if (!response.ok) throw new Error('Failed to update deal');
+      } else {
+        // Create new deal
+        const response = await fetch('/api/deals', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          },
+          body: JSON.stringify(dealForm),
+        });
+        if (!response.ok) throw new Error('Failed to create deal');
+      }
       setIsModalOpen(false);
+      setEditingItem(null);
+      setEditingItem(null);
       setRefreshTrigger(p => p + 1);
+      // Reset form
+      // setDealForm({
+      //   title: '',
+      //   description: '',
+      //   category: '',
+      //   link: '',
+      //   image: '',
+      //   discount: '',
+      //   code: '',
+      //   exclusive: false,
+      //   verified: false,
+      //   featured: false
+      // });
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('contentUpdated'));
       }
@@ -337,7 +573,15 @@ export const AdminDashboard: React.FC = () => {
                       <p className="text-[10px] text-gray-500 uppercase tracking-widest">{c.category} • {c.level} • {c.modules} Mod.</p>
                     </div>
                   </div>
-                  <button onClick={() => { courseService.delete(c.id); setRefreshTrigger(t => t+1); }} className="p-2 text-red-500 hover:text-red-400" aria-label="Delete course"><Trash2 size={18} /></button>
+                  <button onClick={() => {
+                    setEditingItem(c);
+                    setModalType('course');
+                    setIsModalOpen(true);
+                  }} className="p-2 text-blue-500 hover:text-blue-400" aria-label="Edit course"><FileText size={18} /></button>
+                  <button onClick={() => {
+                    setDeleteTarget({ type: 'course', item: c });
+                    setDeleteDialogOpen(true);
+                  }} className="p-2 text-red-500 hover:text-red-400" aria-label="Delete course"><Trash2 size={18} /></button>
                 </div>
               ))}
             </div>
@@ -397,7 +641,15 @@ export const AdminDashboard: React.FC = () => {
                     >
                       <Star size={18} fill={a.featured ? "currentColor" : "none"} />
                     </button>
-                    <button onClick={() => { articleService.delete(a.id); setRefreshTrigger(t => t+1); }} className="p-2 text-red-500 transition-colors hover:text-red-400" aria-label="Delete article"><Trash2 size={18} /></button>
+                    <button onClick={() => {
+                      setDeleteTarget({ type: 'article', item: a });
+                      setDeleteDialogOpen(true);
+                    }} className="p-2 text-red-500 transition-colors hover:text-red-400" aria-label="Delete article"><Trash2 size={18} /></button>
+                  <button onClick={() => {
+                    setEditingItem(a);
+                    setModalType('article');
+                    setIsModalOpen(true);
+                  }} className="p-2 text-blue-500 hover:text-blue-400" aria-label="Edit article"><FileText size={18} /></button>
                   </div>
                 </div>
               ))}
@@ -426,7 +678,15 @@ export const AdminDashboard: React.FC = () => {
                     </div>
                   </div>
                   <div className="flex gap-2">
-                    <button onClick={() => { eventService.delete(e.id); setRefreshTrigger(t => t+1); }} className="p-2 text-red-500 transition-colors hover:text-red-400" aria-label="Delete event"><Trash2 size={18} /></button>
+                    <button onClick={() => {
+                      setEditingItem(e);
+                      setModalType('event');
+                      setIsModalOpen(true);
+                    }} className="p-2 text-blue-500 hover:text-blue-400" aria-label="Edit event"><FileText size={18} /></button>
+                    <button onClick={() => {
+                      setDeleteTarget({ type: 'event', item: e });
+                      setDeleteDialogOpen(true);
+                    }} className="p-2 text-red-500 transition-colors hover:text-red-400" aria-label="Delete event"><Trash2 size={18} /></button>
                   </div>
                 </div>
               ))}
@@ -500,7 +760,15 @@ export const AdminDashboard: React.FC = () => {
                   <div className="flex gap-2">
                     {d.featured && <Star className="text-coinlect-accent" size={18} fill="currentColor" />}
                     {d.verified && <Check className="text-green-500" size={18} />}
-                    <button onClick={() => { /* dealService.delete(d.id); */ setRefreshTrigger(t => t+1); }} className="p-2 text-red-500 hover:text-red-400" aria-label="Delete deal"><Trash2 size={18} /></button>
+                    <button onClick={() => {
+                      setEditingItem(d);
+                      setModalType('deal');
+                      setIsModalOpen(true);
+                    }} className="p-2 text-blue-500 hover:text-blue-400" aria-label="Edit deal"><FileText size={18} /></button>
+                    <button onClick={() => {
+                      setDeleteTarget({ type: 'deal', item: d });
+                      setDeleteDialogOpen(true);
+                    }} className="p-2 text-red-500 hover:text-red-400" aria-label="Delete deal"><Trash2 size={18} /></button>
                   </div>
                 </div>
               ))}
@@ -515,9 +783,10 @@ export const AdminDashboard: React.FC = () => {
           <div className="bg-[#111] border border-white/10 rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-[0_0_50px_rgba(0,0,0,0.8)]">
             <div className="p-6 border-b border-white/10 flex justify-between items-center bg-[#161616]">
               <h2 className="flex items-center gap-2 text-xl font-bold">
-                {modalType === 'course' ? <><BookOpen className="text-coinlect-accent" /> Nouveau Cours Expert</> : 
-                 modalType === 'article' ? <><FileText className="text-purple-500" /> Nouvel Article</> :
-                 modalType === 'deal' ? <><FileText className="text-yellow-500" /> Nouveau Deal</> :
+                {modalType === 'course' ? <><BookOpen className="text-coinlect-accent" /> {editingItem ? 'Modifier le Cours' : 'Nouveau Cours Expert'}</> :
+                 modalType === 'article' ? <><FileText className="text-purple-500" /> {editingItem ? 'Modifier l\'Article' : 'Nouvel Article'}</> :
+                 modalType === 'event' ? <><Calendar className="text-green-500" /> {editingItem ? 'Modifier l\'Événement' : 'Nouvel Événement'}</> :
+                 modalType === 'deal' ? <><FileText className="text-yellow-500" /> {editingItem ? 'Modifier le Deal' : 'Nouveau Deal'}</> :
                  <><Calendar className="text-green-500" /> Nouvel Événement</>}
               </h2>
               <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-white" aria-label="Close modal"><X size={24} /></button>
@@ -751,6 +1020,69 @@ export const AdminDashboard: React.FC = () => {
                   </div>
                 </form>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Dialog */}
+      {deleteDialogOpen && deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="w-full max-w-md p-6 mx-4 bg-gray-900 border border-gray-700 rounded-lg">
+            <h3 className="mb-4 text-lg font-bold text-white">Confirmer la suppression</h3>
+            <p className="mb-6 text-gray-300">
+              Êtes-vous sûr de vouloir supprimer {
+                deleteTarget.type === 'course' ? 'ce cours' :
+                deleteTarget.type === 'article' ? 'cet article' :
+                deleteTarget.type === 'event' ? 'cet événement' :
+                'cette offre'
+              } ?
+              <br />
+              <span className="font-semibold text-white">{deleteTarget.item.title}</span>
+              <br />
+              <span className="text-sm text-red-400">Cette action est irréversible.</span>
+            </p>
+            <div className="flex justify-end gap-3">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setDeleteDialogOpen(false);
+                  setDeleteTarget(null);
+                }}
+              >
+                Annuler
+              </Button>
+              <Button
+                className="text-white bg-red-600 hover:bg-red-700"
+                onClick={async () => {
+                  if (!deleteTarget) return;
+
+                  try {
+                    const endpoint =
+                      deleteTarget.type === 'course' ? `/api/courses/${deleteTarget.item.slug}` :
+                      deleteTarget.type === 'article' ? `/api/articles/${deleteTarget.item.slug}` :
+                      deleteTarget.type === 'event' ? `/api/events/${deleteTarget.item.slug}` :
+                      `/api/deals/${deleteTarget.item.id}`;
+
+                    const response = await fetch(endpoint, {
+                      method: 'DELETE',
+                    });
+
+                    if (response.ok) {
+                      setRefreshTrigger(t => t + 1);
+                      setDeleteDialogOpen(false);
+                      setDeleteTarget(null);
+                    } else {
+                      alert('Erreur lors de la suppression');
+                    }
+                  } catch (error) {
+                    console.error('Error deleting item:', error);
+                    alert('Erreur lors de la suppression');
+                  }
+                }}
+              >
+                Supprimer
+              </Button>
             </div>
           </div>
         </div>

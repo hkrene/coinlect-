@@ -11,16 +11,22 @@ import { ArrowLeft, PlayCircle } from 'lucide-react';
 
 export const CourseDetail: React.FC = () => {
   const params = useParams();
-  const courseSlug = params?.courseId as string;
+  const courseSlug = params?.courseSlug as string;
   const [course, setCourse] = useState<Course | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchCourse = async () => {
       try {
         setLoading(true);
-        const courses = await courseService.getAll();
-        const foundCourse = courses.find(c => c.id === courseSlug);
-        setCourse(foundCourse || null);
+        // Fetch course directly by slug from API
+        const response = await fetch(`/api/courses/${courseSlug}`);
+        if (response.ok) {
+          const data = await response.json();
+          setCourse(data.course);
+        } else {
+          setCourse(null);
+        }
       } catch (error) {
         console.error('Error fetching course:', error);
         setCourse(null);
@@ -31,8 +37,19 @@ export const CourseDetail: React.FC = () => {
 
     if (courseSlug) {
       fetchCourse();
+    } else {
+      setLoading(false);
     }
   }, [courseSlug]);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen gap-4 px-6 text-center">
+        <div className="w-12 h-12 border-b-2 border-white rounded-full animate-spin"></div>
+        <p className="text-white">Chargement du cours...</p>
+      </div>
+    );
+  }
 
   if (!course) {
     return (

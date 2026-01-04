@@ -1,14 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { courseSchema } from '@/lib/validators';
-import { getAuthUser, requireAdmin } from '@/lib/auth-utils';
+import { getAuthUser, requireAdmin, requireAdminSlug } from '@/lib/auth-utils';
 import { UserRole, PublishStatus } from '@prisma/client';
 
-export async function GET(req: NextRequest, context: { params: { id: string } }) {
-  const { id } = context.params;
+export async function GET(req: NextRequest, context: { params: { slug: string } }) {
+  const { slug } = context.params;
   const auth = await getAuthUser(req);
   const course = await prisma.course.findUnique({
-    where: { id },
+    where: { slug },
     include: {
       modules: { orderBy: { order: 'asc' } },
       author: true
@@ -24,8 +24,9 @@ export async function GET(req: NextRequest, context: { params: { id: string } })
   return NextResponse.json({ course });
 }
 
-export const PATCH = requireAdmin(async (req: NextRequest, user, { id }: { id: string }) => {
-  if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
+export const PATCH = requireAdminSlug(async (req: NextRequest, user, params: { slug: string }) => {
+  const { slug } = params;
+  if (!slug) return NextResponse.json({ error: 'Slug required' }, { status: 400 });
 
   try {
     const body = await req.json();
@@ -35,7 +36,7 @@ export const PATCH = requireAdmin(async (req: NextRequest, user, { id }: { id: s
     }
     const data = parsed.data;
     const course = await prisma.course.update({
-      where: { id },
+      where: { slug },
       data: {
         ...data,
         publishedAt: data.status === PublishStatus.PUBLISHED ? new Date() : undefined,
@@ -48,11 +49,12 @@ export const PATCH = requireAdmin(async (req: NextRequest, user, { id }: { id: s
   }
 });
 
-export const DELETE = requireAdmin(async (req: NextRequest, user, { id }: { id: string }) => {
-  if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
+export const DELETE = requireAdminSlug(async (req: NextRequest, user, params: { slug: string }) => {
+  const { slug } = params;
+  if (!slug) return NextResponse.json({ error: 'Slug required' }, { status: 400 });
 
   try {
-    await prisma.course.delete({ where: { id } });
+    await prisma.course.delete({ where: { slug } });
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error('Course delete error', err);
