@@ -29,86 +29,6 @@ export const AdminDashboard: React.FC = () => {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<{ type: string; item: any } | null>(null);
 
-  // Pre-populate forms when editing
-  useEffect(() => {
-    if (editingItem && modalType) {
-      if (modalType === 'course') {
-        setCourseForm({
-          title: editingItem.title || '',
-          slug: editingItem.slug || '',
-          description: editingItem.description || '',
-          seoTitle: editingItem.seoTitle || '',
-          seoDescription: editingItem.seoDescription || '',
-          status: editingItem.status || 'DRAFT',
-          publishedAt: editingItem.publishedAt || undefined,
-          createdAt: editingItem.createdAt || '',
-          updatedAt: editingItem.updatedAt || '',
-          authorId: editingItem.authorId || undefined,
-          author: editingItem.author || undefined,
-          about: editingItem.about || '',
-          level: editingItem.level || 'Débutant',
-          duration: editingItem.duration || '35m',
-          modules: editingItem.modules || 0,
-          category: editingItem.category || 'Blockchain',
-          image: editingItem.image || '',
-          syllabus: editingItem.syllabus || [],
-          courseType: editingItem.courseType || 'academy',
-          videoLink: editingItem.videoLink || ''
-        });
-      } else if (modalType === 'article') {
-        setArticleForm({
-          title: editingItem.title || '',
-          slug: editingItem.slug || '',
-          excerpt: editingItem.excerpt || '',
-          content: editingItem.content || '',
-          tags: editingItem.tags || [],
-          seoTitle: editingItem.seoTitle || '',
-          seoDescription: editingItem.seoDescription || '',
-          status: editingItem.status || 'DRAFT',
-          publishedAt: editingItem.publishedAt || undefined,
-          createdAt: editingItem.createdAt || '',
-          updatedAt: editingItem.updatedAt || '',
-          authorId: editingItem.authorId || undefined,
-          author: editingItem.author || undefined,
-          authorImage: editingItem.authorImage || '',
-          featured: editingItem.featured || false
-        });
-      } else if (modalType === 'event') {
-        setEventForm({
-          title: editingItem.title || '',
-          slug: editingItem.slug || '',
-          date: editingItem.date || '',
-          location: editingItem.location || '',
-          description: editingItem.description || '',
-          banner: editingItem.banner || '',
-          bannerImage: editingItem.bannerImage || '',
-          bannerText: editingItem.bannerText || '',
-          eventTypes: editingItem.eventTypes || [],
-          seoTitle: editingItem.seoTitle || '',
-          seoDescription: editingItem.seoDescription || '',
-          status: editingItem.status || 'DRAFT',
-          publishedAt: editingItem.publishedAt || undefined,
-          createdAt: editingItem.createdAt || '',
-          updatedAt: editingItem.updatedAt || '',
-          authorId: editingItem.authorId || undefined,
-          author: editingItem.author || undefined
-        });
-      } else if (modalType === 'deal') {
-        // setDealForm({
-        //   title: editingItem.title || '',
-        //   description: editingItem.description || '',
-        //   category: editingItem.category || '',
-        //   link: editingItem.link || '',
-        //   image: editingItem.image || '',
-        //   discount: editingItem.discount || '',
-        //   code: editingItem.code || '',
-        //   exclusive: editingItem.exclusive || false,
-        //   verified: editingItem.verified || false,
-        //   featured: editingItem.featured || false
-        // });
-      }
-    }
-  }, [editingItem, modalType]);
 
   // Complex Form State
   const [courseForm, setCourseForm] = useState<Omit<Course, 'id' | 'slug'> & { slug: string }>({
@@ -576,6 +496,28 @@ export const AdminDashboard: React.FC = () => {
                   <button onClick={() => {
                     setEditingItem(c);
                     setModalType('course');
+                    setCourseForm({
+                      title: c.title || '',
+                      slug: c.slug || '',
+                      description: c.description || '',
+                      seoTitle: c.seoTitle || '',
+                      seoDescription: c.seoDescription || '',
+                      status: c.status || 'DRAFT',
+                      publishedAt: c.publishedAt || undefined,
+                      createdAt: c.createdAt || '',
+                      updatedAt: c.updatedAt || '',
+                      authorId: c.authorId || undefined,
+                      author: c.author || undefined,
+                      about: c.about || '',
+                      level: c.level || 'Débutant',
+                      duration: c.duration || '35m',
+                      modules: c.modules || 0,
+                      category: c.category || 'Blockchain',
+                      image: c.image || '',
+                      syllabus: c.syllabus || [],
+                      courseType: c.courseType || 'academy',
+                      videoLink: c.videoLink || ''
+                    });
                     setIsModalOpen(true);
                   }} className="p-2 text-blue-500 hover:text-blue-400" aria-label="Edit course"><FileText size={18} /></button>
                   <button onClick={() => {
@@ -645,11 +587,28 @@ export const AdminDashboard: React.FC = () => {
                       setDeleteTarget({ type: 'article', item: a });
                       setDeleteDialogOpen(true);
                     }} className="p-2 text-red-500 transition-colors hover:text-red-400" aria-label="Delete article"><Trash2 size={18} /></button>
-                  <button onClick={() => {
-                    setEditingItem(a);
-                    setModalType('article');
-                    setIsModalOpen(true);
-                  }} className="p-2 text-blue-500 hover:text-blue-400" aria-label="Edit article"><FileText size={18} /></button>
+                    <button onClick={() => {
+                      setEditingItem(a);
+                      setModalType('article');
+                      setArticleForm({
+                        title: a.title || '',
+                        slug: a.slug || '',
+                        excerpt: a.excerpt || '',
+                        content: a.content || '',
+                        tags: a.tags || [],
+                        seoTitle: a.seoTitle || '',
+                        seoDescription: a.seoDescription || '',
+                        status: a.status || 'DRAFT',
+                        publishedAt: a.publishedAt || undefined,
+                        createdAt: a.createdAt || '',
+                        updatedAt: a.updatedAt || '',
+                        authorId: a.authorId || undefined,
+                        author: a.author || undefined,
+                        authorImage: a.authorImage || '',
+                        featured: a.featured || false
+                      });
+                      setIsModalOpen(true);
+                    }} className="p-2 text-blue-500 hover:text-blue-400" aria-label="Edit article"><FileText size={18} /></button>
                   </div>
                 </div>
               ))}
@@ -681,6 +640,25 @@ export const AdminDashboard: React.FC = () => {
                     <button onClick={() => {
                       setEditingItem(e);
                       setModalType('event');
+                      setEventForm({
+                        title: e.title || '',
+                        slug: e.slug || '',
+                        date: e.date || '',
+                        location: e.location || '',
+                        description: e.description || '',
+                        banner: e.banner || '',
+                        bannerImage: e.bannerImage || '',
+                        bannerText: e.bannerText || '',
+                        eventTypes: e.eventTypes || [],
+                        seoTitle: e.seoTitle || '',
+                        seoDescription: e.seoDescription || '',
+                        status: e.status || 'DRAFT',
+                        publishedAt: e.publishedAt || undefined,
+                        createdAt: e.createdAt || '',
+                        updatedAt: e.updatedAt || '',
+                        authorId: e.authorId || undefined,
+                        author: e.author || undefined
+                      });
                       setIsModalOpen(true);
                     }} className="p-2 text-blue-500 hover:text-blue-400" aria-label="Edit event"><FileText size={18} /></button>
                     <button onClick={() => {
@@ -763,6 +741,18 @@ export const AdminDashboard: React.FC = () => {
                     <button onClick={() => {
                       setEditingItem(d);
                       setModalType('deal');
+                      // setDealForm({
+                      //   title: d.title || '',
+                      //   description: d.description || '',
+                      //   category: d.category || '',
+                      //   link: d.link || '',
+                      //   image: d.image || '',
+                      //   discount: d.discount || '',
+                      //   code: d.code || '',
+                      //   exclusive: d.exclusive || false,
+                      //   verified: d.verified || false,
+                      //   featured: d.featured || false
+                      // });
                       setIsModalOpen(true);
                     }} className="p-2 text-blue-500 hover:text-blue-400" aria-label="Edit deal"><FileText size={18} /></button>
                     <button onClick={() => {
@@ -800,40 +790,44 @@ export const AdminDashboard: React.FC = () => {
                     <h3 className="text-sm font-bold tracking-widest uppercase text-coinlect-accent">1. Informations Générales</h3>
                     <input
                       required placeholder="Titre du cours" className="w-full p-4 text-white bg-black border outline-none border-white/10 rounded-xl focus:border-coinlect-accent"
+                      value={courseForm.title}
                       onChange={e => setCourseForm({...courseForm, title: e.target.value})}
                     />
                     <input
                       required placeholder="Slug (ex: introduction-blockchain)" className="w-full p-4 text-white bg-black border outline-none border-white/10 rounded-xl focus:border-coinlect-accent"
+                      value={courseForm.slug}
                       onChange={e => setCourseForm({...courseForm, slug: e.target.value})}
                     />
-                    <textarea 
+                    <textarea
                       required placeholder="Brève description pour la carte" className="w-full h-24 p-4 text-white bg-black border outline-none border-white/10 rounded-xl focus:border-coinlect-accent"
-                      onChange={e => setCourseForm({...courseForm, description: e.target.value})} 
+                      value={courseForm.description}
+                      onChange={e => setCourseForm({...courseForm, description: e.target.value})}
                     />
-                    <textarea 
+                    <textarea
                       placeholder="À propos de ce cours (contenu détaillé affiché sur la page du cours)" className="w-full h-32 p-4 text-white bg-black border outline-none border-white/10 rounded-xl focus:border-coinlect-accent"
-                      onChange={e => setCourseForm({...courseForm, about: e.target.value})} 
+                      value={courseForm.about}
+                      onChange={e => setCourseForm({...courseForm, about: e.target.value})}
                     />
                     <div className="grid gap-4 md:grid-cols-3">
-                       <select className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" onChange={e => setCourseForm({...courseForm, level: e.target.value as any})} aria-label="Course level">
+                       <select className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={courseForm.level} onChange={e => setCourseForm({...courseForm, level: e.target.value as any})} aria-label="Course level">
                          <option>Débutant</option><option>Intermédiaire</option><option>Avancé</option>
                        </select>
-                       <input placeholder="Durée (ex: 35m)" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" onChange={e => setCourseForm({...courseForm, duration: e.target.value})} />
-                       <input type="number" placeholder="Nombre de modules" min="0" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" onChange={e => setCourseForm({...courseForm, modules: parseInt(e.target.value) || 0})} />
+                       <input placeholder="Durée (ex: 35m)" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={courseForm.duration} onChange={e => setCourseForm({...courseForm, duration: e.target.value})} />
+                       <input type="number" placeholder="Nombre de modules" min="0" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={courseForm.modules} onChange={e => setCourseForm({...courseForm, modules: parseInt(e.target.value) || 0})} />
                     </div>
                     <div className="grid gap-4 md:grid-cols-2">
-                       <input placeholder="Catégorie (DeFi, NFT...)" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" onChange={e => setCourseForm({...courseForm, category: e.target.value})} />
-                       <select className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" onChange={e => setCourseForm({...courseForm, courseType: e.target.value as any})} aria-label="Course type">
+                       <input placeholder="Catégorie (DeFi, NFT...)" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={courseForm.category} onChange={e => setCourseForm({...courseForm, category: e.target.value})} />
+                       <select className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={courseForm.courseType} onChange={e => setCourseForm({...courseForm, courseType: e.target.value as any})} aria-label="Course type">
                          <option value="academy">Academy</option>
                          <option value="specialization">Specialization</option>
                          <option value="university">University</option>
                        </select>
                     </div>
-                    <input placeholder="URL de l'image de couverture" className="w-full p-4 text-white bg-black border outline-none border-white/10 rounded-xl" onChange={e => setCourseForm({...courseForm, image: e.target.value})} />
-                    <input placeholder="Lien vidéo (YouTube/Vimeo/URL directe)" className="w-full p-4 text-white bg-black border outline-none border-white/10 rounded-xl" onChange={e => setCourseForm({...courseForm, videoLink: e.target.value || undefined})} />
+                    <input placeholder="URL de l'image de couverture" className="w-full p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={courseForm.image || ''} onChange={e => setCourseForm({...courseForm, image: e.target.value})} />
+                    <input placeholder="Lien vidéo (YouTube/Vimeo/URL directe)" className="w-full p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={courseForm.videoLink || ''} onChange={e => setCourseForm({...courseForm, videoLink: e.target.value || undefined})} />
                     <div className="grid gap-4 md:grid-cols-2">
-                       <input placeholder="Nom du partenaire (optionnel)" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" onChange={e => setCourseForm({...courseForm, partnerName: e.target.value || undefined})} />
-                       <input placeholder="URL du logo partenaire (optionnel)" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" onChange={e => setCourseForm({...courseForm, partnerLogo: e.target.value || undefined})} />
+                       <input placeholder="Nom du partenaire (optionnel)" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={courseForm.partnerName || ''} onChange={e => setCourseForm({...courseForm, partnerName: e.target.value || undefined})} />
+                       <input placeholder="URL du logo partenaire (optionnel)" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={courseForm.partnerLogo || ''} onChange={e => setCourseForm({...courseForm, partnerLogo: e.target.value || undefined})} />
                     </div>
                     <label className="flex items-center gap-3 px-4 py-2 border cursor-pointer bg-white/5 rounded-xl border-white/10">
                       <input type="checkbox" checked={courseForm.isPaid || false} onChange={e => setCourseForm({...courseForm, isPaid: e.target.checked})} className="border-gray-600 rounded" />
@@ -887,22 +881,22 @@ export const AdminDashboard: React.FC = () => {
                      />
                      <span className="text-xs font-bold">Publier l&apos;article</span>
                    </label>
-                   <input required placeholder="Titre de l'article" className="w-full p-4 text-xl font-bold text-white bg-black border outline-none border-white/10 rounded-xl focus:border-coinlect-accent" onChange={e => setArticleForm({...articleForm, title: e.target.value})} />
-                   <input required placeholder="Slug (ex: blockchain-101)" className="w-full p-4 text-white bg-black border outline-none border-white/10 rounded-xl focus:border-coinlect-accent" onChange={e => setArticleForm({...articleForm, slug: e.target.value})} />
-                   <textarea placeholder="Extrait accrocheur" className="w-full h-20 p-4 text-white bg-black border outline-none border-white/10 rounded-xl" onChange={e => setArticleForm({...articleForm, excerpt: e.target.value})} />
+                   <input required placeholder="Titre de l'article" className="w-full p-4 text-xl font-bold text-white bg-black border outline-none border-white/10 rounded-xl focus:border-coinlect-accent" value={articleForm.title} onChange={e => setArticleForm({...articleForm, title: e.target.value})} />
+                   <input required placeholder="Slug (ex: blockchain-101)" className="w-full p-4 text-white bg-black border outline-none border-white/10 rounded-xl focus:border-coinlect-accent" value={articleForm.slug} onChange={e => setArticleForm({...articleForm, slug: e.target.value})} />
+                   <textarea placeholder="Extrait accrocheur" className="w-full h-20 p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={articleForm.excerpt || ''} onChange={e => setArticleForm({...articleForm, excerpt: e.target.value})} />
                    <div className="grid grid-cols-2 gap-4">
-                     <input placeholder="Catégorie" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" onChange={e => setArticleForm({...articleForm, category: e.target.value})} />
-                     <input placeholder="Temps de lecture (ex: 5 min)" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" onChange={e => setArticleForm({...articleForm, readTime: e.target.value})} />
+                     <input placeholder="Catégorie" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={articleForm.category || ''} onChange={e => setArticleForm({...articleForm, category: e.target.value})} />
+                     <input placeholder="Temps de lecture (ex: 5 min)" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={articleForm.readTime || ''} onChange={e => setArticleForm({...articleForm, readTime: e.target.value})} />
                    </div>
                    <div className="grid grid-cols-2 gap-4">
-                     <input placeholder="URL Image" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" onChange={e => setArticleForm({...articleForm, image: e.target.value})} />
-                     <input type="date" placeholder="Date" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" onChange={e => {
+                     <input placeholder="URL Image" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={articleForm.image || ''} onChange={e => setArticleForm({...articleForm, image: e.target.value})} />
+                     <input type="date" placeholder="Date" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={articleForm.date ? new Date(articleForm.date).toISOString().split('T')[0] : ''} onChange={e => {
                        const date = new Date(e.target.value);
                        setArticleForm({...articleForm, date: date.toLocaleDateString('fr-FR')});
                      }} />
                    </div>
-                    <input placeholder="URL Image auteur" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={articleForm.authorImage} onChange={e => setArticleForm({...articleForm, authorImage: e.target.value})} />
-                   <textarea placeholder="Contenu complet (Séparez les paragraphes par une nouvelle ligne)" className="w-full p-4 text-white bg-black border outline-none border-white/10 rounded-xl h-60" onChange={e => setArticleForm({...articleForm, content: e.target.value})} />
+                    <input placeholder="URL Image auteur" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={articleForm.authorImage || ''} onChange={e => setArticleForm({...articleForm, authorImage: e.target.value})} />
+                   <textarea placeholder="Contenu complet (Séparez les paragraphes par une nouvelle ligne)" className="w-full p-4 text-white bg-black border outline-none border-white/10 rounded-xl h-60" value={articleForm.content} onChange={e => setArticleForm({...articleForm, content: e.target.value})} />
                    <div className="flex gap-4 pt-4">
                      <Button type="button" variant="outline" className="w-1/2" onClick={() => setIsModalOpen(false)}>Annuler</Button>
                      <Button type="submit" className="w-1/2">
@@ -1016,6 +1010,99 @@ export const AdminDashboard: React.FC = () => {
                     <Button type="button" variant="outline" className="w-1/2" onClick={() => setIsModalOpen(false)}>Annuler</Button>
                     <Button type="submit" className="w-1/2">
                       {eventForm.status === 'PUBLISHED' ? 'Mettre à jour l\'Événement' : 'Créer l\'Événement'}
+                    </Button>
+                  </div>
+                </form>
+              )}
+
+              {/* Deal Form */}
+              {modalType === 'deal' && (
+                <form onSubmit={handleSaveDeal} className="space-y-6">
+                  <h3 className="text-sm font-bold tracking-widest text-yellow-500 uppercase">Informations du Deal</h3>
+                  <input
+                    required
+                    placeholder="Titre du deal"
+                    className="w-full p-4 text-xl font-bold text-white bg-black border outline-none border-white/10 rounded-xl focus:border-yellow-500"
+                    value={dealForm.title}
+                    onChange={e => setDealForm({...dealForm, title: e.target.value})}
+                  />
+                  <textarea
+                    required
+                    placeholder="Description détaillée"
+                    className="w-full h-24 p-4 text-white bg-black border outline-none border-white/10 rounded-xl focus:border-yellow-500"
+                    value={dealForm.description}
+                    onChange={e => setDealForm({...dealForm, description: e.target.value})}
+                  />
+                  <div className="grid grid-cols-2 gap-4">
+                    <input
+                      required
+                      placeholder="Catégorie (ex: Exchange, Wallet)"
+                      className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl focus:border-yellow-500"
+                      value={dealForm.category}
+                      onChange={e => setDealForm({...dealForm, category: e.target.value})}
+                    />
+                    <input
+                      required
+                      type="url"
+                      placeholder="Lien vers l'offre"
+                      className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl focus:border-yellow-500"
+                      value={dealForm.link}
+                      onChange={e => setDealForm({...dealForm, link: e.target.value})}
+                    />
+                  </div>
+                  <div className="grid grid-cols-3 gap-4">
+                    <input
+                      placeholder="URL de l'image"
+                      className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl focus:border-yellow-500"
+                      value={dealForm.image || ''}
+                      onChange={e => setDealForm({...dealForm, image: e.target.value})}
+                    />
+                    <input
+                      placeholder="Code promo (optionnel)"
+                      className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl focus:border-yellow-500"
+                      value={dealForm.code || ''}
+                      onChange={e => setDealForm({...dealForm, code: e.target.value})}
+                    />
+                    <input
+                      placeholder="Réduction (ex: 20% off)"
+                      className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl focus:border-yellow-500"
+                      value={dealForm.discount || ''}
+                      onChange={e => setDealForm({...dealForm, discount: e.target.value})}
+                    />
+                  </div>
+                  <div className="flex gap-4">
+                    <label className="flex items-center gap-3 px-4 py-2 border cursor-pointer bg-white/5 rounded-xl border-white/10">
+                      <input
+                        type="checkbox"
+                        checked={dealForm.exclusive || false}
+                        onChange={e => setDealForm({...dealForm, exclusive: e.target.checked})}
+                        className="border-gray-600 rounded"
+                      />
+                      <span className="text-xs font-bold">Deal exclusif</span>
+                    </label>
+                    <label className="flex items-center gap-3 px-4 py-2 border cursor-pointer bg-white/5 rounded-xl border-white/10">
+                      <input
+                        type="checkbox"
+                        checked={dealForm.verified || false}
+                        onChange={e => setDealForm({...dealForm, verified: e.target.checked})}
+                        className="border-gray-600 rounded"
+                      />
+                      <span className="text-xs font-bold">Deal vérifié</span>
+                    </label>
+                    <label className="flex items-center gap-3 px-4 py-2 border cursor-pointer bg-white/5 rounded-xl border-white/10">
+                      <input
+                        type="checkbox"
+                        checked={dealForm.featured || false}
+                        onChange={e => setDealForm({...dealForm, featured: e.target.checked})}
+                        className="border-gray-600 rounded"
+                      />
+                      <span className="text-xs font-bold">Deal en vedette</span>
+                    </label>
+                  </div>
+                  <div className="flex gap-4 pt-4">
+                    <Button type="button" variant="outline" className="w-1/2" onClick={() => setIsModalOpen(false)}>Annuler</Button>
+                    <Button type="submit" className="w-1/2">
+                      {editingItem ? 'Mettre à jour le Deal' : 'Créer le Deal'}
                     </Button>
                   </div>
                 </form>
