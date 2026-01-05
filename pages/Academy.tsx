@@ -95,21 +95,60 @@ export const Academy: React.FC = () => {
   };
 
   // Sub-components: CourseCard and ArticleCard (Logic unchanged)
-  const CourseCard: React.FC<{ course: Course, delay: number }> = ({ course, delay }) => (
+  const CourseCard: React.FC<{ course: Course, delay: number }> = ({ course, delay }) => {
+    const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+
+    // Extract YouTube video ID from URL
+    const getYouTubeVideoId = (url: string) => {
+      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+      const match = url.match(regExp);
+      return (match && match[2].length == 11) ? match[2] : null;
+    };
+
+    const videoId = course.videoLink ? getYouTubeVideoId(course.videoLink) : null;
+
+    return (
     <ScrollReveal delay={delay}>
         <Link href={`/academy/${course.slug}`} className="block h-full group">
             <div className="bg-[#111] rounded-2xl overflow-hidden border border-white/5 group-hover:border-coinlect-accent/30 transition-all duration-300 h-full flex flex-col relative">
                 <div className="relative aspect-video">
-                    <img
-                        src={course.image || 'https://via.placeholder.com/400x225/333/666?text=No+Image'}
-                        alt={course.title}
-                        className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
-                        onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.src = 'https://via.placeholder.com/400x225/333/666?text=No+Image';
-                        }}
-                    />
-                    <div className="absolute inset-0 bg-black/20"></div>
+                    {videoId && !isVideoPlaying ? (
+                        <>
+                            <img
+                                src={course.image || 'https://via.placeholder.com/400x225/333/666?text=No+Image'}
+                                alt={course.title}
+                                className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
+                                onError={(e) => {
+                                    const target = e.target as HTMLImageElement;
+                                    target.src = 'https://via.placeholder.com/400x225/333/666?text=No+Image';
+                                }}
+                            />
+                            <div className="absolute inset-0 bg-black/20"></div>
+                           
+                        </>
+                    ) : videoId && isVideoPlaying ? (
+                        <iframe
+                            src={`https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1`}
+                            title={course.title}
+                            className="w-full h-full"
+                            frameBorder="0"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                        />
+                    ) : (
+                        <>
+                            <img
+                                src={course.image || 'https://via.placeholder.com/400x225/333/666?text=No+Image'}
+                                alt={course.title}
+                                className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
+                                onError={(e) => {
+                                    const target = e.target as HTMLImageElement;
+                                    target.src = 'https://via.placeholder.com/400x225/333/666?text=No+Image';
+                                }}
+                            />
+                            <div className="absolute inset-0 bg-black/20"></div>
+                        </>
+                    )}
                 </div>
                 <div className="flex flex-col flex-grow p-6">
                     <div className="flex items-center gap-2 mb-3">
@@ -117,41 +156,15 @@ export const Academy: React.FC = () => {
                     </div>
                     <h3 className="mb-3 text-lg font-bold leading-tight text-white transition-colors line-clamp-2 group-hover:text-coinlect-accent">{course.title}</h3>
                     <p className="flex-grow mb-6 text-sm text-gray-400 line-clamp-3">{course.description}</p>
-                    <div className="flex items-center justify-between mt-auto">
-                        <div className="flex items-center gap-1.5 text-[10px] text-gray-500 font-bold uppercase tracking-widest">
-                            <BookOpen size={14} className="text-coinlect-accent" /> {course.modules} Modules
-                        </div>
+                    <div className="flex items-center justify-end mt-auto">
                         <span className="text-white transition-transform group-hover:translate-x-1"><ArrowRight size={18} /></span>
                     </div>
                 </div>
             </div>
         </Link>
     </ScrollReveal>
-  );
-
-  // const ArticleCard: React.FC<{ article: Article, delay: number }> = ({ article, delay }) => (
-  //   <ScrollReveal delay={delay}>
-  //       <Link href={`/academy/article/${article.slug}`} className="block h-full group">
-  //           <div className="bg-[#111] rounded-2xl overflow-hidden border border-white/5 group-hover:border-coinlect-accent/30 transition-all duration-300 h-full flex flex-col">
-  //               <div className="relative overflow-hidden aspect-video">
-  //                   <img
-  //                       src={article.image}
-  //                       alt={article.title}
-  //                       className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105 opacity-80"
-  //                       onError={(e) => {
-  //                           const target = e.target as HTMLImageElement;
-  //                           target.src = 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765185502/clclogo_p2v5bp.jpg';
-  //                       }}
-  //                   />
-  //               </div>
-  //               <div className="flex flex-col flex-grow p-6">
-  //                   <h3 className="mb-3 text-lg font-bold leading-tight text-white transition-colors line-clamp-2 group-hover:text-coinlect-accent">{article.title}</h3>
-  //                   <p className="mb-4 text-sm text-gray-400 line-clamp-2">{article.excerpt}</p>
-  //               </div>
-  //           </div>
-  //       </Link>
-  //   </ScrollReveal>
-  // );
+    );
+  };
   const ArticleCard: React.FC<{ article: Article, delay: number }> = ({ article, delay }) => (
     <ScrollReveal delay={delay}>
         <Link href={`/academy/article/${article.slug}`} className="block h-full group">
@@ -159,14 +172,14 @@ export const Academy: React.FC = () => {
                 <div className="relative overflow-hidden aspect-video bg-[#1a1a1a]">
                     <img
                         /* This pulls directly from your database/API */
-                        src={article.image || 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765185502/clclogo_p2v5bp.jpg'}
+                        src={article.image || 'https://via.placeholder.com/400x225/333/666?text=No+Image'}
                         alt={article.title}
                         /* Removed opacity-80 to show full quality image from DB */
                         className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
                         onError={(e) => {
                             const target = e.target as HTMLImageElement;
                             /* Fallback if the database URL is 404/broken */
-                            target.src = 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765185502/clclogo_p2v5bp.jpg';
+                            target.src = 'https://via.placeholder.com/400x225/333/666?text=No+Image';
                         }}
                     />
                 </div>
@@ -184,7 +197,7 @@ export const Academy: React.FC = () => {
                     </p>
                     <div className="flex items-center justify-between mt-auto">
                         <span className="text-[10px] text-gray-500 font-bold uppercase tracking-widest">
-                             {t.academy?.readMore || 'Lire la suite'}
+                             {t.common?.readMore || 'Lire la suite'}
                         </span>
                         <ArrowRight size={18} className="text-white transition-transform group-hover:translate-x-1" />
                     </div>

@@ -3,23 +3,34 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { courseService } from '../services/db';
 import { Course } from '../types';
 import { Button } from '../components/Button';
 import { ScrollReveal } from '../components/ScrollReveal';
-import { ArrowLeft, PlayCircle } from 'lucide-react';
+import { ArrowLeft, VideoOff } from 'lucide-react';
 
 export const CourseDetail: React.FC = () => {
   const params = useParams();
   const courseSlug = params?.courseSlug as string;
   const [course, setCourse] = useState<Course | null>(null);
   const [loading, setLoading] = useState(true);
+  const [videoError, setVideoError] = useState(false);
+
+  // Helper functions for video detection
+  const getYouTubeVideoId = (url: string): string => {
+    const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+    return match ? match[1] : '';
+  };
+
+  const getVimeoVideoId = (url: string): string => {
+    const match = url.match(/vimeo\.com\/(\d+)/);
+    return match ? match[1] : '';
+  };
 
   useEffect(() => {
     const fetchCourse = async () => {
       try {
         setLoading(true);
-        // Fetch course directly by slug from API
+        setVideoError(false); // Reset video error state
         const response = await fetch(`/api/courses/${courseSlug}`);
         if (response.ok) {
           const data = await response.json();
@@ -44,7 +55,7 @@ export const CourseDetail: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen gap-4 px-6 text-center">
+      <div className="flex flex-col items-center justify-center min-h-screen gap-4 px-6 text-center bg-black">
         <div className="w-12 h-12 border-b-2 border-white rounded-full animate-spin"></div>
         <p className="text-white">Chargement du cours...</p>
       </div>
@@ -53,7 +64,7 @@ export const CourseDetail: React.FC = () => {
 
   if (!course) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen gap-4 px-6 text-center">
+      <div className="flex flex-col items-center justify-center min-h-screen gap-4 px-6 text-center bg-black">
         <h1 className="text-2xl font-bold tracking-tighter text-white uppercase">Cours non trouvé</h1>
         <Link href="/academy">
           <Button variant="secondary" className="rounded-none" withArrow>Retour à l&apos;Académie</Button>
@@ -61,23 +72,6 @@ export const CourseDetail: React.FC = () => {
       </div>
     );
   }
-
-  // Helper function to extract video ID from YouTube URL
-  const getYouTubeEmbedUrl = (url: string): string => {
-    if (url.includes('youtube.com/watch?v=')) {
-      return url.replace('watch?v=', 'embed/').split('&')[0];
-    }
-    if (url.includes('youtu.be/')) {
-      return `https://www.youtube.com/embed/${url.split('youtu.be/')[1].split('?')[0]}`;
-    }
-    return url;
-  };
-
-  // Helper function to extract video ID from Vimeo URL
-  const getVimeoEmbedUrl = (url: string): string => {
-    const vimeoId = url.split('vimeo.com/')[1]?.split('?')[0];
-    return vimeoId ? `https://player.vimeo.com/video/${vimeoId}` : url;
-  };
 
   return (
     <div className="min-h-screen pt-24 pb-20 bg-black">
@@ -112,81 +106,51 @@ export const CourseDetail: React.FC = () => {
                 </h1>
               </div>
 
-              {/* Video Preview - Style Squared */}
-              <div className="relative overflow-hidden bg-black border rounded-none shadow-2xl cursor-pointer aspect-video border-white/10 group">
-                {course.videoLink ? (
-                  <div className="relative w-full h-full video-container group">
-                    {/* Play Button Overlay */}
-                    <div className="absolute inset-0 z-10 flex flex-col items-center justify-center transition-opacity duration-300 opacity-0 bg-black/20 group-hover:opacity-100">
-                      <div className="p-4 mb-2 transition-transform duration-300 transform scale-75 rounded-full shadow-lg bg-coinlect-accent group-hover:scale-100">
-                        <PlayCircle size={48} className="ml-1 text-black" fill="currentColor" />
-                      </div>
-                      <p className="text-sm font-medium text-white opacity-90">Cliquer pour regarder</p>
-                    </div>
-                    {course.videoLink.includes('youtube.com') || course.videoLink.includes('youtu.be') ? (
+              {/* Video Preview - Direct from Database */}
+              <div className="relative overflow-hidden bg-black border rounded-none shadow-2xl aspect-video border-white/10">
+                {course.videoLink && course.videoLink.trim() !== '' && !videoError ? (
+                  <>
+                    {/* YouTube Video */}
+                    {getYouTubeVideoId(course.videoLink) ? (
                       <iframe
-                        src={getYouTubeEmbedUrl(course.videoLink)}
+                        src={`https://www.youtube.com/embed/${getYouTubeVideoId(course.videoLink)}`}
+                        title={`${course.title} - YouTube Video`}
                         className="w-full h-full"
+                        frameBorder="0"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen
-                        title={course.title}
-                        onError={() => {
-                          // Fallback to placeholder if iframe fails
-                          const container = document.querySelector('.video-container') as HTMLElement;
-                          if (container) {
-                            container.innerHTML = '<div class="flex items-center justify-center w-full h-full bg-gray-800 text-white">Video unavailable</div>';
-                          }
-                        }}
+                        onError={() => setVideoError(true)}
                       />
-                    ) : course.videoLink.includes('vimeo.com') ? (
+                    ) : getVimeoVideoId(course.videoLink) ? (
+                      /* Vimeo Video */
                       <iframe
-                        src={getVimeoEmbedUrl(course.videoLink)}
+                        src={`https://player.vimeo.com/video/${getVimeoVideoId(course.videoLink)}`}
+                        title={`${course.title} - Vimeo Video`}
                         className="w-full h-full"
+                        frameBorder="0"
                         allow="autoplay; fullscreen; picture-in-picture"
                         allowFullScreen
-                        title={course.title}
-                        onError={() => {
-                          // Fallback to placeholder if iframe fails
-                          const container = document.querySelector('.video-container') as HTMLElement;
-                          if (container) {
-                            container.innerHTML = '<div class="flex items-center justify-center w-full h-full bg-gray-800 text-white">Video unavailable</div>';
-                          }
-                        }}
+                        onError={() => setVideoError(true)}
                       />
                     ) : (
+                      /* Direct Video File */
                       <video
                         src={course.videoLink}
                         controls
-                        className="w-full h-full"
+                        playsInline
+                        className="object-cover w-full h-full"
                         poster={course.image}
-                        onError={(e) => {
-                          const target = e.target as HTMLVideoElement;
-                          target.style.display = 'none';
-                          const container = target.parentElement;
-                          if (container) {
-                            container.innerHTML = '<div class="flex items-center justify-center w-full h-full bg-gray-800 text-white">Video unavailable</div>';
-                          }
-                        }}
+                        onError={() => setVideoError(true)}
                       />
                     )}
-                  </div>
+                  </>
                 ) : (
-                  <div className="relative group">
-                    <img
-                      src={course.image}
-                      alt={course.title}
-                      className="object-cover w-full h-full transition-transform duration-700 opacity-60 group-hover:scale-105"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.src = 'https://via.placeholder.com/800x600/333/666?text=No+Image';
-                      }}
-                    />
-                    <div className="absolute inset-0 transition-colors bg-black/20 group-hover:bg-black/10"></div>
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <div className="w-20 h-20 rounded-none bg-coinlect-accent text-black flex items-center justify-center shadow-[0_0_30px_rgba(245,158,11,0.3)] transform group-hover:scale-110 transition-transform duration-300">
-                        <PlayCircle size={40} fill="currentColor" className="text-black" />
-                      </div>
-                    </div>
+                  /* Fallback when no video or video failed to load */
+                  <div className="flex flex-col items-center justify-center w-full h-full gap-4 bg-neutral-900">
+                    <VideoOff size={48} className="text-white/10" />
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-600">
+                      {course.videoLink ? 'Vidéo non disponible' : 'Aucun aperçu disponible'}
+                    </p>
                   </div>
                 )}
               </div>
@@ -195,9 +159,9 @@ export const CourseDetail: React.FC = () => {
         </div>
       </div>
 
-      {/* Main Content Area - Aligné à gauche avec le reste du layout */}
+      {/* Main Content Area */}
       <div className="container px-6 py-16 mx-auto">
-        <div className="max-w-3xl"> {/* Limite la largeur du texte pour la lisibilité mais reste à gauche */}
+        <div className="max-w-3xl">
           <ScrollReveal>
             <section>
               <h3 className="pl-4 mb-8 text-xl font-black tracking-widest text-left text-white uppercase border-l-2 border-coinlect-accent">
@@ -208,12 +172,8 @@ export const CourseDetail: React.FC = () => {
                   <div className="whitespace-pre-line">{course.about}</div>
                 ) : (
                   <>
-                    <p>
-                      {course.description}
-                    </p>
-                    <p>
-                      Not financial advice
-                    </p>
+                    <p>{course.description}</p>
+                    <p className="text-xs font-bold tracking-widest uppercase opacity-30">Not financial advice</p>
                   </>
                 )}
               </div>
@@ -224,11 +184,4 @@ export const CourseDetail: React.FC = () => {
     </div>
   );
 };
-
-export async function getServerSideProps() {
-  return {
-    props: {},
-  };
-}
-
 export default CourseDetail;

@@ -21,6 +21,7 @@ export const courseSchema = z.object({
   seoDescription: z.string().optional(),
   status: z.enum(['DRAFT', 'PUBLISHED']).optional(),
   image: z.string().optional(),
+  videoLink: z.string().optional(),
 });
 
 // Module validators

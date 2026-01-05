@@ -8,10 +8,12 @@ import { Course, Article, Event, User, Deal } from '../types';
 import { PublishStatus } from '@prisma/client';
 import { Button } from '../components/Button';
 import { Trash2, Plus, BookOpen, FileText, LayoutDashboard, X, Check, Calendar, Star } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 export const AdminDashboard: React.FC = () => {
   const { user, isAdmin } = useAuth();
   const router = useRouter();
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<'overview' | 'courses' | 'articles' | 'events' | 'users' | 'deals'>('overview');
   const [courses, setCourses] = useState<Course[]>([]);
   const [articles, setArticles] = useState<Article[]>([]);
@@ -57,7 +59,6 @@ export const AdminDashboard: React.FC = () => {
     about: '',
     level: 'Débutant',
     duration: '35m',
-    modules: 0,
     category: 'Blockchain',
     image: '',
     syllabus: [],
@@ -235,7 +236,6 @@ export const AdminDashboard: React.FC = () => {
         about: '',
         level: 'Débutant',
         duration: '35m',
-        modules: 0,
         category: 'Blockchain',
         image: '',
         syllabus: [],
@@ -503,7 +503,7 @@ export const AdminDashboard: React.FC = () => {
                     }} />
                     <div>
                       <h4 className="font-bold text-white transition-colors group-hover:text-coinlect-accent">{c.title}</h4>
-                      <p className="text-[10px] text-gray-500 uppercase tracking-widest">{c.category} • {c.level} • {c.modules} Mod.</p>
+                      <p className="text-[10px] text-gray-500 uppercase tracking-widest">{c.category} • {c.level}</p>
                     </div>
                   </div>
                   <button onClick={() => {
@@ -524,7 +524,6 @@ export const AdminDashboard: React.FC = () => {
                       about: c.about || '',
                       level: c.level || 'Débutant',
                       duration: c.duration || '35m',
-                      modules: c.modules || 0,
                       category: c.category || 'Blockchain',
                       image: c.image || '',
                       syllabus: c.syllabus || [],
@@ -832,15 +831,18 @@ export const AdminDashboard: React.FC = () => {
                       value={courseForm.about}
                       onChange={e => setCourseForm({...courseForm, about: e.target.value})}
                     />
-                    <div className="grid gap-4 md:grid-cols-3">
+                    <div className="grid gap-4 md:grid-cols-2">
                        <select className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={courseForm.level} onChange={e => setCourseForm({...courseForm, level: e.target.value as any})} aria-label="Course level">
                          <option>Débutant</option><option>Intermédiaire</option><option>Avancé</option>
                        </select>
                        <input placeholder="Durée (ex: 35m)" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={courseForm.duration} onChange={e => setCourseForm({...courseForm, duration: e.target.value})} />
-                       <input type="number" placeholder="Nombre de modules" min="0" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={courseForm.modules} onChange={e => setCourseForm({...courseForm, modules: parseInt(e.target.value) || 0})} />
                     </div>
                     <div className="grid gap-4 md:grid-cols-2">
-                       <input placeholder="Catégorie (DeFi, NFT...)" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={courseForm.category} onChange={e => setCourseForm({...courseForm, category: e.target.value})} />
+                       <select className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={courseForm.category} onChange={e => setCourseForm({...courseForm, category: e.target.value})} aria-label="Course category">
+                         {t.academy.filters.map(category => (
+                           <option key={category} value={category}>{category}</option>
+                         ))}
+                       </select>
                        <select className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={courseForm.courseType} onChange={e => setCourseForm({...courseForm, courseType: e.target.value as any})} aria-label="Course type">
                          <option value="academy">Academy</option>
                          <option value="specialization">Specialization</option>

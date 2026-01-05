@@ -58,6 +58,7 @@ model Course {
   status        PublishStatus   @default(DRAFT)
   publishedAt   DateTime?
   image         String?
+  videoLink     String?
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
 

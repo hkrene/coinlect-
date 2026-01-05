@@ -116,15 +116,19 @@ export const About: React.FC = () => {
 
                     {/* Navigation Buttons */}
                     <div className="absolute z-20 flex gap-3 bottom-12 right-12">
-                        <button 
+                        <button
                             onClick={(e) => { e.preventDefault(); prevSlide(); }}
                             className="flex items-center justify-center w-10 h-10 text-white transition-colors border rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border-white/10"
+                            aria-label="Previous article"
+                            title="Previous article"
                         >
                             <ChevronLeft size={20} />
                         </button>
-                        <button 
+                        <button
                             onClick={(e) => { e.preventDefault(); nextSlide(); }}
                             className="flex items-center justify-center w-10 h-10 text-white transition-colors border rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border-white/10"
+                            aria-label="Next article"
+                            title="Next article"
                         >
                             <ChevronRight size={20} />
                         </button>
