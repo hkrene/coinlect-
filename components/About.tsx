@@ -77,8 +77,8 @@ export const About: React.FC = () => {
        <div className="container px-6 mx-auto">
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
              
-             {/* Featured Main Card */}
-             <div className="lg:col-span-2 relative min-h-[500px] rounded-xl overflow-hidden group cursor-pointer border border-white/5">
+            {/* Featured Main Card */}
+            <Link href={`/academy/article/${featured.slug}`} className="lg:col-span-2 relative min-h-[500px] rounded-xl overflow-hidden group cursor-pointer border border-white/5 block">
                 <img
                     src={featured.image}
                     alt={featured.title}
@@ -101,18 +101,24 @@ export const About: React.FC = () => {
                     
                     <div className="flex items-center gap-4 mb-8 text-sm font-medium text-gray-300">
                         <div className="flex items-center gap-2">
-                             <img src="https://res.cloudinary.com/drsd8adkq/image/upload/v1765185502/clclogo_p2v5bp.jpg" className="w-5 h-5 rounded-full" alt="Coinlect" />
-                             <span>Coinlect</span>
+                             <img
+                                src={featured.authorImage || 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765185502/clclogo_p2v5bp.jpg'}
+                                className="w-5 h-5 rounded-full"
+                                alt={featured.authorName || featured.author?.name || 'Coinlect'}
+                                onError={(e) => {
+                                    const target = e.target as HTMLImageElement;
+                                    target.src = 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765185502/clclogo_p2v5bp.jpg';
+                                }}
+                             />
+                             <span>{featured.authorName || featured.author?.name || 'Coinlect'}</span>
                         </div>
                         <span className="w-1 h-1 bg-gray-500 rounded-full"></span>
                         <span>{featured.date}</span>
                     </div>
                     
-                    <Link href={`/academy/article/${featured.id}`}>
-                        <button className="bg-white text-black px-6 py-2.5 rounded-full font-bold text-sm hover:bg-gray-200 transition-colors">
-                            Read Article
-                        </button>
-                    </Link>
+                    <button className="bg-white text-black px-6 py-2.5 rounded-full font-bold text-sm hover:bg-gray-200 transition-colors">
+                        Read Article
+                    </button>
 
                     {/* Navigation Buttons */}
                     <div className="absolute z-20 flex gap-3 bottom-12 right-12">
@@ -134,7 +140,7 @@ export const About: React.FC = () => {
                         </button>
                     </div>
                 </div>
-             </div>
+            </Link>
 
              {/* Sidebar List */}
              <div className="bg-[#111] rounded-xl p-8 border border-white/5 flex flex-col h-full">
@@ -142,7 +148,7 @@ export const About: React.FC = () => {
                 
                 <div className="flex flex-col justify-between flex-1 gap-6">
                     {latestArticles.map((article) => (
-                        <Link href={`/academy/article/${article.id}`} key={article.id} className="block group">
+                        <Link href={`/academy/article/${article.slug}`} key={article.id} className="block group">
                             <h4 className="mb-2 text-base font-bold leading-snug text-white transition-colors group-hover:text-coinlect-accent line-clamp-2">
                                 {article.title}
                             </h4>
