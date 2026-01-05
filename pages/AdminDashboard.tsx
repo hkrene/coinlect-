@@ -9,6 +9,7 @@ import { PublishStatus } from '@prisma/client';
 import { Button } from '../components/Button';
 import { Trash2, Plus, BookOpen, FileText, LayoutDashboard, X, Check, Calendar, Star } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
+import MDEditor from '@uiw/react-md-editor';
 
 export const AdminDashboard: React.FC = () => {
   const { user, isAdmin } = useAuth();
@@ -40,6 +41,32 @@ export const AdminDashboard: React.FC = () => {
   const getVimeoVideoId = (url: string): string => {
     const match = url.match(/vimeo\.com\/(\d+)/);
     return match ? match[1] : '';
+  };
+
+  // Image upload function for markdown editor
+  const uploadImage = async (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', 'coinlect-uploads'); // You'll need to create this preset in Cloudinary
+
+      fetch('https://api.cloudinary.com/v1_1/drsd8adkq/image/upload', {
+        method: 'POST',
+        body: formData,
+      })
+        .then(response => response.json())
+        .then(data => {
+          if (data.secure_url) {
+            resolve(data.secure_url);
+          } else {
+            reject(new Error('Upload failed'));
+          }
+        })
+        .catch(error => {
+          console.error('Image upload error:', error);
+          reject(error);
+        });
+    });
   };
 
   // Complex Form State
@@ -84,8 +111,9 @@ export const AdminDashboard: React.FC = () => {
     readTime: '5 min',
     date: new Date().toLocaleDateString('fr-FR'),
     image: '',
-    category: 'News',
     authorImage: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765185502/clclogo_p2v5bp.jpg',
+    keyTakeaways: '',
+    authorName: '',
     featured: false
   });
 
@@ -297,7 +325,9 @@ export const AdminDashboard: React.FC = () => {
         updatedAt: '',
         authorId: undefined,
         author: undefined,
-        authorImage: '',
+        authorImage: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765185502/clclogo_p2v5bp.jpg',
+        keyTakeaways: '',
+        authorName: '',
         featured: false
       });
       // Dispatch custom event to notify other components
@@ -547,7 +577,6 @@ export const AdminDashboard: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <h1 className="text-3xl font-bold">Articles du Blog</h1>
-                <p className="mt-2 text-sm text-gray-400">Minimum 3 articles doivent être en vedette pour la page d&apos;accueil</p>
               </div>
               <Button onClick={() => { setEditingItem(null); setModalType('article'); setIsModalOpen(true); }}><Plus size={16} /> Publier un Article</Button>
             </div>
@@ -575,12 +604,6 @@ export const AdminDashboard: React.FC = () => {
                           const article = updatedArticles.find(art => art.id === a.id);
                           if (article) {
                             const newFeaturedStatus = !article.featured;
-                            // Ensure at least 3 featured articles
-                            const currentFeaturedCount = updatedArticles.filter(art => art.featured).length;
-                            if (currentFeaturedCount < 3 && !newFeaturedStatus) {
-                              alert('Vous devez avoir au moins 3 articles en vedette sur la page d\'accueil');
-                              return;
-                            }
                             await articleService.update(a.id, { featured: newFeaturedStatus });
                             setRefreshTrigger(t => t+1);
                             if (typeof window !== 'undefined') {
@@ -619,7 +642,10 @@ export const AdminDashboard: React.FC = () => {
                         updatedAt: a.updatedAt || '',
                         authorId: a.authorId || undefined,
                         author: a.author || undefined,
+                        image: a.image || '',
                         authorImage: a.authorImage || '',
+                        keyTakeaways: (a as any).keyTakeaways || '',
+                        authorName: (a as any).authorName || '',
                         featured: a.featured || false
                       });
                       setIsModalOpen(true);
@@ -1000,8 +1026,8 @@ export const AdminDashboard: React.FC = () => {
                    <input required placeholder="Slug (ex: blockchain-101)" className="w-full p-4 text-white bg-black border outline-none border-white/10 rounded-xl focus:border-coinlect-accent" value={articleForm.slug} onChange={e => setArticleForm({...articleForm, slug: e.target.value})} />
                    <textarea placeholder="Extrait accrocheur" className="w-full h-20 p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={articleForm.excerpt || ''} onChange={e => setArticleForm({...articleForm, excerpt: e.target.value})} />
                    <div className="grid grid-cols-2 gap-4">
-                     <input placeholder="Catégorie" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={articleForm.category || ''} onChange={e => setArticleForm({...articleForm, category: e.target.value})} />
                      <input placeholder="Temps de lecture (ex: 5 min)" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={articleForm.readTime || ''} onChange={e => setArticleForm({...articleForm, readTime: e.target.value})} />
+                     <input placeholder="Nom de l'auteur" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={articleForm.authorName || ''} onChange={e => setArticleForm({...articleForm, authorName: e.target.value})} />
                    </div>
                    <div className="grid grid-cols-2 gap-4">
                      <input placeholder="URL Image" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={articleForm.image || ''} onChange={e => setArticleForm({...articleForm, image: e.target.value})} />
@@ -1041,6 +1067,7 @@ export const AdminDashboard: React.FC = () => {
                      </div>
                    )}
                     <input placeholder="URL Image auteur" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={articleForm.authorImage || ''} onChange={e => setArticleForm({...articleForm, authorImage: e.target.value})} />
+                    <textarea placeholder="Points clés (Key Takeaways)" className="w-full h-20 p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={articleForm.keyTakeaways || ''} onChange={e => setArticleForm({...articleForm, keyTakeaways: e.target.value})} />
                    {articleForm.authorImage && (
                      <div className="relative w-24 h-24 overflow-hidden border rounded-full border-white/10">
                        <img

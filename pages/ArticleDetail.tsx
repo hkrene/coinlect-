@@ -9,6 +9,8 @@ import { Button } from '../components/Button';
 import { ScrollReveal } from '../components/ScrollReveal';
 import { useLanguage } from '../contexts/LanguageContext';
 import { ArrowLeft, Clock, Calendar, Twitter, Facebook, Link as LinkIcon, Check, Share2, Tag, ChevronRight } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 export const ArticleDetail: React.FC = () => {
   const params = useParams();
@@ -120,7 +122,7 @@ export const ArticleDetail: React.FC = () => {
              <div className="flex items-center gap-4">
                 <img
                   src={article.authorImage || 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765185502/clclogo_p2v5bp.jpg'}
-                  alt={article.author?.name ?? 'CoinLect'}
+                  alt={article.authorName || article.author?.name || 'CoinLect'}
                   className="w-12 h-12 rounded-full border-2 border-[#0a0a0a] ring-2 ring-white/10"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
@@ -128,7 +130,7 @@ export const ArticleDetail: React.FC = () => {
                   }}
                 />
                 <div>
-                    <p className="text-sm font-bold text-white">{article.author?.name ?? 'Author'}</p>
+                    <p className="text-sm font-bold text-white">{article.authorName || article.author?.name || 'Author'}</p>
                     <p className="text-xs text-gray-500">{t.academy.article.writtenBy}</p>
                 </div>
              </div>
@@ -185,19 +187,50 @@ export const ArticleDetail: React.FC = () => {
                  <p className="mb-10 text-xl font-medium leading-relaxed text-white lead md:text-2xl">
                      {article.excerpt}
                  </p>
-                 
-                 {(article.content as string).split('\n').map((paragraph, idx) => (
-                     paragraph.trim() && (
-                         <p key={idx} className="mb-6 leading-relaxed text-gray-300">
-                             {paragraph.trim()}
-                         </p>
-                     )
-                 ))}
 
-                 <h3 className="mt-12 mb-6 text-2xl font-bold text-white">Key Takeaways</h3>
-                 <ul className="space-y-2 text-gray-300">
-                    <li>Not Financial Advice</li>
-                 </ul>
+                 <div className="leading-relaxed text-gray-300">
+                     <ReactMarkdown
+                         remarkPlugins={[remarkGfm]}
+                         components={{
+                             h1: ({children}) => <h2 className="mt-12 mb-6 text-3xl font-bold text-white">{children}</h2>,
+                             h2: ({children}) => <h3 className="mt-10 mb-4 text-2xl font-bold text-white">{children}</h3>,
+                             h3: ({children}) => <h4 className="mt-8 mb-3 text-xl font-bold text-white">{children}</h4>,
+                             p: ({children}) => <p className="mb-6 leading-relaxed">{children}</p>,
+                             ul: ({children}) => <ul className="mb-6 space-y-2 list-disc list-inside">{children}</ul>,
+                             ol: ({children}) => <ol className="mb-6 space-y-2 list-decimal list-inside">{children}</ol>,
+                             blockquote: ({children}) => <blockquote className="pl-4 my-6 italic text-gray-400 border-l-4 border-coinlect-accent">{children}</blockquote>,
+                             code: ({children}) => <code className="px-2 py-1 text-sm bg-gray-800 rounded">{children}</code>,
+                             pre: ({children}) => <pre className="p-4 my-6 overflow-x-auto bg-gray-800 rounded">{children}</pre>,
+                             img: ({src, alt}) => (
+                                 <img
+                                     src={src}
+                                     alt={alt}
+                                     className="h-auto max-w-full my-6 rounded-lg shadow-lg"
+                                     onError={(e) => {
+                                         const target = e.target as HTMLImageElement;
+                                         target.src = 'https://via.placeholder.com/800x400/333/666?text=Image+Not+Found';
+                                     }}
+                                 />
+                             ),
+                             a: ({href, children}) => (
+                                 <a href={href} className="underline text-coinlect-accent hover:text-coinlect-accent/80" target="_blank" rel="noopener noreferrer">
+                                     {children}
+                                 </a>
+                             )
+                         }}
+                     >
+                         {article.content}
+                     </ReactMarkdown>
+                 </div>
+
+                 {article.keyTakeaways && (
+                   <>
+                     <h3 className="mt-12 mb-6 text-2xl font-bold text-white">Key Takeaways</h3>
+                     <div className="text-gray-300 whitespace-pre-line">
+                       {article.keyTakeaways}
+                     </div>
+                   </>
+                 )}
              </div>
          </ScrollReveal>
 

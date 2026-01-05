@@ -97,6 +97,10 @@ model Article {
   status         PublishStatus @default(DRAFT)
   publishedAt    DateTime?
   featured       Boolean       @default(false)
+  image          String?
+  authorImage    String?
+  keyTakeaways   String?
+  authorName     String?
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 

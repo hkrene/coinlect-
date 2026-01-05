@@ -47,6 +47,10 @@ export const POST = requireAdmin(async (req: NextRequest, user) => {
         status: data.status ?? PublishStatus.DRAFT,
         publishedAt: data.status === PublishStatus.PUBLISHED ? new Date() : null,
         featured: data.featured ?? false,
+        image: data.image,
+        authorImage: data.authorImage,
+        keyTakeaways: data.keyTakeaways,
+        authorName: data.authorName,
         authorId: user.id,
       },
     });

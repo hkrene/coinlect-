@@ -43,6 +43,10 @@ export const articleSchema = z.object({
   seoDescription: z.string().optional(),
   status: z.enum(['DRAFT', 'PUBLISHED']).optional(),
   featured: z.boolean().default(false).optional(),
+  image: z.string().optional(),
+  authorImage: z.string().optional(),
+  keyTakeaways: z.string().optional(),
+  authorName: z.string().optional(),
 });
 
 // Event validators

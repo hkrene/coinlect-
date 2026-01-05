@@ -75,6 +75,8 @@ export interface Article {
   image?: string;
   category?: string;
   authorImage?: string;
+  keyTakeaways?: string;
+  authorName?: string;
   featured?: boolean;
 }
 
