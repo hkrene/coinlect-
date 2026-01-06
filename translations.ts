@@ -117,7 +117,7 @@ export const translations = {
             content: "Coinlect se veut utile et sûr. En utilisant notre site, vous acceptez ce qui suit :",
             allowedTitle: "✅ Autorisé",
             allowed: ["Naviguer et accéder au contenu éducatif, aux actualités et aux ressources", "S'inscrire aux événements, programmes ou cours que nous proposons", "Participer aux discussions de manière respectueuse et professionnelle"],
-            disallowedTitle: "❌ Interdit",
+            disallowedTitle: "Interdit",
             disallowed: ["Publier des informations trompeuses, fausses ou nuisibles", "Escroqueries, hameçonnage ou activités frauduleuses de toute nature", "Tenter de pirater, d'exploiter, d'abuser ou d'endommager le site web", "Partager des données personnelles ou sensibles en violation des lois sur la vie privée"]
         },
         section3: { title: "3. Votre compte et sécurité", content: "Si vous créez un compte sur Coinlect :", items: ["Gardez vos identifiants de connexion en sécurité", "Ne partagez pas l'accès avec qui que ce soit", "Vous êtes entièrement responsable de l'activité sous votre compte", "Signalez immédiatement tout comportement suspect"] },
@@ -271,7 +271,8 @@ export const translations = {
       filters: ["Tous", "Échange", "Portefeuille", "Fiscalité", "Outil Trading", "Sécurité"],
       claim: "Profiter de l'offre",
       exclusive: "Exclusivité Coinlect",
-      coupon: "Code Promo"
+      coupon: "Code Promo",
+      noDealsFound: "Aucune offre trouvée pour cette catégorie."
     },
     auth: {
         welcome: "Bon retour",
@@ -570,7 +571,8 @@ export const translations = {
       filters: ["All", "Exchange", "Wallet", "Tax", "Trading Tool", "Security"],
       claim: "Claim Offer",
       exclusive: "Coinlect Exclusive",
-      coupon: "Promo Code"
+      coupon: "Promo Code",
+      noDealsFound: "No deals found for this category."
     },
     auth: {
         welcome: "Welcome Back",

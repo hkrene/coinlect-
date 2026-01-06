@@ -19,10 +19,22 @@ import { useLanguage } from '../contexts/LanguageContext';
 export const Academy: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'courses' | 'articles'>('courses');
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeCategory, setActiveCategory] = useState('Tous'); // Default to 'Tous' to show all courses
+  const [activeCategory, setActiveCategory] = useState('All'); // Default to 'All' to show all courses
   const [progressMap, setProgressMap] = useState<Record<string, number>>({});
   const { t } = useLanguage();
   const searchParams = useSearchParams();
+
+  // Academy category system similar to deals
+  const displayCategories = t.academy.filters;
+  const canonicalCategories = ["All", "Blockchain", "Trading", "DeFi", "NFT", "Security", "Mining"];
+
+  // Create mapping between canonical and display categories
+  const categoryMapping: { [key: string]: string } = {};
+  canonicalCategories.forEach((canonical, index) => {
+    categoryMapping[canonical] = displayCategories[index] || canonical;
+    // Also map display names back to canonical
+    categoryMapping[displayCategories[index] || canonical] = canonical;
+  });
 
   // Use React Query hooks
   const { data: courses = [], isLoading: coursesLoading, error: coursesError } = useCourses();
@@ -63,35 +75,29 @@ export const Academy: React.FC = () => {
 
     // Handle category filtering
     if (categoryParam) {
-      const categoryMapping: { [key: string]: string } = {
-        'education': 'Tous', 'defi': 'DeFi', 'adoption': 'Tous',
+      const urlCategoryMapping: { [key: string]: string } = {
+        'education': 'All', 'defi': 'DeFi', 'adoption': 'All',
         'mining': 'Mining', 'guides': 'Guides', 'reviews': 'Reviews', 'trading': 'Trading'
       };
-      const mappedCategory = categoryMapping[categoryParam] || 'Tous';
+      const mappedCategory = urlCategoryMapping[categoryParam] || categoryMapping[categoryParam] || 'All';
       setActiveCategory(mappedCategory);
     } else {
       // If no category param (e.g., /academy), reset to show all courses
-      setActiveCategory('Tous');
+      setActiveCategory('All');
       setActiveTab('courses');
     }
   }, [searchParams]);
 
   // React Query handles all data fetching and invalidation automatically
 
-  const getFilteredCourses = () => courses.filter(c => (activeCategory === "Tous" || c.category === activeCategory) && c.title.toLowerCase().includes(searchQuery.toLowerCase()));
+  const getFilteredCourses = () => courses.filter(c => {
+    const isAll = activeCategory === 'All';
+    const courseCategory = c.category || '';
+    const canonicalCategory = categoryMapping[courseCategory] || courseCategory;
+    return (isAll || canonicalCategory === activeCategory) && c.title.toLowerCase().includes(searchQuery.toLowerCase());
+  });
   const getFilteredArticles = () => {
-    let filtered = articles.filter(a => a.title.toLowerCase().includes(searchQuery.toLowerCase()) || (a.excerpt && a.excerpt.toLowerCase().includes(searchQuery.toLowerCase())));
-    // Filter by category if not "Tous" and category matches article category
-    if (activeCategory !== "Tous" && activeTab === 'articles') {
-      filtered = filtered.filter(a => {
-        const articleCategory = a.category || '';
-        return articleCategory === activeCategory || 
-               articleCategory.toLowerCase() === activeCategory.toLowerCase() ||
-               (activeCategory === 'Reviews' && articleCategory.toLowerCase().includes('review')) ||
-               (activeCategory === 'Guides' && articleCategory.toLowerCase().includes('guide'));
-      });
-    }
-    return filtered;
+    return articles.filter(a => a.title.toLowerCase().includes(searchQuery.toLowerCase()) || (a.excerpt && a.excerpt.toLowerCase().includes(searchQuery.toLowerCase())));
   };
 
   // Sub-components: CourseCard and ArticleCard (Logic unchanged)
@@ -241,8 +247,15 @@ export const Academy: React.FC = () => {
               </div>
               {activeTab === 'courses' && (
                   <div className="flex w-full gap-2 pb-2 overflow-x-auto md:w-auto md:pb-0 scrollbar-hide">
-                      {t.academy.filters.map(f => (
-                          <button key={f} onClick={() => setActiveCategory(f)} className={`whitespace-nowrap px-4 py-2 rounded-full text-xs font-bold border transition-all ${activeCategory === f ? 'bg-white text-black border-white' : 'bg-transparent border-white/10 text-gray-400 hover:border-white/30 hover:text-white'}`}>{f}</button>
+                      {canonicalCategories.map((catKey, index) => (
+                          <button
+                              key={catKey}
+                              onClick={() => setActiveCategory(catKey)}
+                              className={`whitespace-nowrap px-4 py-2 rounded-full text-xs font-bold border transition-all ${activeCategory === catKey ? 'bg-white text-black border-white' : 'bg-transparent border-white/10 text-gray-400 hover:border-white/30 hover:text-white'}`}
+                          >
+                              {/* Display translated category */}
+                              {displayCategories[index] || catKey}
+                          </button>
                       ))}
                   </div>
               )}

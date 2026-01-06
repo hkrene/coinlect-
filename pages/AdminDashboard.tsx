@@ -434,19 +434,21 @@ export const AdminDashboard: React.FC = () => {
       setEditingItem(null);
       setEditingItem(null);
       setRefreshTrigger(p => p + 1);
-      // Reset form
-      // setDealForm({
-      //   title: '',
-      //   description: '',
-      //   category: '',
-      //   link: '',
-      //   image: '',
-      //   discount: '',
-      //   code: '',
-      //   exclusive: false,
-      //   verified: false,
-      //   featured: false
-      // });
+      setDealForm({
+        title: '',
+        description: '',
+        category: '',
+        link: '',
+        image: '',
+        discount: '',
+        code: '',
+        exclusive: false,
+        verified: false,
+        featured: false,
+        createdAt: '',
+        updatedAt: '',
+        status: 'DRAFT'
+      });
       if (typeof window !== 'undefined') {
         window.dispatchEvent(new CustomEvent('contentUpdated'));
       }
@@ -497,12 +499,13 @@ export const AdminDashboard: React.FC = () => {
         {activeTab === 'overview' && (
           <div className="space-y-8 animate-in fade-in">
             <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-4">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-5">
                 {[
                   { label: 'Cours', val: courses.length, icon: <BookOpen />, color: 'text-coinlect-accent' },
                   { label: 'Articles', val: articles.length, icon: <FileText />, color: 'text-purple-500' },
                   { label: 'Événements', val: events.length, icon: <Calendar />, color: 'text-green-500' },
-                  { label: 'Utilisateurs', val: users.length, icon: <Star />, color: 'text-yellow-500' }
+                  { label: 'Deals', val: deals.length, icon: <Star />, color: 'text-yellow-500' },
+                  { label: 'Utilisateurs', val: users.length, icon: <Star />, color: 'text-blue-500' }
                 ].map((card, i) => (
                   <div key={i} className="bg-[#111] p-6 rounded-xl border border-white/10 flex items-center justify-between">
                     <div>
@@ -512,6 +515,43 @@ export const AdminDashboard: React.FC = () => {
                     <div className={`${card.color}`}>{card.icon}</div>
                   </div>
                 ))}
+              </div>
+
+              {/* Recent Deals */}
+              <div className="bg-[#111] rounded-xl border border-white/10 p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl font-bold">Deals Récentes</h2>
+                  <Button variant="outline" size="sm" onClick={() => setActiveTab('deals')}>
+                    Voir tous les deals
+                  </Button>
+                </div>
+                <div className="space-y-3">
+                  {deals.slice(0, 3).map(d => (
+                    <div key={d.id} className="flex items-center gap-4 p-3 border rounded-lg bg-white/5 border-white/10">
+                      <img
+                        src={d.image || 'https://via.placeholder.com/40x30/333/666?text=No+Image'}
+                        className="object-cover w-10 h-8 rounded"
+                        alt="Deal"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = 'https://via.placeholder.com/40x30/333/666?text=No+Image';
+                        }}
+                      />
+                      <div className="flex-1 min-w-0">
+                        <h4 className="text-sm font-semibold text-white truncate">{d.title}</h4>
+                        <p className="text-xs text-gray-400">{d.category} • {d.discount}</p>
+                      </div>
+                      <div className="flex gap-1">
+                        {d.featured && <Star className="text-coinlect-accent" size={14} fill="currentColor" />}
+                        {d.verified && <Check className="text-green-500" size={14} />}
+                        {d.exclusive && <span className="text-xs font-bold text-yellow-500">EXC</span>}
+                      </div>
+                    </div>
+                  ))}
+                  {deals.length === 0 && (
+                    <p className="py-4 text-center text-gray-500">Aucun deal disponible</p>
+                  )}
+                </div>
               </div>
           </div>
         )}
@@ -790,18 +830,21 @@ export const AdminDashboard: React.FC = () => {
                     <button onClick={() => {
                       setEditingItem(d);
                       setModalType('deal');
-                      // setDealForm({
-                      //   title: d.title || '',
-                      //   description: d.description || '',
-                      //   category: d.category || '',
-                      //   link: d.link || '',
-                      //   image: d.image || '',
-                      //   discount: d.discount || '',
-                      //   code: d.code || '',
-                      //   exclusive: d.exclusive || false,
-                      //   verified: d.verified || false,
-                      //   featured: d.featured || false
-                      // });
+                      setDealForm({
+                        title: d.title || '',
+                        description: d.description || '',
+                        category: d.category || '',
+                        link: d.link || '',
+                        image: d.image || '',
+                        discount: d.discount || '',
+                        code: d.code || '',
+                        exclusive: d.exclusive || false,
+                        verified: d.verified || false,
+                        featured: d.featured || false,
+                        createdAt: d.createdAt || '',
+                        updatedAt: d.updatedAt || '',
+                        status: (d as any).status || 'DRAFT'
+                      });
                       setIsModalOpen(true);
                     }} className="p-2 text-blue-500 hover:text-blue-400" aria-label="Edit deal"><FileText size={18} /></button>
                     <button onClick={() => {
@@ -865,8 +908,8 @@ export const AdminDashboard: React.FC = () => {
                     </div>
                     <div className="grid gap-4 md:grid-cols-2">
                        <select className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={courseForm.category} onChange={e => setCourseForm({...courseForm, category: e.target.value})} aria-label="Course category">
-                         {t.academy.filters.map(category => (
-                           <option key={category} value={category}>{category}</option>
+                         {["All", "Blockchain", "Trading", "DeFi", "NFT", "Security", "Mining"].map((category, index) => (
+                           <option key={category} value={category}>{t.academy.filters[index] || category}</option>
                          ))}
                        </select>
                        <select className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={courseForm.courseType} onChange={e => setCourseForm({...courseForm, courseType: e.target.value as any})} aria-label="Course type">
@@ -1106,7 +1149,7 @@ export const AdminDashboard: React.FC = () => {
                      </Button>
                    </div>
                 </form>
-              ) : (
+              ) : modalType === 'event' ? (
                 <form onSubmit={handleSaveEvent} className="space-y-6">
                   <input
                     required
@@ -1233,10 +1276,7 @@ export const AdminDashboard: React.FC = () => {
                     </Button>
                   </div>
                 </form>
-              )}
-
-              {/* Deal Form */}
-              {modalType === 'deal' && (
+              ) : modalType === 'deal' ? (
                 <form onSubmit={handleSaveDeal} className="space-y-6">
                   <h3 className="text-sm font-bold tracking-widest text-yellow-500 uppercase">Informations du Deal</h3>
                   <input
@@ -1254,13 +1294,20 @@ export const AdminDashboard: React.FC = () => {
                     onChange={e => setDealForm({...dealForm, description: e.target.value})}
                   />
                   <div className="grid grid-cols-2 gap-4">
-                    <input
+                    <select
                       required
-                      placeholder="Catégorie (ex: Exchange, Wallet)"
                       className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl focus:border-yellow-500"
                       value={dealForm.category}
                       onChange={e => setDealForm({...dealForm, category: e.target.value})}
-                    />
+                      aria-label="Deal category"
+                    >
+                      <option value="">Sélectionner une catégorie</option>
+                      <option value="Exchange">Exchange</option>
+                      <option value="Wallet">Wallet</option>
+                      <option value="Tax">Tax</option>
+                      <option value="Trading Tool">Trading Tool</option>
+                      <option value="Security">Security</option>
+                    </select>
                     <input
                       required
                       type="url"
@@ -1356,7 +1403,7 @@ export const AdminDashboard: React.FC = () => {
                     </Button>
                   </div>
                 </form>
-              )}
+              ) : null}
             </div>
           </div>
         </div>

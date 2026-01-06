@@ -131,7 +131,7 @@ export const Deals: React.FC = () => {
                 ))
             ) : (
                 <div className="py-20 text-center">
-                    <p className="text-gray-500">Aucune offre trouvée pour cette catégorie.</p>
+                    <p className="text-gray-500">{t.deals.noDealsFound}</p>
                 </div>
             )}
         </div>

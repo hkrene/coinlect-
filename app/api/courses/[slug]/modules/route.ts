@@ -3,8 +3,8 @@ import { prisma } from '@/lib/prisma';
 import { moduleSchema } from '@/lib/validators';
 import { requireAdminSlug } from '@/lib/auth-utils';
 
-export const POST = requireAdminSlug(async (req: NextRequest, user, params: { slug: string }) => {
-  const { slug } = params;
+export const POST = requireAdminSlug(async (req: NextRequest, user: any, params: Promise<{ slug: string }>) => {
+  const { slug } = await params;
 
   try {
     const body = await req.json();

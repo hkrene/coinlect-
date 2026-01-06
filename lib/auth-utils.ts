@@ -43,8 +43,10 @@ export function requireAuth(handler: (req: NextRequest, user: AuthUser) => Promi
   };
 }
 
-export function requireAdmin(handler: (req: NextRequest, user: AuthUser, params: Promise<{ id: string }>) => Promise<NextResponse>) {
-  return async (req: NextRequest, context: { params: Promise<{ id: string }> }) => {
+export function requireAdmin(handler: (req: NextRequest, user: AuthUser) => Promise<NextResponse>): any;
+export function requireAdmin(handler: (req: NextRequest, user: AuthUser, params: Promise<{ id: string }>) => Promise<NextResponse>): any;
+export function requireAdmin(handler: any, params?: any) {
+  return async (req: NextRequest, context?: any) => {
     const user = await getAuthUser(req);
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -52,7 +54,11 @@ export function requireAdmin(handler: (req: NextRequest, user: AuthUser, params:
     if (user.role !== UserRole.ADMIN) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
-    return handler(req, user, context.params);
+    if (context?.params) {
+      return handler(req, user, context.params);
+    } else {
+      return handler(req, user);
+    }
   };
 }
 

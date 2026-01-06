@@ -3,8 +3,8 @@ import { prisma } from '@/lib/prisma';
 import { dealSchema } from '@/lib/validators';
 import { requireAdmin } from '@/lib/auth-utils';
 
-export async function GET(req: NextRequest, context: { params: { id: string } }) {
-  const { id } = context.params;
+export async function GET(req: NextRequest, context: { params: Promise<{ id: string }> }) {
+  const { id } = await context.params;
 
   const deal = await prisma.deal.findUnique({
     where: { id },
@@ -15,8 +15,8 @@ export async function GET(req: NextRequest, context: { params: { id: string } })
   return NextResponse.json({ deal });
 }
 
-export const PATCH = requireAdmin(async (req: NextRequest, user, params: { id: string }) => {
-  const { id } = params;
+export const PATCH = requireAdmin(async (req: NextRequest, user: any, params: Promise<{ id: string }>) => {
+  const { id } = await params;
   if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
 
   try {
@@ -50,8 +50,8 @@ export const PATCH = requireAdmin(async (req: NextRequest, user, params: { id: s
   }
 });
 
-export const DELETE = requireAdmin(async (req: NextRequest, user, params: { id: string }) => {
-  const { id } = params;
+export const DELETE = requireAdmin(async (req: NextRequest, user: any, params: Promise<{ id: string }>) => {
+  const { id } = await params;
   if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
 
   try {
