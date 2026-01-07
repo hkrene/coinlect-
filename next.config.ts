@@ -12,6 +12,8 @@ const nextConfig: NextConfig = {
   images: {
     formats: ['image/avif', 'image/webp'],
   },
+  // Silence the multiple lockfiles warning
+  outputFileTracingRoot: process.cwd(),
 };
 
 export default nextConfig;

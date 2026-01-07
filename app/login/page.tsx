@@ -37,8 +37,11 @@ export default function LoginPage() {
     try {
       console.log('LoginPage: Attempting login with email:', email);
       await login(email, password);
-      console.log('LoginPage: Login function completed, attempting redirect to /academy');
-      router.push('/academy');
+      // Check if there's a redirect path stored in sessionStorage
+      const redirectPath = sessionStorage.getItem('redirectAfterLogin') || '/academy';
+      sessionStorage.removeItem('redirectAfterLogin'); // Clean up
+      console.log('LoginPage: Login function completed, redirecting to:', redirectPath);
+      router.push(redirectPath);
     } catch (err) {
       console.error('LoginPage: Login failed in catch block:', err);
     } finally {
@@ -127,7 +130,10 @@ export default function LoginPage() {
                 <GoogleAuthButton
                   variant="login"
                   onSuccess={(user, tokens) => {
-                    router.push('/academy');
+                    // Check if there's a redirect path stored in sessionStorage
+                    const redirectPath = sessionStorage.getItem('redirectAfterLogin') || '/academy';
+                    sessionStorage.removeItem('redirectAfterLogin'); // Clean up
+                    router.push(redirectPath);
                   }}
                   onError={(error) => {
                     setGoogleError(error);
