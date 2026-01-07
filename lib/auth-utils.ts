@@ -9,26 +9,26 @@ export interface AuthUser {
 
 export async function getAuthUser(req: NextRequest): Promise<AuthUser | null> {
   try {
-    const sessionId = req.cookies.get('__session')?.value;
-    if (!sessionId) {
+    const refreshTokenValue = req.cookies.get('refreshToken')?.value;
+    if (!refreshTokenValue) {
       return null;
     }
 
-    const session = await (prisma as any).session.findUnique({
-      where: { id: sessionId, expiresAt: { gt: new Date() } },
+    const refreshToken = await prisma.refreshToken.findUnique({
+      where: { token: refreshTokenValue, expiresAt: { gt: new Date() } },
       include: { user: true },
     });
 
-    if (!session || !session.user) {
+    if (!refreshToken || !refreshToken.user) {
       return null;
     }
 
     return {
-      id: session.user.id,
-      role: session.user.role,
+      id: refreshToken.user.id,
+      role: refreshToken.user.role,
     };
   } catch (error) {
-    console.error('Session verification failed:', error);
+    console.error('Refresh token verification failed:', error);
     return null;
   }
 }

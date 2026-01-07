@@ -5,6 +5,7 @@ import { Menu, X, LogOut, LayoutDashboard, ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from './Button';
+import { ProfileDropdown } from './ProfileDropdown';
 import { NavItem } from '../types';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -23,8 +24,8 @@ export const Header: React.FC = () => {
     { title: t.academy.megaMenu.education, description: t.academy.megaMenu.educationDesc, href: '/academy?category=education' },
     { title: t.academy.megaMenu.defi, description: t.academy.megaMenu.defiDesc, href: '/academy?category=defi' },
     { title: t.academy.megaMenu.adoption, description: t.academy.megaMenu.adoptionDesc, href: '/academy?category=adoption' },
-    { title: t.academy.megaMenu.reviews, description: t.academy.megaMenu.reviewsDesc, href: '/academy?tab=articles' },
-    { title: t.academy.megaMenu.guides, description: t.academy.megaMenu.guidesDesc, href: '/academy?tab=articles' },
+    { title: t.academy.megaMenu.reviews, description: t.academy.megaMenu.reviewsDesc, href: '/academy?category=reviews' },
+    { title: t.academy.megaMenu.guides, description: t.academy.megaMenu.guidesDesc, href: '/academy?category=guides' },
     { title: t.academy.megaMenu.trading, description: t.academy.megaMenu.tradingDesc, href: '/academy?category=trading' },
     { title: t.academy.megaMenu.mining, description: t.academy.megaMenu.miningDesc, href: '/academy?category=mining' },
     { title: t.academy.megaMenu.news, description: t.academy.megaMenu.newsDesc, href: '/trends#news' },
@@ -119,13 +120,7 @@ export const Header: React.FC = () => {
           {!isAuthenticated && <Link href="/register"><Button variant="outline" className="px-4 py-2 text-xs text-white border-white/20">{t.nav.getStarted}</Button></Link>}
           <Link href="/donate"><Button className="px-4 py-2 text-xs">{t.nav.donate}</Button></Link>
           {isAuthenticated && (
-             <div className="flex items-center gap-3">
-                {isAdmin && <Link href="/admin"><button className="flex items-center gap-1 bg-purple-500/10 text-purple-400 px-3 py-1.5 rounded-full text-xs font-bold border border-purple-500/20"><LayoutDashboard size={14} /> Admin</button></Link>}
-                <div className="flex items-center gap-2 py-1 pl-3 pr-1 border rounded-full border-white/10 bg-white/5">
-                  <span className="text-xs font-semibold text-white">{user?.name || user?.email}</span>
-                  <button onClick={logout} className="p-1.5 bg-red-500/10 text-red-600 rounded-full hover:bg-red-500"><LogOut size={12} /></button>
-                </div>
-             </div>
+            <ProfileDropdown />
           )}
         </div>
 
@@ -178,12 +173,31 @@ export const Header: React.FC = () => {
                </div>
                {!isAuthenticated && <Link href="/register" className="flex-grow"><Button variant="outline" className="px-4 py-2 text-xs text-white border-white/20" onClick={() => setMobileMenuOpen(false)}>{t.nav.getStarted}</Button></Link>}
              </div>
-             {isAuthenticated && (
-               <div className="flex items-center justify-between p-2 mt-2 rounded-lg bg-white/5">
-                 <span className="text-sm font-semibold text-white">{user?.name || user?.email}</span>
-                 <button onClick={() => { logout(); setMobileMenuOpen(false); }} className="p-1.5 bg-red-500/10 text-red-600 rounded-full hover:bg-red-500"><LogOut size={14} /></button>
-               </div>
-             )}
+            {isAuthenticated && (
+              <div className="flex items-center justify-between p-2 mt-2 rounded-lg bg-white/5">
+                <div className="flex items-center gap-3">
+                  <img
+                    src={user?.avatar || undefined}
+                    alt={user?.name || user?.email || 'User'}
+                    className="object-cover w-8 h-8 rounded-full bg-gradient-to-br from-coinlect-accent to-purple-600"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      const initials = (user?.name || user?.email || 'U').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+                      target.style.display = 'none';
+                      const parent = target.parentElement;
+                      if (parent) {
+                        parent.innerHTML = `<div class="w-8 h-8 rounded-full bg-gradient-to-br from-coinlect-accent to-purple-600 flex items-center justify-center text-xs font-semibold text-white">${initials}</div>`;
+                      }
+                    }}
+                  />
+                  <div>
+                    <span className="block text-sm font-semibold text-white">{user?.name || 'User'}</span>
+                    <span className="text-xs text-gray-400">{user?.email}</span>
+                  </div>
+                </div>
+                <button onClick={() => { logout(); setMobileMenuOpen(false); }} aria-label="Logout" className="p-1.5 bg-red-500/10 text-red-600 rounded-full hover:bg-red-500"><LogOut size={14} /></button>
+              </div>
+            )}
            </div>
         </div>
       )}

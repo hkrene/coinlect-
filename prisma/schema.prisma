@@ -32,6 +32,7 @@ model User {
   email          String          @unique
   passwordHash   String?
   name           String?
+  avatar         String?         // Profile picture URL
   role           UserRole        @default(USER)
   provider       String?         // local | google
   googleId       String?         @unique

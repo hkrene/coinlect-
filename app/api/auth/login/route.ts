@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { loginSchema } from '@/lib/validators';
-import { verifyPassword } from '@/lib/auth';
+import { verifyPassword, signRefreshToken } from '@/lib/auth';
 import { serialize } from 'cookie';
 
 export async function POST(req: NextRequest) {
@@ -23,16 +23,20 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 
-    // Create a new session
-    const session = await prisma.session.create({
+    // Create refresh token
+    const tokenPayload = { sub: user.id, role: user.role };
+    const refreshToken = await signRefreshToken(tokenPayload);
+
+    await prisma.refreshToken.create({
       data: {
         userId: user.id,
-        expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7), // 7 days expiration
+        token: refreshToken,
+        expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
       },
     });
 
-    // Set the session cookie
-    const cookie = serialize('__session', session.id, {
+    // Set the refresh token cookie
+    const cookie = serialize('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: 60 * 60 * 24 * 7, // 7 days

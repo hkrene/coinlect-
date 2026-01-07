@@ -30,6 +30,7 @@ export async function POST(req: NextRequest) {
     const email = payload.email;
     const googleId = payload.sub;
     const name = payload.name || email;
+    const avatar = payload.picture || null;
 
     const user = await prisma.user.upsert({
       where: { email },
@@ -37,12 +38,14 @@ export async function POST(req: NextRequest) {
         googleId,
         provider: 'google',
         name,
+        avatar,
       },
       create: {
         email,
         googleId,
         provider: 'google',
         name,
+        avatar,
         role: UserRole.USER,
       },
     });

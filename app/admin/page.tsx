@@ -7,22 +7,26 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 
 export default function AdminDashboardPage() {
-  const { user, isAuthenticated, isAdmin } = useAuth();
+  const { user, isAuthenticated, isAdmin, isLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      router.push('/login');
-      return;
-    }
+    // Only redirect after loading is complete
+    if (!isLoading) {
+      if (!isAuthenticated) {
+        router.push('/login');
+        return;
+      }
 
-    if (!isAdmin) {
-      router.push('/');
-      return;
+      if (!isAdmin) {
+        router.push('/');
+        return;
+      }
     }
-  }, [isAuthenticated, isAdmin, router]);
+  }, [isAuthenticated, isAdmin, isLoading, router]);
 
-  if (!isAuthenticated || !isAdmin) {
+  // Show loading while authentication is being checked
+  if (isLoading || !isAuthenticated || !isAdmin) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-black">
         <div className="text-white">Loading...</div>

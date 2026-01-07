@@ -7,6 +7,7 @@ interface User {
   id: string;
   email: string;
   name: string | null;
+  avatar: string | null;
   role: 'ADMIN' | 'USER';
 }
 
@@ -37,7 +38,9 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const refreshUser = async () => {
     try {
-      const res = await fetch('/api/auth/me'); // Rely on session cookie
+      const res = await fetch('/api/auth/me', {
+        credentials: 'include' // Include cookies in the request
+      });
 
       if (res.ok) {
         const data = await res.json();
@@ -105,6 +108,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     try {
       await fetch('/api/auth/logout', {
         method: 'POST',
+        credentials: 'include'
       });
     } catch (err) {
       console.error('Logout error', err);

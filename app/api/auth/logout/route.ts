@@ -4,16 +4,17 @@ import { serialize } from 'cookie';
 
 export async function POST(req: NextRequest) {
   try {
-    const sessionId = req.cookies.get('__session')?.value;
+    const refreshToken = req.cookies.get('refreshToken')?.value;
 
-    if (sessionId) {
-      await prisma.session.delete({
-        where: { id: sessionId },
+    if (refreshToken) {
+      // Delete the refresh token from database
+      await prisma.refreshToken.deleteMany({
+        where: { token: refreshToken },
       });
     }
 
-    // Clear the session cookie
-    const cookie = serialize('__session', '', {
+    // Clear the refresh token cookie
+    const cookie = serialize('refreshToken', '', {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       maxAge: 0, // Expire immediately

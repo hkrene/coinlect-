@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Button } from './Button';
+import { useAuth } from '../contexts/AuthContext';
 
 interface GoogleAuthButtonProps {
   onSuccess?: (user: any, tokens: any) => void;
@@ -22,6 +23,14 @@ export const GoogleAuthButton: React.FC<GoogleAuthButtonProps> = ({
   className = '',
 }) => {
   const [isLoading, setIsLoading] = useState(false);
+  const { refreshUser } = useAuth();
+  const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+  const isGoogleConfigured = !!clientId;
+
+  // Only disable Google Sign-In if not configured, not in development
+  if (!isGoogleConfigured) {
+    return null;
+  }
 
   useEffect(() => {
     // Load Google Identity Services script only once
@@ -31,54 +40,64 @@ export const GoogleAuthButton: React.FC<GoogleAuthButtonProps> = ({
     script.src = 'https://accounts.google.com/gsi/client';
     script.async = true;
     script.defer = true;
-    
+
     script.onload = () => {
-      const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-      if (!clientId || !window.google) {
-        console.warn('Google Client ID not configured or Google API not loaded');
+      if (!window.google) {
+        console.warn('Google API not loaded');
         return;
       }
 
-      window.google.accounts.id.initialize({
-        client_id: clientId,
-        callback: async (response: any) => {
-          setIsLoading(true);
-          try {
-            const res = await fetch('/api/auth/google', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ idToken: response.credential }),
-            });
+      try {
+        // Check if we're in development and warn about Google OAuth configuration
+        const isDevelopment = process.env.NODE_ENV !== 'production';
+        const currentOrigin = window.location.origin;
 
-            if (!res.ok) {
-              const error = await res.json();
-              throw new Error(error.error || 'Authentication failed');
-            }
+        if (isDevelopment) {
+          console.warn('Google OAuth Configuration Check:', {
+            currentOrigin,
+            expectedOrigins: ['http://localhost:3000', 'https://your-production-domain.com'],
+            action: 'Add current origin to Google Cloud Console OAuth client authorized origins'
+          });
+        }
 
-            const data = await res.json();
-            
-            if (data.accessToken) {
-              localStorage.setItem('accessToken', data.accessToken);
-            }
-            if (data.refreshToken) {
-              localStorage.setItem('refreshToken', data.refreshToken);
-            }
-            if (data.user) {
-              localStorage.setItem('coinlect_current_user', JSON.stringify(data.user));
-            }
+        window.google.accounts.id.initialize({
+          client_id: clientId,
+          ux_mode: 'popup',
+          callback: async (response: any) => {
+            setIsLoading(true);
+            try {
+              const res = await fetch('/api/auth/google', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ idToken: response.credential }),
+              });
 
-            onSuccess?.(data.user, {
-              accessToken: data.accessToken,
-              refreshToken: data.refreshToken,
-            });
-          } catch (err) {
-            const errorMessage = err instanceof Error ? err.message : 'Authentication failed';
-            onError?.(errorMessage);
-          } finally {
-            setIsLoading(false);
-          }
-        },
-      });
+              if (!res.ok) {
+                const error = await res.json();
+                throw new Error(error.error || 'Authentication failed');
+              }
+
+              const data = await res.json();
+
+              // Refresh user data from the server
+              await refreshUser();
+
+              onSuccess?.(data.user, {
+                accessToken: data.accessToken,
+                refreshToken: data.refreshToken,
+              });
+            } catch (err) {
+              const errorMessage = err instanceof Error ? err.message : 'Authentication failed';
+              onError?.(errorMessage);
+            } finally {
+              setIsLoading(false);
+            }
+          },
+        });
+      } catch (err) {
+        console.error('Failed to initialize Google Sign-In:', err);
+        onError?.('Failed to initialize Google Sign-In');
+      }
     };
 
     script.onerror = () => {
@@ -92,21 +111,15 @@ export const GoogleAuthButton: React.FC<GoogleAuthButtonProps> = ({
     return () => {
       // Script cleanup handled by browser
     };
-  }, [onSuccess, onError]);
+  }, [clientId, onSuccess, onError, refreshUser]);
 
   const handleClick = () => {
-    const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-    if (!clientId) {
-      onError?.('Google Client ID not configured');
-      return;
-    }
-
     if (typeof window !== 'undefined' && window.google?.accounts?.id) {
       window.google.accounts.id.prompt();
     } else {
       // Fallback: redirect to Google OAuth
       const redirectUri = `${window.location.origin}/api/auth/google/callback`;
-      const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=email profile&access_type=offline`;
+      const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=email%20profile&access_type=offline&prompt=consent`;
       window.location.href = googleAuthUrl;
     }
   };
