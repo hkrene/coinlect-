@@ -90,6 +90,7 @@ export const progressSchema = z.object({
 export const dealSchema = z.object({
   title: z.string().min(2),
   description: z.string().min(10),
+  details: z.string().optional(),
   category: z.string().min(2),
   link: z.string().url(),
   image: z.string().url().optional(),

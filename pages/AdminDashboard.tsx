@@ -142,6 +142,7 @@ export const AdminDashboard: React.FC = () => {
   const [dealForm, setDealForm] = useState<Omit<Deal, 'id'> & { status: PublishStatus }>({
     title: '',
     description: '',
+    details: '',
     category: '',
     link: '',
     image: '',
@@ -437,6 +438,7 @@ export const AdminDashboard: React.FC = () => {
       setDealForm({
         title: '',
         description: '',
+        details: '',
         category: '',
         link: '',
         image: '',
@@ -833,6 +835,7 @@ export const AdminDashboard: React.FC = () => {
                       setDealForm({
                         title: d.title || '',
                         description: d.description || '',
+                        details: d.details || '',
                         category: d.category || '',
                         link: d.link || '',
                         image: d.image || '',
@@ -1292,6 +1295,12 @@ export const AdminDashboard: React.FC = () => {
                     className="w-full h-24 p-4 text-white bg-black border outline-none border-white/10 rounded-xl focus:border-yellow-500"
                     value={dealForm.description}
                     onChange={e => setDealForm({...dealForm, description: e.target.value})}
+                  />
+                  <textarea
+                    placeholder="Détails supplémentaires (optionnel)"
+                    className="w-full h-32 p-4 text-white bg-black border outline-none border-white/10 rounded-xl focus:border-yellow-500"
+                    value={dealForm.details || ''}
+                    onChange={e => setDealForm({...dealForm, details: e.target.value})}
                   />
                   <div className="grid grid-cols-2 gap-4">
                     <select

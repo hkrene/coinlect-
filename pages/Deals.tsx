@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { ScrollReveal } from '../components/ScrollReveal';
 import { Button } from '../components/Button';
 import { dealService } from '../services/db';
@@ -87,7 +88,8 @@ export const Deals: React.FC = () => {
             {filteredDeals.length > 0 ? (
                 filteredDeals.map((deal, idx) => (
                     <ScrollReveal key={deal.id} delay={idx * 50}>
-                        <div className="relative flex flex-col md:flex-row h-full overflow-hidden transition-all duration-300 border rounded-none bg-[#0a0a0a] border-white/10 hover:border-white/30 group">
+                        <Link href={`/deals/${deal.id}`} className="block h-full">
+                          <div className="relative flex flex-col md:flex-row h-full overflow-hidden transition-all duration-300 border rounded-none bg-[#0a0a0a] border-white/10 hover:border-white/30 group cursor-pointer">
                             
                             <div className="relative w-full md:w-[380px] h-56 md:h-auto overflow-hidden bg-black flex items-center justify-center border-b md:border-b-0 md:border-r border-white/10">
                                 <img
@@ -110,14 +112,19 @@ export const Deals: React.FC = () => {
                                     <span className="text-[10px] font-bold text-coinlect-accent uppercase tracking-[0.2em] mb-3">{deal.category}</span>
                                     <h3 className="text-2xl font-bold tracking-tight text-white md:text-3xl">{deal.title} {deal.discount && ` — ${deal.discount}`}</h3>
                                 </div>
-                                <p className="mb-6 text-sm leading-relaxed text-[#71717a] max-w-2xl font-medium">{deal.description}</p>
+                                <p className="mb-6 text-sm leading-relaxed text-[#71717a] max-w-2xl font-medium">{deal.details || deal.description}</p>
                                 
                                 <div className="flex items-center gap-6 mt-auto wrap">
-                                    <a href={deal.link} target="_blank" rel="noopener noreferrer">
-                                        <button className="px-10 py-4 text-xs font-bold tracking-widest text-black uppercase transition-all bg-white rounded-none hover:bg-coinlect-accent">
-                                            {t.deals.claim}
-                                        </button>
-                                    </a>
+                                    <button
+                                        onClick={(e) => {
+                                          e.preventDefault();
+                                          e.stopPropagation();
+                                          window.open(deal.link, '_blank');
+                                        }}
+                                        className="px-10 py-4 text-xs font-bold tracking-widest text-black uppercase transition-all bg-white rounded-none hover:bg-coinlect-accent"
+                                    >
+                                        {t.deals.claim}
+                                    </button>
                                     {deal.code && (
                                         <div className="flex items-center gap-3 text-xs font-bold tracking-widest text-gray-500 uppercase">
                                             <span>{t.deals.coupon} :</span>
@@ -126,7 +133,8 @@ export const Deals: React.FC = () => {
                                     )}
                                 </div>
                             </div>
-                        </div>
+                          </div>
+                        </Link>
                     </ScrollReveal>
                 ))
             ) : (

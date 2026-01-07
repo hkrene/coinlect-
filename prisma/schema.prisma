@@ -177,6 +177,7 @@ model Deal {
   id          String   @id @default(uuid())
   title       String
   description String
+  details     String?
   category    String
   link        String
   image       String?

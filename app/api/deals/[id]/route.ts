@@ -32,6 +32,7 @@ export const PATCH = requireAdmin(async (req: NextRequest, user: any, params: Pr
       data: {
         title: data.title,
         description: data.description,
+        details: data.details,
         category: data.category,
         link: data.link,
         image: data.image,

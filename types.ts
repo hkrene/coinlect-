@@ -143,6 +143,7 @@ export interface Deal {
   id: string;
   title: string;
   description: string;
+  details?: string;
   category: string;
   link: string;
   image?: string;
