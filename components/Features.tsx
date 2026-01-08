@@ -10,9 +10,16 @@ export const Features: React.FC = () => {
   const { t } = useLanguage();
   const { isAuthenticated } = useAuth();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [communityImageIndex, setCommunityImageIndex] = useState(0);
 
-  // Simplified image list
+  // Images for the scam prevention section
   const rotatingImages = [
+    'https://imgs.search.brave.com/u85qbulP9AtJIk6OFfyh6vQ7BYMRACL6B08iGqTZu4I/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9hc3Nl/dHMuYmVpbmNyeXB0/by5jb20vaW1nLzRh/VjZLMW9ZRXMzV2Fl/X1VsZjRLM3I3ajFO/RT0vc21hcnQvNTZh/YmNiZTFiNTA1NDE3/NjkwYmY0YzczNDEw/MjdkNjc',
+    'https://imgs.search.brave.com/GAmLdlt6GY0SAqlAQYLOIaRRuRYJIcY4NjqJJklvuM8/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWcu/ZnJlZXBpay5jb20v/cHJlbWl1bS1waG90/by9maW5hbmNlLWNv/bmNlcHQtd2l0aC1j/b2luLXN5bWJvbF8y/My0yMTQ5NDQ4NDkw/LmpwZz9zZW10PWFp/c19oeWJyaWQmdz03/NDAmcT04MA'
+  ];
+
+  // Images for the community section
+  const communityImages = [
     'https://imgs.search.brave.com/u85qbulP9AtJIk6OFfyh6vQ7BYMRACL6B08iGqTZu4I/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9hc3Nl/dHMuYmVpbmNyeXB0/by5jb20vaW1nLzRh/VjZLMW9ZRXMzV2Fl/X1VsZjRLM3I3ajFO/RT0vc21hcnQvNTZh/YmNiZTFiNTA1NDE3/NjkwYmY0YzczNDEw/MjdkNjc',
     'https://imgs.search.brave.com/GAmLdlt6GY0SAqlAQYLOIaRRuRYJIcY4NjqJJklvuM8/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9pbWcu/ZnJlZXBpay5jb20v/cHJlbWl1bS1waG90/by9maW5hbmNlLWNv/bmNlcHQtd2l0aC1j/b2luLXN5bWJvbF8y/My0yMTQ5NDQ4NDkw/LmpwZz9zZW10PWFp/c19oeWJyaWQmdz03/NDAmcT04MA'
   ];
@@ -23,6 +30,13 @@ export const Features: React.FC = () => {
     }, 4000);
     return () => clearInterval(interval);
   }, [rotatingImages.length]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCommunityImageIndex((prevIndex) => (prevIndex + 1) % communityImages.length);
+    }, 5000); // Slightly different timing for variety
+    return () => clearInterval(interval);
+  }, [communityImages.length]);
 
   return (
     <div className="container flex flex-col gap-32 px-6 py-24 mx-auto bg-black">
@@ -76,7 +90,7 @@ export const Features: React.FC = () => {
         <div className="grid items-center gap-16 md:grid-cols-2">
              <div className="md:order-2 md:p-8">
                 <h2 className="mb-6 text-4xl font-bold leading-tight text-white md:text-5xl">
-                    {t.features.communityTitle} <br/>
+                    <span className="md:inline">{t.features.communityTitle} </span>
                     <span className="text-coinlect-accent">{t.features.communityTitleSuffix}</span>
                 </h2>
                 <div className="mb-10 space-y-6 text-base leading-relaxed text-gray-400">
@@ -91,13 +105,26 @@ export const Features: React.FC = () => {
                 </Link>
             </div>
 
-             <div className="md:order-1 relative h-[450px] w-full rounded-3xl overflow-hidden bg-[#0F0F0F] border border-white/5 shadow-2xl">
-                <img 
-                    src="https://imgs.search.brave.com/u85qbulP9AtJIk6OFfyh6vQ7BYMRACL6B08iGqTZu4I/rs:fit:500:0:1:0/g:ce/aHR0cHM6Ly9hc3Nl/dHMuYmVpbmNyeXB0/by5jb20vaW1nLzRh/VjZLMW9ZRXMzV2Fl/X1VsZjRLM3I3ajFO/RT0vc21hcnQvNTZh/YmNiZTFiNTA1NDE3/NjkwYmY0YzczNDEw/MjdkNjc" 
-                    alt="Gold Assets" 
-                    className="object-cover w-full h-full" 
+             <div className="md:order-1 relative h-[450px] w-full rounded-3xl overflow-hidden bg-[#0F0F0F] shadow-2xl">
+                <img
+                    src={communityImages[communityImageIndex]}
+                    alt="Community Assets"
+                    className="object-cover w-full h-full transition-opacity duration-1000"
+                    key={communityImageIndex}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+
+                {/* Community Image Indicators */}
+                <div className="absolute bottom-6 right-8 flex gap-2">
+                  {communityImages.map((_, index) => (
+                    <div
+                      key={index}
+                      className={`h-1 transition-all duration-300 rounded-full ${
+                        index === communityImageIndex ? 'w-8 bg-coinlect-accent' : 'w-2 bg-white/20'
+                      }`}
+                    />
+                  ))}
+                </div>
             </div>
         </div>
 
