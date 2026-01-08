@@ -12,6 +12,9 @@ import { ArrowLeft, ExternalLink, Tag, ChevronRight, Check, Star, ShieldCheck, T
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
+export const dynamic = 'force-dynamic';
+export const generateStaticParams = () => [];
+
 const DealDetail: React.FC = () => {
   const params = useParams();
   const dealId = params?.dealId as string;

@@ -27,11 +27,6 @@ export const GoogleAuthButton: React.FC<GoogleAuthButtonProps> = ({
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
   const isGoogleConfigured = !!clientId;
 
-  // Only disable Google Sign-In if not configured, not in development
-  if (!isGoogleConfigured) {
-    return null;
-  }
-
   useEffect(() => {
     // Load Google Identity Services script only once
     if (typeof window === 'undefined' || window.google) return;
@@ -112,6 +107,11 @@ export const GoogleAuthButton: React.FC<GoogleAuthButtonProps> = ({
       // Script cleanup handled by browser
     };
   }, [clientId, onSuccess, onError, refreshUser]);
+
+  // Only disable Google Sign-In if not configured, not in development
+  if (!isGoogleConfigured) {
+    return null;
+  }
 
   const handleClick = () => {
     if (typeof window !== 'undefined' && window.google?.accounts?.id) {

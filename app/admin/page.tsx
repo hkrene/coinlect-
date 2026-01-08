@@ -13,15 +13,15 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     // Only redirect after loading is complete
     if (!isLoading) {
-      if (!isAuthenticated) {
-        router.push('/login');
-        return;
-      }
+    if (!isAuthenticated) {
+      router.push('/login');
+      return;
+    }
 
-      if (!isAdmin) {
-        router.push('/');
-        return;
-      }
+    if (!isAdmin) {
+      router.push('/');
+      return;
+    }
     }
   }, [isAuthenticated, isAdmin, isLoading, router]);
 

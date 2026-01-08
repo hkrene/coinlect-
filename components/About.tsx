@@ -143,7 +143,7 @@ export const About: React.FC = () => {
             </Link>
 
              {/* Sidebar List */}
-             <div className="bg-[#111] rounded-xl p-8 border border-white/5 flex flex-col h-full">
+             {/* <div className="bg-[#111] rounded-xl p-8 border border-white/5 flex flex-col h-full">
                 <h3 className="mb-8 text-xs font-bold tracking-widest text-white uppercase">LATEST</h3>
                 
                 <div className="flex flex-col justify-between flex-1 gap-6">
@@ -162,7 +162,7 @@ export const About: React.FC = () => {
                         </Link>
                     ))}
                 </div>
-             </div>
+             </div> */}
 
           </div>
        </div>

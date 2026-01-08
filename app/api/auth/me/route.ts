@@ -23,10 +23,10 @@ export async function GET(req: NextRequest) {
     }
 
     // Get user data
-    const user = await prisma.user.findUnique({
+  const user = await prisma.user.findUnique({
       where: { id: payload.sub },
       select: { id: true, email: true, name: true, role: true, avatar: true, lastActivityAt: true },
-    });
+  });
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
       data: { lastActivityAt: new Date() },
     });
 
-    return NextResponse.json({ user });
+  return NextResponse.json({ user });
   } catch (err) {
     console.error('Auth check error:', err);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

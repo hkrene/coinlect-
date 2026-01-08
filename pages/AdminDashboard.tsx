@@ -1,6 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+
+export const dynamic = 'force-dynamic';
+export const generateStaticParams = () => [];
 import { useAuth } from '../contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { courseService, articleService, eventService, dealService } from '../services/db';

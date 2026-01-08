@@ -1,6 +1,9 @@
 'use client';
 
 import React from 'react';
+
+export const dynamic = 'force-dynamic';
+export const generateStaticParams = () => [];
 import { useLanguage } from '../contexts/LanguageContext';
 
 export const Terms: React.FC = () => {

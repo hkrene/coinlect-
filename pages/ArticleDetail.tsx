@@ -1,6 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+
+export const dynamic = 'force-dynamic';
+export const generateStaticParams = () => [];
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { articleService } from '../services/db';

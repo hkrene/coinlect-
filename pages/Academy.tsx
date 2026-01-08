@@ -1,6 +1,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+
+export const dynamic = 'force-dynamic';
+export const generateStaticParams = () => [];
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { ScrollReveal } from '../components/ScrollReveal';

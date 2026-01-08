@@ -115,7 +115,7 @@ export const translations = {
         section2: {
             title: "2. Ce que vous pouvez et ne pouvez pas faire sur notre site",
             content: "Coinlect se veut utile et sûr. En utilisant notre site, vous acceptez ce qui suit :",
-            allowedTitle: "✅ Autorisé",
+            allowedTitle: "Autorisé",
             allowed: ["Naviguer et accéder au contenu éducatif, aux actualités et aux ressources", "S'inscrire aux événements, programmes ou cours que nous proposons", "Participer aux discussions de manière respectueuse et professionnelle"],
             disallowedTitle: "Interdit",
             disallowed: ["Publier des informations trompeuses, fausses ou nuisibles", "Escroqueries, hameçonnage ou activités frauduleuses de toute nature", "Tenter de pirater, d'exploiter, d'abuser ou d'endommager le site web", "Partager des données personnelles ou sensibles en violation des lois sur la vie privée"]
@@ -126,7 +126,7 @@ export const translations = {
         section6: { title: "6. Pas de conseil financier ou d'investissement", content: "Toutes les informations sur Coinlect sont uniquement éducatives. Rien sur cette plateforme ne doit être considéré comme un conseil financier, d'investissement ou juridique. Faites vos propres recherches. Toujours. Nous ne sommes pas responsables des pertes ou des décisions que vous prenez." },
         section7: { title: "7. Liens et outils tiers", content: "Coinlect peut renvoyer vers des sites web, des outils ou des dApps tiers. Nous ne les contrôlons pas et n'assumons aucune responsabilité pour leurs actions. Utilisez les services tiers à vos propres risques et consultez leurs conditions." },
         section8: { title: "8. Modifications de ces conditions", content: "Le Web3 évolue vite—et ces conditions aussi. Les changements importants seront communiqués, mais il est de votre responsabilité de rester informé." },
-        section9: { title: "9. Contactez-nous", content: "Des questions ou besoin d'aide ? Contactez-nous à coinlect@gmail.com" },
+        section9: { title: "9. Contactez-nous", content: "Des questions ou besoin d'aide ? Contactez-nous à coinlectacademy@gmail.com" },
         closing: "Merci de faire partie de Coinlect. Construisons le Web3 de la bonne manière."
     },
     about: {
@@ -139,11 +139,11 @@ export const translations = {
       ]
     },
     features: {
-      buyTitle: "Comment",
-      buyTitleSuffix: "acheter des cryptos ?",
-      buyDesc1: "Démarrez votre aventure crypto avec des solutions simples et sécurisées. Nous vous guidons pas à pas.",
+      buyTitle: "Comment eviter les",
+      buyTitleSuffix: "arnaques crypto ?",
+      buyDesc1: "Évitez les arnaques crypto grâce à des conseils clairs et des pratiques de sécurité éprouvées. Nous vous guidons pas à pas pour protéger vos actifs.",
       buyDesc2: "Accédez aux meilleurs échanges et outils recommandés par notre communauté d'experts.",
-      buyCta: "Acheter maintenant",
+      buyCta: "Sécurisez vous maintenant",
       communityTitle: "Rejoindre la",
       communityTitleSuffix: "Communauté",
       communityDesc1: "Connectez-vous avec des milliers de passionnés. Partagez vos connaissances et restez à jour.",
@@ -151,9 +151,52 @@ export const translations = {
       communityCta: "Communauté"
     },
     partners: {
-      title: "Quels sont nos",
-      titleSuffix: "Partenaires affiliés ?",
+      title: "Nos Partenaires",
+      titleSuffix: "affiliés & Ecosystem",
       desc: "Nous collaborons avec les leaders de l'industrie pour vous offrir le meilleur."
+    },
+    testimonials: {
+      title: "Ce que disent nos",
+      titleSuffix: "utilisateurs",
+      desc: "Découvrez les témoignages de notre communauté grandissante.",
+      items: [
+        {
+          name: "Marie K.",
+          role: "Développeuse Blockchain",
+          avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
+          content: "Coinlect Academy a transformé ma compréhension de la blockchain. Les cours sont clairs, pratiques et adaptés au contexte africain."
+        },
+        {
+          name: "Jean P.",
+          role: "Investisseur Crypto",
+          avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+          content: "Grâce à Coinlect, j'ai pu sécuriser mes premiers investissements en crypto. L'accompagnement est exceptionnel."
+        },
+        {
+          name: "Sophie M.",
+          role: "Étudiante",
+          avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+          content: "Enfin une plateforme éducative en français qui explique simplement les concepts complexes de la finance décentralisée."
+        },
+        {
+          name: "David L.",
+          role: "Entrepreneur Tech",
+          avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+          content: "Coinlect m'a aidé à lancer mon projet NFT. Les ressources pratiques et la communauté sont incroyables."
+        },
+        {
+          name: "Amina T.",
+          role: "Designer UX",
+          avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face",
+          content: "L'approche pédagogique de Coinlect est parfaite. J'ai pu comprendre Web3 sans background technique préalable."
+        },
+        {
+          name: "Thomas B.",
+          role: "Trader Crypto",
+          avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
+          content: "Les analyses de marché et les outils éducatifs de Coinlect sont devenus essentiels à ma stratégie d'investissement."
+        }
+      ]
     },
     faq: {
         title: "Questions",
@@ -415,9 +458,9 @@ export const translations = {
         section2: {
             title: "2. What You Can and Cannot Do on Our Site",
             content: "Coinlect aims to be useful and safe. By using our site, you agree to the following:",
-            allowedTitle: "✅ Allowed",
+            allowedTitle: "Allowed",
             allowed: ["Browsing and accessing educational content, news, and resources", "Registering for events, programs, or courses we offer", "Participating in discussions respectfully and professionally"],
-            disallowedTitle: "❌ Prohibited",
+            disallowedTitle: "Prohibited",
             disallowed: ["Posting misleading, false, or harmful information", "Scams, phishing, or fraudulent activities of any kind", "Attempting to hack, exploit, abuse, or damage the website", "Sharing personal or sensitive data in violation of privacy laws"]
         },
         section3: { title: "3. Your Account and Security", content: "If you create an account on Coinlect:", items: ["Keep your login credentials secure", "Do not share access with anyone", "You are fully responsible for activity under your account", "Report any suspicious behavior immediately"] },
@@ -426,7 +469,7 @@ export const translations = {
         section6: { title: "6. No Financial or Investment Advice", content: "All information on Coinlect is for educational purposes only. Nothing on this platform should be considered financial, investment, or legal advice. Do your own research. Always. We are not responsible for losses or decisions you make." },
         section7: { title: "7. Third-Party Links and Tools", content: "Coinlect may link to third-party websites, tools, or dApps. We do not control them and assume no responsibility for their actions. Use third-party services at your own risk and check their terms." },
         section8: { title: "8. Changes to These Terms", content: "Web3 moves fast—and so do these terms. Important changes will be communicated, but it is your responsibility to stay informed." },
-        section9: { title: "9. Contact Us", content: "Questions or need help? Contact us at coinlect@gmail.com" },
+        section9: { title: "9. Contact Us", content: "Questions or need help? Contact us at coinlectacademy@gmail.com" },
         closing: "Thank you for being part of Coinlect. Let's build Web3 the right way."
     },
     about: {
@@ -451,9 +494,52 @@ export const translations = {
       communityCta: "Community"
     },
     partners: {
-      title: "Who are our",
-      titleSuffix: "Affiliate Partners?",
+      title: "Affiliate",
+      titleSuffix: "Partners & Ecosystem",
       desc: "We collaborate with industry leaders to offer you the best."
+    },
+    testimonials: {
+      title: "What our",
+      titleSuffix: "users say",
+      desc: "Discover testimonials from our growing community.",
+      items: [
+        {
+          name: "Marie K.",
+          role: "Blockchain Developer",
+          avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
+          content: "Coinlect Academy transformed my understanding of blockchain. The courses are clear, practical and adapted to the African context."
+        },
+        {
+          name: "Jean P.",
+          role: "Crypto Investor",
+          avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+          content: "Thanks to Coinlect, I was able to secure my first crypto investments. The support is exceptional."
+        },
+        {
+          name: "Sophie M.",
+          role: "Student",
+          avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+          content: "Finally a French educational platform that simply explains complex concepts of decentralized finance."
+        },
+        {
+          name: "David L.",
+          role: "Tech Entrepreneur",
+          avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+          content: "Coinlect helped me launch my NFT project. The practical resources and community are incredible."
+        },
+        {
+          name: "Amina T.",
+          role: "UX Designer",
+          avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face",
+          content: "Coinlect's pedagogical approach is perfect. I was able to understand Web3 without prior technical background."
+        },
+        {
+          name: "Thomas B.",
+          role: "Crypto Trader",
+          avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
+          content: "Coinlect's market analysis and educational tools have become essential to my investment strategy."
+        }
+      ]
     },
     faq: {
         title: "Frequently Asked",

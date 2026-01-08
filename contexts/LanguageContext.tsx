@@ -31,8 +31,13 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
 
 export const useLanguage = () => {
   const context = useContext(LanguageContext);
+  // Provide fallback during static generation or when context is not available
   if (!context) {
-    throw new Error('useLanguage must be used within a LanguageProvider');
+    return {
+      language: 'fr' as Language,
+      setLanguage: () => {},
+      t: translations.fr,
+    };
   }
   return context;
 };
