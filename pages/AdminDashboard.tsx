@@ -181,7 +181,9 @@ export const AdminDashboard: React.FC = () => {
 
   const fetchUsers = async (): Promise<User[]> => {
     try {
-      const response = await fetch('/api/users');
+      const response = await fetch('/api/users', {
+        credentials: 'include',
+      });
       if (!response.ok) throw new Error('Failed to fetch users');
       const data = await response.json();
       return data.users;
@@ -196,6 +198,7 @@ export const AdminDashboard: React.FC = () => {
       const response = await fetch('/api/users', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ userId, action }),
       });
 

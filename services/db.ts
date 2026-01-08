@@ -5,7 +5,9 @@ import { User, Course, Article, Event, Deal } from '../types';
 export const courseService = {
   getAll: async (): Promise<Course[]> => {
     try {
-      const response = await fetch('/api/courses');
+      const response = await fetch('/api/courses', {
+        credentials: 'include',
+      });
       if (!response.ok) throw new Error('Failed to fetch courses');
       const data = await response.json();
       return data.courses || [];
@@ -21,6 +23,7 @@ export const courseService = {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify(course),
       });
       if (!response.ok) throw new Error('Failed to create course');
@@ -35,6 +38,7 @@ export const courseService = {
     try {
       const response = await fetch(`/api/courses/${id}`, {
         method: 'DELETE',
+        credentials: 'include',
       });
       if (!response.ok) throw new Error('Failed to delete course');
     } catch (error) {
@@ -47,7 +51,9 @@ export const courseService = {
 export const articleService = {
   getAll: async (): Promise<Article[]> => {
     try {
-      const response = await fetch('/api/articles');
+      const response = await fetch('/api/articles', {
+        credentials: 'include',
+      });
       if (!response.ok) throw new Error('Failed to fetch articles');
       const data = await response.json();
       return data.articles || [];
@@ -67,6 +73,7 @@ export const articleService = {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify(article),
       });
       if (!response.ok) throw new Error('Failed to create article');
@@ -79,14 +86,19 @@ export const articleService = {
   },
   update: async (id: string, updates: Partial<Article>): Promise<Article | null> => {
     try {
-      const response = await fetch(`/api/articles/${id}`, {
+      const response = await fetch(`/api/articles/by-id/${id}`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify(updates),
       });
-      if (!response.ok) throw new Error('Failed to update article');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('Article update failed:', errorData);
+        throw new Error(errorData.error || 'Failed to update article');
+      }
       const data = await response.json();
       return data.article;
     } catch (error) {
@@ -96,10 +108,15 @@ export const articleService = {
   },
   delete: async (id: string): Promise<void> => {
     try {
-      const response = await fetch(`/api/articles/${id}`, {
+      const response = await fetch(`/api/articles/by-id/${id}`, {
         method: 'DELETE',
+        credentials: 'include',
       });
-      if (!response.ok) throw new Error('Failed to delete article');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('Article delete failed:', errorData);
+        throw new Error(errorData.error || 'Failed to delete article');
+      }
     } catch (error) {
       console.error('Error deleting article:', error);
       throw error;
@@ -110,7 +127,9 @@ export const articleService = {
 export const dealService = {
   getAll: async (): Promise<Deal[]> => {
     try {
-      const response = await fetch('/api/deals');
+      const response = await fetch('/api/deals', {
+        credentials: 'include',
+      });
       if (!response.ok) throw new Error('Failed to fetch deals');
       const data = await response.json();
       return data.deals || [];
@@ -126,6 +145,7 @@ export const dealService = {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify(deal),
       });
       if (!response.ok) {
@@ -144,7 +164,9 @@ export const dealService = {
 export const eventService = {
   getAll: async (): Promise<Event[]> => {
     try {
-      const response = await fetch('/api/events');
+      const response = await fetch('/api/events', {
+        credentials: 'include',
+      });
       if (!response.ok) throw new Error('Failed to fetch events');
       const data = await response.json();
       return data.events || [];
@@ -160,6 +182,7 @@ export const eventService = {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify(event),
       });
       if (!response.ok) throw new Error('Failed to create event');
@@ -174,6 +197,7 @@ export const eventService = {
     try {
       const response = await fetch(`/api/events/${id}`, {
         method: 'DELETE',
+        credentials: 'include',
       });
       if (!response.ok) throw new Error('Failed to delete event');
     } catch (error) {
