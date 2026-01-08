@@ -173,7 +173,7 @@ export const CourseDetail: React.FC = () => {
                 ) : (
                   <>
                     <p>{course.description}</p>
-                    <p className="text-xs font-bold tracking-widest uppercase opacity-30">Not financial advice</p>
+                    <p className="font-bold tracking-widest uppercase text-red-600 text-2xl">Not financial advice</p>
                   </>
                 )}
               </div>

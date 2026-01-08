@@ -222,26 +222,58 @@ export const AdminDashboard: React.FC = () => {
     try {
       if (editingItem) {
         // Update existing course
+        // Prepare course data for API (exclude frontend-only fields)
+        const courseData = {
+          title: courseForm.title,
+          slug: courseForm.slug,
+          description: courseForm.description,
+          seoTitle: courseForm.seoTitle,
+          seoDescription: courseForm.seoDescription,
+          status: courseForm.status,
+          image: courseForm.image,
+          videoLink: courseForm.videoLink,
+        };
+
         const response = await fetch(`/api/courses/${editingItem.slug}`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
           },
           credentials: 'include',
-          body: JSON.stringify(courseForm),
+          body: JSON.stringify(courseData),
         });
-        if (!response.ok) throw new Error('Failed to update course');
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+          console.error('Course update failed:', errorData);
+          throw new Error(errorData.error || 'Failed to update course');
+        }
       } else {
         // Create new course
+        // Prepare course data for API (exclude frontend-only fields)
+        const courseData = {
+          title: courseForm.title,
+          slug: courseForm.slug,
+          description: courseForm.description,
+          seoTitle: courseForm.seoTitle,
+          seoDescription: courseForm.seoDescription,
+          status: courseForm.status,
+          image: courseForm.image,
+          videoLink: courseForm.videoLink,
+        };
+
         const response = await fetch('/api/courses', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           credentials: 'include',
-          body: JSON.stringify(courseForm),
+          body: JSON.stringify(courseData),
         });
-        if (!response.ok) throw new Error('Failed to create course');
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+          console.error('Course creation failed:', errorData);
+          throw new Error(errorData.error || 'Failed to create course');
+        }
       }
       setIsModalOpen(false);
       setEditingItem(null);
