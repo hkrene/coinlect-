@@ -93,28 +93,23 @@ export const AdminDashboard: React.FC = () => {
     videoLink: ''
   });
 
-  const [articleForm, setArticleForm] = useState<Omit<Article, 'id' | 'slug'> & { slug: string }>({
+  const [articleForm, setArticleForm] = useState({
     title: '',
     slug: '',
     excerpt: '',
     content: '',
-    tags: [],
+    tags: [] as string[],
     seoTitle: '',
     seoDescription: '',
-    status: 'DRAFT',
-    publishedAt: undefined,
-    createdAt: '',
-    updatedAt: '',
-    authorId: undefined,
-    author: undefined,
-    // Legacy fields for frontend compatibility
-    readTime: '5 min',
-    date: new Date().toLocaleDateString('fr-FR'),
+    status: 'DRAFT' as 'DRAFT' | 'PUBLISHED',
+    featured: false,
     image: '',
-    authorImage: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765185502/clclogo_p2v5bp.jpg',
+    authorImage: '',
     keyTakeaways: '',
     authorName: '',
-    featured: false
+    // Legacy fields for frontend compatibility (not sent to API)
+    readTime: '5 min',
+    date: new Date().toLocaleDateString('fr-FR'),
   });
 
   const [eventForm, setEventForm] = useState<Omit<Event, 'id' | 'slug'> & { slug: string }>({
@@ -228,8 +223,8 @@ export const AdminDashboard: React.FC = () => {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
           },
+          credentials: 'include',
           body: JSON.stringify(courseForm),
         });
         if (!response.ok) throw new Error('Failed to update course');
@@ -239,8 +234,8 @@ export const AdminDashboard: React.FC = () => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
           },
+          credentials: 'include',
           body: JSON.stringify(courseForm),
         });
         if (!response.ok) throw new Error('Failed to create course');
@@ -290,22 +285,43 @@ export const AdminDashboard: React.FC = () => {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
           },
+          credentials: 'include',
           body: JSON.stringify(articleForm),
         });
         if (!response.ok) throw new Error('Failed to update article');
       } else {
         // Create new article
+        // Prepare article data for API (exclude frontend-only fields)
+        const articleData = {
+          title: articleForm.title,
+          slug: articleForm.slug,
+          excerpt: articleForm.excerpt,
+          content: articleForm.content,
+          tags: articleForm.tags,
+          seoTitle: articleForm.seoTitle,
+          seoDescription: articleForm.seoDescription,
+          status: articleForm.status,
+          featured: articleForm.featured,
+          image: articleForm.image,
+          authorImage: articleForm.authorImage,
+          keyTakeaways: articleForm.keyTakeaways,
+          authorName: articleForm.authorName,
+        };
+
         const response = await fetch('/api/articles', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
           },
-          body: JSON.stringify(articleForm),
+          credentials: 'include',
+          body: JSON.stringify(articleData),
         });
-        if (!response.ok) throw new Error('Failed to create article');
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+          console.error('Article creation failed:', errorData);
+          throw new Error(`Failed to create article: ${errorData.error || response.statusText}`);
+        }
       }
       setIsModalOpen(false);
       setEditingItem(null);
@@ -321,15 +337,14 @@ export const AdminDashboard: React.FC = () => {
         seoTitle: '',
         seoDescription: '',
         status: 'DRAFT',
-        publishedAt: undefined,
-        createdAt: '',
-        updatedAt: '',
-        authorId: undefined,
-        author: undefined,
-        authorImage: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765185502/clclogo_p2v5bp.jpg',
+        featured: false,
+        image: '',
+        authorImage: '',
         keyTakeaways: '',
         authorName: '',
-        featured: false
+        // Legacy fields for frontend compatibility
+        readTime: '5 min',
+        date: new Date().toLocaleDateString('fr-FR'),
       });
       // Dispatch custom event to notify other components
       if (typeof window !== 'undefined') {
@@ -354,8 +369,8 @@ export const AdminDashboard: React.FC = () => {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
           },
+          credentials: 'include',
           body: JSON.stringify(eventData),
         });
         if (!response.ok) throw new Error('Failed to update event');
@@ -365,8 +380,8 @@ export const AdminDashboard: React.FC = () => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
           },
+          credentials: 'include',
           body: JSON.stringify(eventData),
         });
         if (!response.ok) throw new Error('Failed to create event');
@@ -414,8 +429,8 @@ export const AdminDashboard: React.FC = () => {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
           },
+          credentials: 'include',
           body: JSON.stringify(dealForm),
         });
         if (!response.ok) throw new Error('Failed to update deal');
@@ -425,8 +440,8 @@ export const AdminDashboard: React.FC = () => {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`,
           },
+          credentials: 'include',
           body: JSON.stringify(dealForm),
         });
         if (!response.ok) throw new Error('Failed to create deal');
@@ -679,16 +694,13 @@ export const AdminDashboard: React.FC = () => {
                         seoTitle: a.seoTitle || '',
                         seoDescription: a.seoDescription || '',
                         status: a.status || 'DRAFT',
-                        publishedAt: a.publishedAt || undefined,
-                        createdAt: a.createdAt || '',
-                        updatedAt: a.updatedAt || '',
-                        authorId: a.authorId || undefined,
-                        author: a.author || undefined,
                         image: a.image || '',
                         authorImage: a.authorImage || '',
                         keyTakeaways: (a as any).keyTakeaways || '',
                         authorName: (a as any).authorName || '',
-                        featured: a.featured || false
+                        featured: a.featured || false,
+                        readTime: (a as any).readTime || '5 min',
+                        date: a.createdAt ? new Date(a.createdAt).toLocaleDateString('fr-FR') : new Date().toLocaleDateString('fr-FR')
                       });
                       setIsModalOpen(true);
                     }} className="p-2 text-blue-500 hover:text-blue-400" aria-label="Edit article"><FileText size={18} /></button>
@@ -1061,8 +1073,7 @@ export const AdminDashboard: React.FC = () => {
                        checked={articleForm.status === 'PUBLISHED'}
                        onChange={e => setArticleForm({
                          ...articleForm,
-                         status: e.target.checked ? 'PUBLISHED' : 'DRAFT',
-                         publishedAt: e.target.checked ? new Date().toISOString() : undefined
+                         status: e.target.checked ? 'PUBLISHED' : 'DRAFT'
                        })}
                        className="border-gray-600 rounded"
                      />
