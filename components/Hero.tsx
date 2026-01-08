@@ -4,9 +4,11 @@ import React from 'react';
 import Link from 'next/link';
 import { Button } from './Button';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useAuth } from '../contexts/AuthContext';
 
 export const Hero: React.FC = () => {
   const { t } = useLanguage();
+  const { isAuthenticated } = useAuth();
 
   return (
     <section id="home" className="relative flex items-center justify-center min-h-screen pt-32 pb-20 overflow-hidden transition-colors duration-500 bg-black">
@@ -37,7 +39,7 @@ export const Hero: React.FC = () => {
               {t.hero.ctaDonation}
             </Button>
           </Link>
-          <Link href="/register">
+          <Link href={isAuthenticated ? "/academy" : "/register"}>
             <Button variant="secondary" className="min-w-[140px] bg-white/10 border border-white/10 text-gray-300 hover:bg-white/20">
               {t.hero.ctaStart}
             </Button>

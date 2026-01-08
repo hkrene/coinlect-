@@ -5,9 +5,11 @@ import Link from 'next/link';
 import { Button } from './Button';
 import { ArrowUpRight } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useAuth } from '../contexts/AuthContext';
 
 export const Features: React.FC = () => {
   const { t } = useLanguage();
+  const { isAuthenticated } = useAuth();
 
   return (
     <div className="container flex flex-col gap-24 px-6 py-24 mx-auto bg-black">
@@ -23,7 +25,7 @@ export const Features: React.FC = () => {
                     <p>{t.features.buyDesc1}</p>
                     <p>{t.features.buyDesc2}</p>
                 </div>
-                <Link href="/register">
+                <Link href={isAuthenticated ? "/academy" : "/register"}>
                     <div className="inline-flex items-center justify-between w-full md:w-auto min-w-[200px] border border-white/20 rounded-lg px-6 py-4 hover:bg-white/5 transition-colors group cursor-pointer">
                         <span className="font-bold text-white">{t.features.buyCta}</span>
                         <ArrowUpRight className="text-white transition-colors group-hover:text-coinlect-accent" size={20} />
