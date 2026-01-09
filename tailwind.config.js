@@ -9,9 +9,8 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['Jura', 'sans-serif'],
-        orbitron: ['Orbitron', 'sans-serif'],
-        jura: ['Jura', 'sans-serif'],
+        sans: ['Geist', 'Arial', '"Apple Color Emoji"', '"Segoe UI Emoji"', '"Segoe UI Symbol"', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', '"Noto Sans"', 'sans-serif', '"Apple Color Emoji"', '"Segoe UI Emoji"', '"Segoe UI Symbol"', '"Noto Color Emoji"'],
+        poppins: ['Poppins', '"Poppins Placeholder"', 'sans-serif'],
       },
       colors: {
         coinlect: {

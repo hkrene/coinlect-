@@ -59,7 +59,7 @@ export const Ticker: React.FC = () => {
               )}
               
               <span className="font-bold text-gray-200 uppercase">{coin.symbol}</span>
-              <span className="font-mono text-gray-400">{formatPrice(coin.current_price)}</span>
+              <span className="text-gray-400">{formatPrice(coin.current_price)}</span>
               
               <span className={`font-medium ${change >= 0 ? 'text-green-500' : 'text-red-500'}`}>
                 {change >= 0 ? '+' : ''}

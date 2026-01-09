@@ -214,7 +214,7 @@ const DealDetail: React.FC = () => {
                        <div className="md:col-span-2">
                          <p className="text-sm text-gray-400">Promo Code</p>
                          <div className="flex items-center gap-3 mt-1">
-                           <code className="px-3 py-1 font-mono bg-gray-800 rounded text-coinlect-accent">{deal.code}</code>
+                           <code className="px-3 py-1 bg-gray-800 rounded text-coinlect-accent">{deal.code}</code>
                            <button
                              onClick={() => navigator.clipboard.writeText(deal.code!)}
                              className="text-xs text-gray-400 transition-colors hover:text-white"

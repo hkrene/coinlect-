@@ -85,12 +85,12 @@ export const Donate: React.FC = () => {
                                     </div>
                                     <div className="flex-grow min-w-0 text-left">
                                         <h3 className="text-sm font-bold text-white sm:text-base">{wallet.name}</h3>
-                                        <p className="block font-mono text-[10px] text-gray-500 sm:text-xs">Network: {wallet.network}</p>
+                                        <p className="block text-[10px] text-gray-500 sm:text-xs">Network: {wallet.network}</p>
                                     </div>
                                 </div>
                                 
                                 <div className="flex items-center w-full gap-2 sm:gap-3 md:w-auto">
-                                    <div className="flex-grow px-3 py-2 font-mono text-[10px] text-gray-300 truncate border rounded-lg select-all bg-black/50 border-white/5 sm:px-4 sm:py-3 sm:text-xs md:flex-grow-0 md:w-80">
+                                    <div className="flex-grow px-3 py-2 text-[10px] text-gray-300 truncate border rounded-lg select-all bg-black/50 border-white/5 sm:px-4 sm:py-3 sm:text-xs md:flex-grow-0 md:w-80">
                                         {wallet.address}
                                     </div>
                                     <button 
@@ -117,7 +117,7 @@ export const Donate: React.FC = () => {
                                 <div key={idx} className="flex items-center justify-between p-4 transition-all border bg-white/5 border-white/10 rounded-xl group hover:border-coinlect-accent/30">
                                     <div>
                                         <p className="text-xs tracking-wider text-gray-500 uppercase">{item.name}</p>
-                                        <p className="font-mono font-bold text-white">{item.number}</p>
+                                        <p className="font-bold text-white">{item.number}</p>
                                     </div>
                                     <button 
                                         onClick={() => handleCopy(item.number)}

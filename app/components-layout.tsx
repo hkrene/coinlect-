@@ -17,7 +17,7 @@ export function ComponentsLayout({ children }: { children: React.ReactNode }) {
   }, [pathname]);
 
   return (
-    <div className="flex flex-col min-h-screen font-sans text-white bg-black selection:bg-coinlect-accent selection:text-black dark">
+    <div className="flex flex-col min-h-screen text-white bg-black selection:bg-coinlect-accent selection:text-black dark">
       {isAdminPage ? (
         <div className="fixed top-0 left-0 right-0 z-50 flex items-center px-6 py-4 bg-black border-b border-white/5">
           <Link href="/" className="flex items-center gap-2 group">

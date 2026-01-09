@@ -248,7 +248,7 @@ export const Trends: React.FC = () => {
                                         <tr key={coin.id} className="transition-colors hover:bg-white/5 group">
                                             <td className="p-3 pl-4 pr-2 sm:p-3 sm:pl-4 sm:pr-2 md:p-6 md:pl-8 md:pr-6">
                                                 <div className="flex items-center gap-2 md:gap-4">
-                                                    <span className="hidden w-6 font-mono text-sm text-gray-600 md:block">#{coin.market_cap_rank}</span>
+                                                    <span className="hidden w-6 text-sm text-gray-600 md:block">#{coin.market_cap_rank}</span>
                                                     <img src={coin.image} alt={coin.name} className="w-6 h-6 transition-transform duration-300 rounded-full shadow-lg md:w-8 md:h-8 group-hover:scale-110" />
                                                     <div>
                                                         {/* Full name hidden on mobile */}
@@ -259,7 +259,7 @@ export const Trends: React.FC = () => {
                                                 </div>
                                             </td>
                                             <td className="p-3 px-2 sm:p-3 sm:px-2 md:p-6 md:px-6">
-                                                <div className="font-mono text-xs font-medium tracking-tight text-white md:text-sm">
+                                                <div className="text-xs font-medium tracking-tight text-white md:text-sm">
                                                     {formatCurrency(coin.current_price)}
                                                 </div>
                                             </td>
@@ -269,10 +269,10 @@ export const Trends: React.FC = () => {
                                                     {Math.abs(coin.price_change_percentage_24h).toFixed(2)}%
                                                 </div>
                                             </td>
-                                            <td className="hidden p-3 px-2 font-mono text-xs text-right text-gray-400 sm:p-3 sm:px-2 md:table-cell md:text-sm md:p-6 md:px-6">
+                                            <td className="hidden p-3 px-2 text-xs text-right text-gray-400 sm:p-3 sm:px-2 md:table-cell md:text-sm md:p-6 md:px-6">
                                                 ${formatCompactNumber(coin.total_volume)}
                                             </td>
-                                            <td className="hidden p-3 pl-2 pr-4 font-mono text-xs text-right text-gray-400 sm:p-3 sm:pl-2 sm:pr-4 md:table-cell md:text-sm md:p-6 md:pl-6 md:pr-8">
+                                            <td className="hidden p-3 pl-2 pr-4 text-xs text-right text-gray-400 sm:p-3 sm:pl-2 sm:pr-4 md:table-cell md:text-sm md:p-6 md:pl-6 md:pr-8">
                                                 ${formatCompactNumber(coin.market_cap)}
                                             </td>
                                         </tr>

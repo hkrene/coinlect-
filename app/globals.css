@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Geist&display=swap');
 
 /* postcss-ignore */
 @tailwind base;
@@ -8,19 +9,18 @@
 @tailwind utilities;
 
 body {
-  font-family: 'Jura', sans-serif;
+  font-family: Geist, Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Apply Orbitron to all headings and titles */
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Orbitron', sans-serif;
+  font-family: Poppins, "Poppins Placeholder", sans-serif;
 }
 
-/* Utility class for titles that aren't headings */
 .font-title {
-  font-family: 'Orbitron', sans-serif;
+  font-family: Poppins, "Poppins Placeholder", sans-serif;
 }
+
 
 .glass-card {
   background: rgba(255, 255, 255, 0.95);
