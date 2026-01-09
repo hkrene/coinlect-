@@ -117,8 +117,8 @@ export const Header: React.FC = () => {
               <span className="text-xs font-semibold">EN</span>
             </button>
           </div>
-          {!isAuthenticated && <Link href="/register"><Button variant="outline" className="px-4 py-2 text-xs text-white border-white/20">{t.nav.getStarted}</Button></Link>}
           <Link href="/donate"><Button className="px-4 py-2 text-xs">{t.nav.donate}</Button></Link>
+          {!isAuthenticated && <Link href="/register"><Button variant="outline" className="px-4 py-2 text-xs text-white border-white/20">{t.nav.getStarted}</Button></Link>}
           {isAuthenticated && (
             <ProfileDropdown />
           )}
@@ -126,8 +126,8 @@ export const Header: React.FC = () => {
 
         {/* Mobile Toggle */}
         <div className="flex items-center gap-3 lg:hidden">
-            {!isAuthenticated && <Link href="/donate"><Button className="px-3 py-1.5 text-xs h-8 shadow-none">{t.nav.donate}</Button></Link>}
-            <button className="p-1 text-white" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>{mobileMenuOpen ? <X /> : <Menu />}</button>
+          <Link href="/donate"><Button className="px-3 py-1.5 text-xs h-8 shadow-none">{t.nav.donate}</Button></Link>
+          <button className="p-1 text-white" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>{mobileMenuOpen ? <X /> : <Menu />}</button>
         </div>
       </div>
 
@@ -162,7 +162,7 @@ export const Header: React.FC = () => {
              );
            })}
            <div className="flex flex-col gap-2 pt-4 mt-4 border-t border-white/10">
-             <div className="flex items-center gap-2">
+             <div className="flex items-center justify-between">
                <div className="relative flex items-center flex-none">
                  <button onClick={() => setLanguage('fr')} className={`relative z-10 w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all ${language === 'fr' ? 'border-coinlect-accent bg-black text-gray-200' : 'border-white/10 bg-black text-gray-500'}`}>
                    <span className="text-xs font-semibold">FR</span>
@@ -171,33 +171,11 @@ export const Header: React.FC = () => {
                    <span className="text-xs font-semibold">EN</span>
                  </button>
                </div>
-               {!isAuthenticated && <Link href="/register" className="flex-grow"><Button variant="outline" className="px-4 py-2 text-xs text-white border-white/20" onClick={() => setMobileMenuOpen(false)}>{t.nav.getStarted}</Button></Link>}
+               {isAuthenticated && (
+                <ProfileDropdown />
+              )}
              </div>
-            {isAuthenticated && (
-              <div className="flex items-center justify-between p-2 mt-2 rounded-lg bg-white/5">
-                <div className="flex items-center gap-3">
-                  <img
-                    src={user?.avatar || undefined}
-                    alt={user?.name || user?.email || 'User'}
-                    className="object-cover w-8 h-8 rounded-full bg-gradient-to-br from-coinlect-accent to-purple-600"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      const initials = (user?.name || user?.email || 'U').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-                      target.style.display = 'none';
-                      const parent = target.parentElement;
-                      if (parent) {
-                        parent.innerHTML = `<div class="w-8 h-8 rounded-full bg-gradient-to-br from-coinlect-accent to-purple-600 flex items-center justify-center text-xs font-semibold text-white">${initials}</div>`;
-                      }
-                    }}
-                  />
-                  <div>
-                    <span className="block text-sm font-semibold text-white">{user?.name || 'User'}</span>
-                    <span className="text-xs text-gray-400">{user?.email}</span>
-                  </div>
-                </div>
-                <button onClick={() => { logout(); setMobileMenuOpen(false); }} aria-label="Logout" className="p-1.5 bg-red-500/10 text-red-600 rounded-full hover:bg-red-500"><LogOut size={14} /></button>
-              </div>
-            )}
+             {!isAuthenticated && <Link href="/register" className="flex-grow"><Button variant="outline" className="w-full px-4 py-2 text-xs text-white border-white/20" onClick={() => setMobileMenuOpen(false)}>{t.nav.getStarted}</Button></Link>}
            </div>
         </div>
       )}
