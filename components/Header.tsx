@@ -17,9 +17,20 @@ export const Header: React.FC = () => {
   const [academyDropdownOpen, setAcademyDropdownOpen] = useState(false);
   const [mobileAcademyDropdownOpen, setMobileAcademyDropdownOpen] = useState(false);
   const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
+  const [hasMounted, setHasMounted] = useState(false); // New state for client-side mounting
   const pathname = usePathname();
   const { t, language, setLanguage } = useLanguage();
   const { user, isAuthenticated, logout, isAdmin } = useAuth();
+
+  useEffect(() => {
+    setHasMounted(true); // Set hasMounted to true after component mounts on client
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const academyMegaMenuContent = [
     { title: t.academy.megaMenu.allCategories, description: t.academy.megaMenu.allCategoriesDesc, href: '/academy' },
@@ -43,12 +54,6 @@ export const Header: React.FC = () => {
     { label: t.nav.events, href: '/events' },
   ];
 
-  useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 20);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
   const isActive = (path: string) => {
     if (!pathname) return false;
     if (path === '/' && pathname !== '/') return false;
@@ -69,7 +74,7 @@ export const Header: React.FC = () => {
 
         {/* Desktop Nav */}
         <nav className="items-center hidden gap-8 lg:flex">
-          {navItems.map((item) => {
+          {hasMounted && navItems.map((item) => { // Conditionally render navItems
             if (item.label === t.nav.academy) {
               return (
                 <div 
@@ -136,7 +141,7 @@ export const Header: React.FC = () => {
       {/* Mobile Menu */}
       {mobileMenuOpen && (
         <div className="absolute left-0 right-0 flex flex-col gap-2 p-6 bg-black border-b border-white/10 lg:hidden top-full max-h-[90vh] overflow-y-auto">
-           {navItems.map((item) => {
+           {hasMounted && navItems.map((item) => { // Conditionally render navItems
              if (item.label === t.nav.academy) {
                return (
                  <div key={item.href} className="flex flex-col">
