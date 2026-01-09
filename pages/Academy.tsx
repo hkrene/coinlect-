@@ -225,14 +225,14 @@ export const Academy: React.FC = () => {
         <div className="container relative z-10 px-6 mx-auto">
             <ScrollReveal>
                 <div className="max-w-5xl mx-auto">
-                    <h1 className="mb-8 text-5xl font-bold leading-[1.1] tracking-tighter text-white md:text-7xl lg:text-8xl">
+                    <h1 className="mb-8 text-4xl  font-bold leading-[1.1] tracking-tighter text-white md:text-6xl lg:text-6xl">
                         <span className="text-[#a1a1aa]">Apprenez la</span>{' '}Crypto{' '}<span className="text-[#a1a1aa]">et la</span>{' '}<br className="hidden md:block" />
                         <span className="relative inline-block text-white">
                             <span className="absolute inset-x-0 top-1/2 h-[2px] w-[110%] -translate-x-[5%] bg-white -rotate-2 z-10" />
                             Blockchain
                         </span>{' '}<span className="text-[#a1a1aa]">facilement</span>
                     </h1>
-                    <p className="max-w-3xl mx-auto text-base leading-relaxed text-[#71717a] md:text-xl lg:text-2xl">
+                    <p className="max-w-3xl mx-auto text-sm leading-relaxed text-[#71717a] md:text-sm lg:text-sm">
                         Maîtrisez les fondamentaux de la Finance Décentralisée (DeFi), des smart contracts et de l&apos;infrastructure Web3.
                     </p>
                 </div>
@@ -329,14 +329,14 @@ export const Academy: React.FC = () => {
   <div className="relative z-10 w-full px-6 mx-auto max-w-7xl">
     <ScrollReveal>
       <div className="mb-24 text-center">
-        <h2 className="mb-8 text-5xl font-bold leading-[1.1] tracking-tighter text-white md:text-7xl lg:text-8xl">
+        <h2 className="mb-8 text-4xl font-bold leading-[1.1] tracking-tighter text-white md:text-6xl lg:text-6xl">
           <span className="text-[#a1a1aa]">Explorez les</span>{' '}Protocoles{' '}<span className="text-[#a1a1aa]">et</span>{' '}<br className="hidden md:block" />
           <span className="relative inline-block text-white">
             <span className="absolute inset-x-0 top-1/2 h-[2px] w-[110%] -translate-x-[5%] bg-white -rotate-2 z-10" />
             Écosystèmes
           </span>{' '}<span className="text-[#a1a1aa]">Blockchain</span>
         </h2>
-        <p className="max-w-3xl mx-auto text-base leading-relaxed text-[#71717a] md:text-xl lg:text-2xl">
+        <p className="max-w-3xl mx-auto text-sm leading-relaxed text-[#71717a] md:text-sm lg:text-sm">
           Maîtrisez le développement sur les réseaux les plus puissants avec nos guides techniques.
         </p>
       </div>

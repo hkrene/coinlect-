@@ -136,21 +136,21 @@ export const About: React.FC = () => {
                 À propos de <span className="text-coinlect-accent">CoinLect</span>
               </h1>
 
-              <p className="mb-4 text-lg leading-relaxed text-gray-400">
+              <p className="mb-4 text-sm text-gray-400 eading-relaxed md:text-xl">
                 CoinLect Academy est née d’une conviction simple : l’éducation est la clé
                 de l’adoption et de l’inclusion financière. Notre mission est de rendre
                 l’apprentissage de la crypto, du Web3 et de la blockchain accessible à
                 la jeunesse de l’Afrique francophone.
               </p>
 
-              <p className="mb-4 text-lg leading-relaxed text-gray-400">
+              <p className="mb-4 text-sm leading-relaxed text-gray-400">
                 À travers nos contenus éducatifs, nos formations et notre communauté
                 en ligne, nous aidons chaque apprenant à transformer la curiosité en
                 compétences concrètes. Nous ne faisons pas la promotion aveugle de
                 tendances : nous expliquons, formons et structurons la compréhension.
               </p>
 
-              <p className="text-lg leading-relaxed text-gray-400">
+              <p className="text-sm leading-relaxed text-gray-400">
                 CoinLect Academy construit une nouvelle génération de talents africains
                 capables de comprendre, créer et innover dans l’économie numérique
                 mondiale.
@@ -191,19 +191,19 @@ export const About: React.FC = () => {
                 Notre <span className="text-coinlect-accent">Mission</span>
               </h2>
 
-              <p className="mb-4 text-lg leading-relaxed text-gray-400">
+              <p className="mb-4 text-sm leading-relaxed text-gray-400">
                 Notre mission est de démocratiser l’éducation crypto et Web3 afin de
                 favoriser une adoption massive, responsable et durable une personne
                 à la fois.
               </p>
 
-              <p className="mb-4 text-lg leading-relaxed text-gray-400">
+              <p className="mb-4 text-sm leading-relaxed text-gray-400">
                 Nous proposons des contenus clairs, pratiques et impartiaux, conçus
                 pour répondre aux réalités économiques et technologiques de l’Afrique
                 francophone.
               </p>
 
-              <p className="text-lg leading-relaxed text-gray-400">
+              <p className="text-sm leading-relaxed text-gray-400">
                 CoinLect Academy s’engage à fournir une information honnête, sans
                 promesses irréalistes ni discours trompeurs. Notre objectif est
                 d’autonomiser chaque apprenant pour qu’il puisse prendre des décisions
@@ -232,7 +232,7 @@ export const About: React.FC = () => {
                         target.src = 'https://via.placeholder.com/128x128/333/666?text=' + member.name.split(' ').map(n => n[0]).join('');
                     }}
                   />
-                  <h3 className="text-lg font-bold text-white">{member.name}</h3>
+                  <h3 className="text-xl font-bold text-white">{member.name}</h3>
                   <p className="mb-3 text-sm text-gray-400">{member.title}</p>
                   <div className="flex gap-3">
                     {member.socials.twitter && (

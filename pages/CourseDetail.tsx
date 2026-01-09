@@ -101,7 +101,7 @@ export const CourseDetail: React.FC = () => {
                   </span>
                 </div>
                 
-                <h1 className="mb-6 text-3xl font-black leading-tight tracking-tighter text-left text-white md:text-6xl">
+                <h1 className="mb-6 text-2xl font-black leading-tight tracking-tighter text-left text-white md:text-4xl ">
                   {course.title}
                 </h1>
               </div>
@@ -167,13 +167,13 @@ export const CourseDetail: React.FC = () => {
               <h3 className="pl-4 mb-8 text-xl font-black tracking-widest text-left text-white uppercase border-l-2 border-coinlect-accent">
                 À propos de ce cours
               </h3>
-              <div className="space-y-6 text-lg font-light leading-relaxed text-left text-gray-400">
+              <div className="space-y-6 text-xs font-light leading-relaxed text-left text-gray-400 md:text-xl">
                 {course.about ? (
-                  <div className="whitespace-pre-line">{course.about}</div>
+                  <div className="text-sm whitespace-pre-line">{course.about}</div>
                 ) : (
                   <>
                     <p>{course.description}</p>
-                    <p className="font-bold tracking-widest uppercase text-red-600 text-2xl">Not financial advice</p>
+                    <p className="text-sm font-bold tracking-widest text-red-600 uppercase md:text-2xl">Not financial advice</p>
                   </>
                 )}
               </div>

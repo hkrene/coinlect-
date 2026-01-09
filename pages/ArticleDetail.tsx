@@ -117,7 +117,7 @@ export const ArticleDetail: React.FC = () => {
             </span>
          </div>
 
-         <h1 className="mb-8 text-3xl font-extrabold leading-tight text-white md:text-5xl">
+         <h1 className="mb-8 text-2xl font-extrabold leading-tight text-white md:text-4xl">
             {article.title}
          </h1>
 
