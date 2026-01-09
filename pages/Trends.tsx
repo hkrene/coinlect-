@@ -7,6 +7,7 @@ import { AdBanner } from '../components/AdBanner';
 import { ArrowUpRight, ArrowDownRight, ExternalLink, Clock, TrendingUp, RefreshCw, AlertCircle } from 'lucide-react';
 import { Button } from '../components/Button';
 import { MarketCoin, MOCK_MARKET_DATA } from '../mockData';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface NewsItem {
   id: string;
@@ -60,6 +61,7 @@ export const Trends: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [isLive, setIsLive] = useState(false);
+  const { language } = useLanguage();
 
   // Helper to format relative time from UNIX timestamp (seconds)
   const getRelativeTime = (timestamp: number) => {
@@ -84,7 +86,7 @@ export const Trends: React.FC = () => {
     if (!isBackground) setNewsLoading(true);
     try {
         // Using CryptoCompare API which is more reliable for public news feeds than CoinGecko
-        const response = await fetch('https://min-api.cryptocompare.com/data/v2/news/?lang=FR');
+        const response = await fetch(`https://min-api.cryptocompare.com/data/v2/news/?lang=${language.toUpperCase()}`);
 
         if (!response.ok) throw new Error("API Limit or Error");
 

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { translations } from '../translations';
 
 type Language = 'fr' | 'en';
@@ -14,7 +14,17 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [language, setLanguage] = useState<Language>('fr');
+  const [language, setLanguage] = useState<Language>(() => {
+    if (typeof window !== 'undefined') {
+      const storedLang = localStorage.getItem('coinlect_language');
+      return (storedLang === 'fr' || storedLang === 'en') ? storedLang : 'fr';
+    }
+    return 'fr';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('coinlect_language', language);
+  }, [language]);
 
   const value = {
     language,
