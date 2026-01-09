@@ -59,9 +59,7 @@ export default function LoginPage() {
             <div className="mb-6 text-center sm:mb-8">
               <h1 className="mb-2 text-xl font-bold sm:text-2xl md:text-3xl">Welcome Back</h1>
               <p className="text-xs text-gray-500 sm:text-sm">Enter your credentials to access your account</p>
-              <div className="mt-3 text-[10px] sm:text-xs text-gray-600 bg-white/5 p-2 sm:p-3 rounded">
-                <span className="block sm:inline">Demo Admin: admin@coinlect.com / admin123</span>
-              </div>
+              
             </div>
 
             {error && (
