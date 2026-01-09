@@ -84,7 +84,7 @@ export const Trends: React.FC = () => {
     if (!isBackground) setNewsLoading(true);
     try {
         // Using CryptoCompare API which is more reliable for public news feeds than CoinGecko
-        const response = await fetch('https://min-api.cryptocompare.com/data/v2/news/?lang=EN');
+        const response = await fetch('https://min-api.cryptocompare.com/data/v2/news/?lang=FR');
 
         if (!response.ok) throw new Error("API Limit or Error");
 
