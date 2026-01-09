@@ -1,13 +1,16 @@
 'use client';
 
 import React from 'react';
+
+export const dynamic = 'force-dynamic';
+export const generateStaticParams = () => [];
 import { useLanguage } from '../contexts/LanguageContext';
 
 export const Privacy: React.FC = () => {
   const { t } = useLanguage();
 
   return (
-    <div className="min-h-screen px-6 py-20 font-sans text-white bg-black md:px-12">
+    <div className="min-h-screen px-6 py-20 text-white bg-black md:px-12">
       <div className="max-w-3xl mx-auto">
         <h1 className="mb-8 text-3xl font-medium tracking-tight md:text-4xl">{t.privacy.title}</h1>
         
@@ -42,5 +45,11 @@ export const Privacy: React.FC = () => {
     </div>
   );
 };
+
+export async function getServerSideProps() {
+  return {
+    props: {},
+  };
+}
 
 export default Privacy;

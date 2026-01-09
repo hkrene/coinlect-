@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { featuredSchema } from '@/lib/validators';
-import { getAuthContext, unauthorized, forbidden } from '@/lib/api';
-import { UserRole } from '@prisma/client';
+import { requireAdmin } from '@/lib/auth-utils';
 
 export async function GET() {
   const items = await prisma.featuredItem.findMany({
@@ -12,10 +11,7 @@ export async function GET() {
   return NextResponse.json({ items });
 }
 
-export async function POST(req: NextRequest) {
-  const auth = await getAuthContext(req);
-  if (!auth) return unauthorized();
-  if (auth.role !== UserRole.ADMIN && auth.role !== UserRole.EDITOR) return forbidden();
+export const POST = requireAdmin(async (req: NextRequest, user) => {
 
   try {
     const body = await req.json();
@@ -39,12 +35,9 @@ export async function POST(req: NextRequest) {
     console.error('Featured create error', err);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
-}
+});
 
-export async function PUT(req: NextRequest) {
-  const auth = await getAuthContext(req);
-  if (!auth) return unauthorized();
-  if (auth.role !== UserRole.ADMIN && auth.role !== UserRole.EDITOR) return forbidden();
+export const PUT = requireAdmin(async (req: NextRequest, user) => {
 
   try {
     const { items } = await req.json();
@@ -64,5 +57,5 @@ export async function PUT(req: NextRequest) {
     console.error('Featured bulk update error', err);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
-}
+});
 

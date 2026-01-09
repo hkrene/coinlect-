@@ -1,208 +1,208 @@
 
-import { User, Course, Article, Event } from '../types';
-import { COURSES_DATA, ARTICLES_DATA, DEALS_DATA, Deal } from '../mockData';
+import { User, Course, Article, Event, Deal } from '../types';
 
-const STORAGE_KEYS = {
-  USERS: 'coinlect_users',
-  COURSES: 'coinlect_courses',
-  ARTICLES: 'coinlect_articles',
-  DEALS: 'coinlect_deals',
-  EVENTS: 'coinlect_events',
-  SESSION: 'coinlect_session'
-};
-
-const initData = () => {
-  if (typeof window === 'undefined') return; // Skip on server-side
-  
-  if (!localStorage.getItem(STORAGE_KEYS.COURSES)) {
-    localStorage.setItem(STORAGE_KEYS.COURSES, JSON.stringify(COURSES_DATA));
-  }
-  if (!localStorage.getItem(STORAGE_KEYS.ARTICLES)) {
-    localStorage.setItem(STORAGE_KEYS.ARTICLES, JSON.stringify(ARTICLES_DATA));
-  }
-  localStorage.setItem(STORAGE_KEYS.DEALS, JSON.stringify(DEALS_DATA));
-  
-  // Initialize events with default data if not exists
-  if (!localStorage.getItem(STORAGE_KEYS.EVENTS)) {
-    const defaultEvents: Event[] = [
-      {
-        id: 1,
-        title: 'Africa Blockchain Festival 2025',
-        date: 'Friday, November 7, 2025',
-        location: 'Kigali Convention Center, Rwanda',
-        type: ['CONFERENCE'],
-        banner: 'africa-blockchain-festival',
-        bannerText: 'SAVE THE DATE\n7th - 9th November 2025\nKigali Convention Center, Rwanda'
-      },
-      {
-        id: 2,
-        title: 'Blockf3st Africa 2025',
-        date: 'Saturday, October 11, 2025',
-        location: 'Please register to see the exact location of this event.',
-        type: ['MEETUP', 'CONFERENCE', 'WEB3'],
-        banner: 'blockf3st-africa',
-        bannerText: 'BLOCKF3ST AFRICA'
-      },
-      {
-        id: 3,
-        title: 'Aptos Meet & Build, Edo',
-        date: 'Saturday, September 20, 2025',
-        location: 'Opolo Hub, Uniben Benin City, Edo State',
-        type: ['WORKSHOP'],
-        banner: 'aptos-meet-build',
-        bannerText: 'APTOS\nMeet Build\nOpolo Hub, UniBen Benin City, Edo State'
-      },
-      {
-        id: 4,
-        title: 'Aptos Africa BOOTCAMP',
-        date: 'Monday, August 25, 2025',
-        location: 'Virtual',
-        type: ['HACKATHON', 'WORKSHOP'],
-        banner: 'aptos-bootcamp',
-        bannerText: 'MOVE BOOTCAMP\nHackathon Pool: $100,000 USD'
-      },
-      {
-        id: 5,
-        title: 'Developer Meetup with Mantle',
-        date: 'Saturday, July 5, 2025',
-        location: 'Cafe One Yaba',
-        type: ['MEETUP', 'WORKSHOP'],
-        banner: 'mantle-meetup',
-        bannerText: 'Developer Meetup with Mantle\n10:00 AM - 3:00 PM\n5th July, 2025\nCafe One, Yaba, Lagos'
-      },
-      {
-        id: 6,
-        title: '#StellarWACon25- Where Blockchain Meets the Real World',
-        date: 'Saturday, May 31, 2025',
-        location: 'The zone, Gbagada expressway, Lagos.',
-        type: ['CONFERENCE'],
-        banner: 'stellar-wacon',
-        bannerText: 'Stellar West Africa Conference 2025\nWhere Blockchain Meets the Real World\nMay 31st, 2025.\nLagos, Nigeria'
-      }
-    ];
-    localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(defaultEvents));
-  }
-  
-  if (!localStorage.getItem(STORAGE_KEYS.USERS)) {
-    const adminUser: User = {
-      id: 'admin-1',
-      email: 'admin@coinlect.com',
-      firstName: 'Admin',
-      lastName: 'User',
-      role: 'admin',
-      createdAt: new Date().toISOString()
-    };
-    localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify([adminUser]));
-  }
-};
-
-// Only initialize on client-side
-if (typeof window !== 'undefined') {
-  initData();
-}
-
-export const userService = {
-  getAll: (): User[] => {
-    if (typeof window === 'undefined') return [];
-    return JSON.parse(localStorage.getItem(STORAGE_KEYS.USERS) || '[]');
-  },
-  create: (user: Omit<User, 'id' | 'createdAt'>): User => {
-    const users = userService.getAll();
-    if (users.find(u => u.email === user.email)) {
-      throw new Error('Email already exists');
-    }
-    const newUser: User = {
-      ...user,
-      id: Math.random().toString(36).substr(2, 9),
-      createdAt: new Date().toISOString()
-    };
-    users.push(newUser);
-    localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
-    return newUser;
-  },
-  toggleRole: (id: string) => {
-    const users = userService.getAll();
-    const user = users.find(u => u.id === id);
-    if (user) {
-      user.role = user.role === 'admin' ? 'user' : 'admin';
-      localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
-    }
-  },
-  login: (email: string): User | null => {
-    const users = userService.getAll();
-    return users.find(u => u.email === email) || null;
-  },
-  delete: (id: string) => {
-    let users = userService.getAll();
-    users = users.filter(u => u.id !== id);
-    localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(users));
-  }
-};
 
 export const courseService = {
-  getAll: (): Course[] => {
-    if (typeof window === 'undefined') return [];
-    return JSON.parse(localStorage.getItem(STORAGE_KEYS.COURSES) || '[]');
+  getAll: async (): Promise<Course[]> => {
+    try {
+      const response = await fetch('/api/courses', {
+        credentials: 'include',
+      });
+      if (!response.ok) throw new Error('Failed to fetch courses');
+      const data = await response.json();
+      return data.courses || [];
+    } catch (error) {
+      console.error('Error fetching courses:', error);
+      return [];
+    }
   },
-  add: (course: Omit<Course, 'id'>) => {
-    const courses = courseService.getAll();
-    const newCourse = { ...course, id: Date.now() };
-    courses.push(newCourse as Course);
-    localStorage.setItem(STORAGE_KEYS.COURSES, JSON.stringify(courses));
-    return newCourse;
+  add: async (course: Omit<Course, 'id' | 'slug'> & { slug: string }): Promise<Course> => {
+    try {
+      const response = await fetch('/api/courses', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(course),
+      });
+      if (!response.ok) throw new Error('Failed to create course');
+      const data = await response.json();
+      return data.course;
+    } catch (error) {
+      console.error('Error creating course:', error);
+      throw error;
+    }
   },
-  delete: (id: number) => {
-    let courses = courseService.getAll();
-    courses = courses.filter(c => c.id !== id);
-    localStorage.setItem(STORAGE_KEYS.COURSES, JSON.stringify(courses));
+  delete: async (id: string): Promise<void> => {
+    try {
+      const response = await fetch(`/api/courses/${id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      if (!response.ok) throw new Error('Failed to delete course');
+    } catch (error) {
+      console.error('Error deleting course:', error);
+      throw error;
+    }
   }
 };
 
 export const articleService = {
-  getAll: (): Article[] => {
-    if (typeof window === 'undefined') return [];
-    return JSON.parse(localStorage.getItem(STORAGE_KEYS.ARTICLES) || '[]');
+  getAll: async (): Promise<Article[]> => {
+    try {
+      const response = await fetch('/api/articles', {
+        credentials: 'include',
+      });
+      if (!response.ok) throw new Error('Failed to fetch articles');
+      const data = await response.json();
+      return data.articles || [];
+    } catch (error) {
+      console.error('Error fetching articles:', error);
+      return [];
+    }
   },
-  getFeatured: (): Article[] => {
-    const articles = articleService.getAll();
+  getFeatured: async (): Promise<Article[]> => {
+    const articles = await articleService.getAll();
     return articles.filter(a => a.featured);
   },
-  add: (article: Omit<Article, 'id'>) => {
-    const articles = articleService.getAll();
-    const newArticle = { ...article, id: Date.now() };
-    articles.unshift(newArticle as Article);
-    localStorage.setItem(STORAGE_KEYS.ARTICLES, JSON.stringify(articles));
-    return newArticle;
+  add: async (article: Omit<Article, 'id' | 'slug'> & { slug: string }): Promise<Article> => {
+    try {
+      const response = await fetch('/api/articles', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(article),
+      });
+      if (!response.ok) throw new Error('Failed to create article');
+      const data = await response.json();
+      return data.article;
+    } catch (error) {
+      console.error('Error creating article:', error);
+      throw error;
+    }
   },
-  delete: (id: number) => {
-    let articles = articleService.getAll();
-    articles = articles.filter(a => a.id !== id);
-    localStorage.setItem(STORAGE_KEYS.ARTICLES, JSON.stringify(articles));
+  update: async (id: string, updates: Partial<Article>): Promise<Article | null> => {
+    try {
+      const response = await fetch(`/api/articles/by-id/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(updates),
+      });
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('Article update failed:', errorData);
+        throw new Error(errorData.error || 'Failed to update article');
+      }
+      const data = await response.json();
+      return data.article;
+    } catch (error) {
+      console.error('Error updating article:', error);
+      return null;
+    }
+  },
+  delete: async (id: string): Promise<void> => {
+    try {
+      const response = await fetch(`/api/articles/by-id/${id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+        console.error('Article delete failed:', errorData);
+        throw new Error(errorData.error || 'Failed to delete article');
+      }
+    } catch (error) {
+      console.error('Error deleting article:', error);
+      throw error;
+    }
   }
 };
 
 export const dealService = {
-  getAll: (): Deal[] => {
-    if (typeof window === 'undefined') return [];
-    return JSON.parse(localStorage.getItem(STORAGE_KEYS.DEALS) || '[]');
-  }
+  getAll: async (): Promise<Deal[]> => {
+    try {
+      const response = await fetch('/api/deals', {
+        credentials: 'include',
+      });
+      if (!response.ok) throw new Error('Failed to fetch deals');
+      const data = await response.json();
+      return data.deals || [];
+    } catch (error) {
+      console.error('Error fetching deals:', error);
+      return [];
+    }
+  },
+  add: async (deal: Omit<Deal, 'id' | 'createdAt' | 'updatedAt'>): Promise<Deal> => {
+    try {
+      const response = await fetch('/api/deals', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(deal),
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to add deal');
+      }
+      const data = await response.json();
+      return data.deal;
+    } catch (error) {
+      console.error('Error adding deal:', error);
+      throw error;
+    }
+  },
 };
 
 export const eventService = {
-  getAll: (): Event[] => {
-    if (typeof window === 'undefined') return [];
-    return JSON.parse(localStorage.getItem(STORAGE_KEYS.EVENTS) || '[]');
+  getAll: async (): Promise<Event[]> => {
+    try {
+      const response = await fetch('/api/events', {
+        credentials: 'include',
+      });
+      if (!response.ok) throw new Error('Failed to fetch events');
+      const data = await response.json();
+      return data.events || [];
+    } catch (error) {
+      console.error('Error fetching events:', error);
+      return [];
+    }
   },
-  add: (event: Omit<Event, 'id'>) => {
-    const events = eventService.getAll();
-    const newEvent = { ...event, id: Date.now() };
-    events.unshift(newEvent as Event);
-    localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(events));
-    return newEvent;
+  add: async (event: Omit<Event, 'id' | 'slug'> & { slug: string }): Promise<Event> => {
+    try {
+      const response = await fetch('/api/events', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(event),
+      });
+      if (!response.ok) throw new Error('Failed to create event');
+      const data = await response.json();
+      return data.event;
+    } catch (error) {
+      console.error('Error creating event:', error);
+      throw error;
+    }
   },
-  delete: (id: number) => {
-    let events = eventService.getAll();
-    events = events.filter(e => e.id !== id);
-    localStorage.setItem(STORAGE_KEYS.EVENTS, JSON.stringify(events));
+  delete: async (id: string): Promise<void> => {
+    try {
+      const response = await fetch(`/api/events/${id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      if (!response.ok) throw new Error('Failed to delete event');
+    } catch (error) {
+      console.error('Error deleting event:', error);
+      throw error;
+    }
   }
 };

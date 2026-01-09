@@ -5,9 +5,11 @@ import { Button } from './Button';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useLanguage } from '../contexts/LanguageContext';
+import { useAuth } from '../contexts/AuthContext';
 
 export const Footer: React.FC = () => {
   const { t, language, setLanguage } = useLanguage();
+  const { isAuthenticated } = useAuth();
   const pathname = usePathname();
   const isDonatePage = pathname === '/donate';
 
@@ -22,19 +24,43 @@ export const Footer: React.FC = () => {
                 <div className="relative z-10 max-w-xl">
                     {isDonatePage ? (
                         <>
-                            <p className="mb-2 text-gray-400">{t.footer.ready}</p>
-                            <p className="mb-8 text-sm text-gray-500">{t.footer.join}</p>
-                            <Link href="/register">
-                                <Button variant="secondary" withArrow className="text-xs">{t.footer.createAccount}</Button>
-                            </Link>
+                            {isAuthenticated ? (
+                                <>
+                                    <p className="mb-2 text-gray-400">Sponsor Us</p>
+                                    <p className="mb-8 text-sm text-gray-500">Support our mission to provide free Web3 education in Africa.</p>
+                                    <a href="mailto:coinlectacademy@gmail.com?subject=Sponsorship Inquiry" target="_blank" rel="noopener noreferrer">
+                                        <Button variant="primary" withArrow className="text-xs font-bold">Sponsor Us</Button>
+                                    </a>
+                                </>
+                            ) : (
+                                <>
+                                    <p className="mb-2 text-gray-400">{t.footer.ready}</p>
+                                    <p className="mb-8 text-sm text-gray-500">{t.footer.join}</p>
+                                    <Link href="/register">
+                                        <Button variant="secondary" withArrow className="text-xs">{t.footer.createAccount}</Button>
+                                    </Link>
+                                </>
+                            )}
                         </>
                     ) : (
                         <>
-                            <p className="mb-2 text-gray-400">{t.footer.donateTitle}</p>
-                            <p className="mb-8 text-sm text-gray-500">{t.footer.donateDesc}</p>
-                            <Link href="/donate">
-                                <Button variant="primary" withArrow className="text-xs font-bold">{t.footer.donateBtn}</Button>
-                            </Link>
+                            {isAuthenticated ? (
+                                <>
+                                    <p className="mb-2 text-gray-400">Sponsor Us</p>
+                                    <p className="mb-8 text-sm text-gray-500">Support our mission to provide free Web3 education in Africa.</p>
+                                    <a href="mailto:coinlectacademy@gmail.com?subject=Sponsorship Inquiry" target="_blank" rel="noopener noreferrer">
+                                        <Button variant="primary" withArrow className="text-xs font-bold">Sponsor Us</Button>
+                                    </a>
+                                </>
+                            ) : (
+                                <>
+                                    <p className="mb-2 text-gray-400">{t.footer.donateTitle}</p>
+                                    <p className="mb-8 text-sm text-gray-500">{t.footer.donateDesc}</p>
+                                    <Link href="/donate">
+                                        <Button variant="primary" withArrow className="text-xs font-bold">{t.footer.donateBtn}</Button>
+                                    </Link>
+                                </>
+                            )}
                         </>
                     )}
                 </div>
@@ -52,7 +78,7 @@ export const Footer: React.FC = () => {
                         <li><Link href="/academy" className="hover:text-coinlect-accent">{t.nav.academy}</Link></li>
                         <li><Link href="/deals" className="hover:text-coinlect-accent">{t.nav.deals}</Link></li>
                         <li><Link href="/events" className="hover:text-coinlect-accent">{t.nav.events}</Link></li>
-                        <li><Link href="/register" className="hover:text-coinlect-accent">{t.nav.register}</Link></li>
+                        {!isAuthenticated && <li><Link href="/register" className="hover:text-coinlect-accent">{t.nav.register}</Link></li>}
                     </ul>
                 </div>
                 <div>
@@ -83,15 +109,7 @@ export const Footer: React.FC = () => {
                 </div>
             </div>
 
-            <div className="flex flex-col items-center justify-between pt-8 border-t md:flex-row border-white/5">
-                <div className="flex items-center gap-4 mb-4 md:mb-0">
-                    <img 
-                        src="https://res.cloudinary.com/drsd8adkq/image/upload/v1765187097/coinlect-0_denz8g.jpg" 
-                        alt="Coinlect" 
-                        className="hidden w-auto h-6 rounded-full opacity-70 md:block"
-                    />
-                    <span className="text-gray-500">© 2025 Coinlect. {t.footer.rights}</span>
-                </div>
+            <div className="flex flex-col items-center justify-between border-t md:flex-row border-white/5">
                 <div className="flex flex-col items-center gap-4 md:flex-row">
                     <div className="flex items-center gap-4">
                         {/* Language Toggle beside Social Icons */}
@@ -144,6 +162,12 @@ export const Footer: React.FC = () => {
                         </a>
                         </div>
                     </div>
+                </div>
+                <div className="flex items-center gap-4 my-4 md:mb-0">
+                    <span className="text-xs text-gray-500">© 2025 Coinlect. {t.footer.rights}</span>
+                    <a href="http://hirwarene-dev.netlify.app" className="text-xs text-gray-500" target="_blank" rel="noopener noreferrer">
+                <span>Designed by <span  className='text-blue-500'>Hkrene</span></span>
+                </a>
                 </div>
             </div>
         </div>

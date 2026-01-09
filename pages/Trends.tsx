@@ -1,12 +1,13 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { ScrollReveal } from '../components/ScrollReveal';
 import { Ticker } from '../components/Ticker';
 import { AdBanner } from '../components/AdBanner';
 import { ArrowUpRight, ArrowDownRight, ExternalLink, Clock, TrendingUp, RefreshCw, AlertCircle } from 'lucide-react';
 import { Button } from '../components/Button';
 import { MarketCoin, MOCK_MARKET_DATA } from '../mockData';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface NewsItem {
   id: string;
@@ -60,6 +61,7 @@ export const Trends: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [isLive, setIsLive] = useState(false);
+  const { language } = useLanguage();
 
   // Helper to format relative time from UNIX timestamp (seconds)
   const getRelativeTime = (timestamp: number) => {
@@ -80,16 +82,16 @@ export const Trends: React.FC = () => {
     return "Just now";
   };
 
-  const fetchNews = async (isBackground = false) => {
+  const fetchNews = useCallback(async (isBackground = false) => {
     if (!isBackground) setNewsLoading(true);
     try {
         // Using CryptoCompare API which is more reliable for public news feeds than CoinGecko
-        const response = await fetch('https://min-api.cryptocompare.com/data/v2/news/?lang=EN');
-        
+        const response = await fetch(`https://min-api.cryptocompare.com/data/v2/news/?lang=${language.toUpperCase()}`);
+
         if (!response.ok) throw new Error("API Limit or Error");
 
         const data = await response.json();
-        
+
         if (data.Data && data.Data.length > 0) {
             const formattedNews = data.Data.slice(0, 9).map((item: any) => ({
                 id: item.id,
@@ -97,7 +99,7 @@ export const Trends: React.FC = () => {
                 summary: item.body, // CryptoCompare uses 'body' for summary
                 source: item.source_info?.name || 'CryptoNews',
                 time: getRelativeTime(item.published_on),
-                imageUrl: item.imageurl, 
+                imageUrl: item.imageurl,
                 category: item.categories?.split('|')[0] || "Crypto",
                 url: item.url
             }));
@@ -114,7 +116,7 @@ export const Trends: React.FC = () => {
     } finally {
         if (!isBackground) setNewsLoading(false);
     }
-  };
+  }, [news.length]);
 
   const fetchMarketData = async () => {
     try {
@@ -185,7 +187,7 @@ export const Trends: React.FC = () => {
           <div className="container px-6 mx-auto mb-12">
             <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
                 <div>
-                    <h1 className="mb-4 text-4xl font-bold text-center md:text-left">Market <span className="text-coinlect-accent">Trends</span></h1>
+                    <h1 className="mb-4 text-4xl font-bold text-center md:text-left">Marché <span className="text-coinlect-accent">Crypto</span></h1>
                 </div>
                 <div className="flex items-center gap-4">
                     <button 
@@ -227,30 +229,28 @@ export const Trends: React.FC = () => {
                             <thead className="text-xs font-semibold tracking-wider text-gray-500 uppercase border-b bg-white/5 border-white/10">
                                 <tr>
                                     <th className="p-3 pl-4 pr-2 text-left sm:p-3 sm:pl-4 sm:pr-2 md:p-6 md:pl-8 md:pr-6">Asset</th>
-                                    <th className="p-3 px-2 text-right sm:p-3 sm:px-2 md:p-6 md:px-6">Price</th>
-                                    <th className="p-3 px-2 text-right sm:p-3 sm:px-2 md:p-6 md:px-6">24h Change</th>
-                                    <th className="p-3 px-2 text-right sm:p-3 sm:px-2 md:p-6 md:px-6">24h Volume</th>
-                                    <th className="p-3 pl-2 pr-4 text-right sm:p-3 sm:pl-2 sm:pr-4 md:p-6 md:pl-6 md:pr-8">Market Cap</th>
+                                    <th className="p-3 px-2 text-left sm:p-3 sm:px-2 md:p-6 md:px-6">Price</th>
+                                    <th className="p-3 px-2 text-left sm:p-3 sm:px-2 md:p-6 md:px-6">24h Change</th>
+                                    <th className="hidden p-3 px-2 text-right sm:p-3 sm:px-2 md:table-cell md:p-6 md:px-6">24h Volume</th>
+                                    <th className="hidden p-3 pl-2 pr-4 text-right sm:p-3 sm:pl-2 sm:pr-4 md:table-cell md:p-6 md:pl-6 md:pr-8">Market Cap</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-white/5">
                                 {loading && coins.length === 0 ? (
-                                    // Skeleton Loader
-                                    Array.from({ length: 10 }).map((_, i) => (
-                                        <tr key={i} className="animate-pulse">
-                                            <td className="p-3 pl-4 pr-2 sm:p-3 sm:pl-4 sm:pr-2 md:p-6 md:pl-8 md:pr-6"><div className="w-32 h-10 rounded bg-white/5"></div></td>
-                                            <td className="p-3 px-2 sm:p-3 sm:px-2 md:p-6 md:px-6"><div className="w-20 h-6 ml-auto rounded bg-white/5"></div></td>
-                                            <td className="p-3 px-2 sm:p-3 sm:px-2 md:p-6 md:px-6"><div className="w-16 h-6 ml-auto rounded bg-white/5"></div></td>
-                                            <td className="p-3 px-2 sm:p-3 sm:px-2 md:p-6 md:px-6"><div className="w-24 h-6 ml-auto rounded bg-white/5"></div></td>
-                                            <td className="p-3 pl-2 pr-4 sm:p-3 sm:pl-2 sm:pr-4 md:p-6 md:pl-6 md:pr-8"><div className="h-6 ml-auto rounded w-28 bg-white/5"></div></td>
-                                        </tr>
-                                    ))
+                                    <tr>
+                                        <td colSpan={5} className="p-12">
+                                            <div className="flex flex-col items-center justify-center gap-4">
+                                                <div className="w-12 h-12 border-b-2 border-white rounded-full animate-spin"></div>
+                                                <p className="text-white">Chargement du marché...</p>
+                                            </div>
+                                        </td>
+                                    </tr>
                                 ) : (
                                     coins.map((coin) => (
                                         <tr key={coin.id} className="transition-colors hover:bg-white/5 group">
                                             <td className="p-3 pl-4 pr-2 sm:p-3 sm:pl-4 sm:pr-2 md:p-6 md:pl-8 md:pr-6">
                                                 <div className="flex items-center gap-2 md:gap-4">
-                                                    <span className="hidden w-6 font-mono text-sm text-gray-600 md:block">#{coin.market_cap_rank}</span>
+                                                    <span className="hidden w-6 text-sm text-gray-600 md:block">#{coin.market_cap_rank}</span>
                                                     <img src={coin.image} alt={coin.name} className="w-6 h-6 transition-transform duration-300 rounded-full shadow-lg md:w-8 md:h-8 group-hover:scale-110" />
                                                     <div>
                                                         {/* Full name hidden on mobile */}
@@ -261,7 +261,7 @@ export const Trends: React.FC = () => {
                                                 </div>
                                             </td>
                                             <td className="p-3 px-2 sm:p-3 sm:px-2 md:p-6 md:px-6">
-                                                <div className="font-mono text-xs font-medium tracking-tight text-white md:text-sm">
+                                                <div className="text-xs font-medium tracking-tight text-white md:text-sm">
                                                     {formatCurrency(coin.current_price)}
                                                 </div>
                                             </td>
@@ -271,10 +271,10 @@ export const Trends: React.FC = () => {
                                                     {Math.abs(coin.price_change_percentage_24h).toFixed(2)}%
                                                 </div>
                                             </td>
-                                            <td className="p-3 px-2 sm:p-3 sm:px-2 font-mono text-xs text-right text-gray-400 md:text-sm md:p-6 md:px-6">
+                                            <td className="hidden p-3 px-2 text-xs text-right text-gray-400 sm:p-3 sm:px-2 md:table-cell md:text-sm md:p-6 md:px-6">
                                                 ${formatCompactNumber(coin.total_volume)}
                                             </td>
-                                            <td className="p-3 pl-2 pr-4 sm:p-3 sm:pl-2 sm:pr-4 font-mono text-xs text-right text-gray-400 md:text-sm md:p-6 md:pl-6 md:pr-8">
+                                            <td className="hidden p-3 pl-2 pr-4 text-xs text-right text-gray-400 sm:p-3 sm:pl-2 sm:pr-4 md:table-cell md:text-sm md:p-6 md:pl-6 md:pr-8">
                                                 ${formatCompactNumber(coin.market_cap)}
                                             </td>
                                         </tr>
@@ -292,11 +292,11 @@ export const Trends: React.FC = () => {
         </ScrollReveal>
 
         {/* NEWS SECTION */}
-        <div className="relative">
+        <div id="news"  className="relative">
             <ScrollReveal>
                 <div className="flex flex-col justify-between gap-4 mb-8 md:flex-row md:items-center">
                     <h2 className="flex items-center gap-2 text-2xl font-bold">
-                        <TrendingUp className="text-coinlect-accent" />
+                        <TrendingUp className="text-coinlect-accent" id='news' />
                         Trending <span className="text-white">Crypto News</span>
                     </h2>
                     <Button variant="ghost" withArrow onClick={() => window.open('https://cryptopanic.com/', '_blank')} className="justify-center w-full md:w-auto md:justify-start">View More News</Button>
@@ -304,10 +304,9 @@ export const Trends: React.FC = () => {
             </ScrollReveal>
 
             {newsLoading && news.length === 0 ? (
-               <div className="grid gap-8 md:grid-cols-3">
-                   {Array.from({length: 6}).map((_, i) => (
-                       <div key={i} className="h-64 bg-[#0F0F0F] border border-white/10 rounded-2xl animate-pulse"></div>
-                   ))}
+               <div className="flex flex-col items-center justify-center gap-4 py-20">
+                   <div className="w-12 h-12 border-b-2 border-white rounded-full animate-spin"></div>
+                   <p className="text-white">Chargement des actualités...</p>
                </div>
             ) : (
                 <div className="grid gap-8 md:grid-cols-3">

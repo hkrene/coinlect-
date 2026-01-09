@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/Button';
 import { ScrollReveal } from '@/components/ScrollReveal';
 import { AdBanner } from '@/components/AdBanner';
+import { Eye, EyeOff } from 'lucide-react';
 import { GoogleAuthButton } from '@/components/GoogleAuthButton';
 import { useAuth } from '@/contexts/AuthContext';
 import { ComponentsLayout } from '../components-layout';
@@ -14,6 +15,7 @@ export default function RegisterPage() {
   const [formData, setFormData] = useState({ firstName: '', lastName: '', email: '', password: '' });
   const [isLoading, setIsLoading] = useState(false);
   const [googleError, setGoogleError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
   const { register, error } = useAuth();
   const router = useRouter();
 
@@ -35,9 +37,15 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    await register(formData.firstName, formData.lastName, formData.email, formData.password);
-    setIsLoading(false);
-    router.push('/academy');
+    try {
+      await register(`${formData.firstName} ${formData.lastName}`.trim(), formData.email, formData.password);
+      router.push('/academy');
+    } catch (err) {
+      // Error is already handled by the AuthContext
+      console.error('Registration failed:', err);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -96,14 +104,23 @@ export default function RegisterPage() {
               </div>
               <div>
                 <label className="block mb-2 text-xs font-medium text-gray-400 sm:text-sm">Password</label>
-                <input 
-                  id="password" 
-                  type="password" 
-                  required 
-                  onChange={handleChange} 
-                  className="w-full px-3 py-3 text-sm text-white transition-colors border rounded-lg sm:px-4 sm:text-base bg-black/50 border-white/10 focus:outline-none focus:border-coinlect-accent focus:ring-1 focus:ring-coinlect-accent/50" 
-                  placeholder="••••••••" 
-                />
+                <div className="relative">
+                  <input 
+                    id="password" 
+                    type={showPassword ? 'text' : 'password'} 
+                    required 
+                    onChange={handleChange} 
+                    className="w-full px-3 py-3 pr-10 text-sm text-white transition-colors border rounded-lg sm:px-4 sm:text-base bg-black/50 border-white/10 focus:outline-none focus:border-coinlect-accent focus:ring-1 focus:ring-coinlect-accent/50" 
+                    placeholder="••••••••" 
+                  />
+                  <button 
+                    type="button" 
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-white focus:outline-none"
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
               </div>
               
               <div className="pt-2 text-xs text-gray-500 sm:text-sm">
@@ -147,9 +164,6 @@ export default function RegisterPage() {
             <div className="mt-6 text-xs text-center text-gray-500 sm:mt-8 sm:text-sm">
               Already have an account? <Link href="/login" className="font-semibold text-white transition-colors hover:text-coinlect-accent">Sign in</Link>
             </div>
-          </div>
-          <div className="mt-6">
-            <AdBanner variant="compact" />
           </div>
         </ScrollReveal>
       </div>

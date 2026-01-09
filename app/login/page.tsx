@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/Button';
 import { ScrollReveal } from '@/components/ScrollReveal';
 import { AdBanner } from '@/components/AdBanner';
+import { Eye, EyeOff } from 'lucide-react';
 import { GoogleAuthButton } from '@/components/GoogleAuthButton';
 import { useAuth } from '@/contexts/AuthContext';
 import { ComponentsLayout } from '../components-layout';
@@ -15,6 +16,7 @@ export default function LoginPage() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [googleError, setGoogleError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
   const { login, error } = useAuth();
   const router = useRouter();
 
@@ -32,10 +34,18 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    await login(email, password);
-    setIsLoading(false);
-    if (!error) {
-      router.push('/academy');
+    try {
+      console.log('LoginPage: Attempting login with email:', email);
+      await login(email, password);
+      // Check if there's a redirect path stored in sessionStorage
+      const redirectPath = sessionStorage.getItem('redirectAfterLogin') || '/academy';
+      sessionStorage.removeItem('redirectAfterLogin'); // Clean up
+      console.log('LoginPage: Login function completed, redirecting to:', redirectPath);
+      router.push(redirectPath);
+    } catch (err) {
+      console.error('LoginPage: Login failed in catch block:', err);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -74,14 +84,23 @@ export default function LoginPage() {
               </div>
               <div>
                 <label className="block mb-2 text-xs font-medium text-gray-400 sm:text-sm">Password</label>
+                <div className="relative">
                 <input 
-                  type="password" 
+                    type={showPassword ? 'text' : 'password'} 
                   required
-                  className="w-full px-3 py-3 text-sm text-white transition-colors border rounded-lg sm:px-4 sm:py-3 sm:text-base bg-black/50 border-white/10 focus:outline-none focus:border-coinlect-accent focus:ring-1 focus:ring-coinlect-accent/50" 
+                    className="w-full px-3 py-3 pr-10 text-sm text-white transition-colors border rounded-lg sm:px-4 sm:py-3 sm:text-base bg-black/50 border-white/10 focus:outline-none focus:border-coinlect-accent focus:ring-1 focus:ring-coinlect-accent/50" 
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
+                  <button 
+                    type="button" 
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-white focus:outline-none"
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </button>
+                </div>
               </div>
               
               <div className="flex flex-col gap-3 text-xs sm:flex-row sm:items-center sm:justify-between sm:text-sm">
@@ -89,7 +108,7 @@ export default function LoginPage() {
                   <input type="checkbox" className="w-4 h-4 bg-transparent border-gray-600 rounded" />
                   <span>Remember me</span>
                 </label>
-                <a href="#" className="font-medium text-coinlect-accent hover:underline">Forgot password?</a>
+                <a href="/forgot-password" className="font-medium text-coinlect-accent hover:underline">Forgot password?</a>
               </div>
 
               <Button className="justify-center w-full py-3 text-sm font-semibold sm:py-4 sm:text-base" disabled={isLoading}>
@@ -111,7 +130,10 @@ export default function LoginPage() {
                 <GoogleAuthButton
                   variant="login"
                   onSuccess={(user, tokens) => {
-                    router.push('/academy');
+                    // Check if there's a redirect path stored in sessionStorage
+                    const redirectPath = sessionStorage.getItem('redirectAfterLogin') || '/academy';
+                    sessionStorage.removeItem('redirectAfterLogin'); // Clean up
+                    router.push(redirectPath);
                   }}
                   onError={(error) => {
                     setGoogleError(error);
@@ -129,9 +151,6 @@ export default function LoginPage() {
             <div className="mt-6 text-xs text-center text-gray-500 sm:mt-8 sm:text-sm">
               Don&apos;t have an account? <Link href="/register" className="font-semibold text-white transition-colors hover:text-coinlect-accent">Sign up</Link>
             </div>
-          </div>
-          <div className="mt-6">
-            <AdBanner variant="compact" />
           </div>
         </ScrollReveal>
       </div>

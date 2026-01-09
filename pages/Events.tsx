@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { Search, ArrowRight, ChevronDown, Calendar, MapPin } from 'lucide-react';
+import { Search, ArrowRight, Calendar, MapPin, ArrowLeft } from 'lucide-react';
 import { ScrollReveal } from '../components/ScrollReveal';
 import { eventService } from '../services/db';
 import { Event } from '../types';
@@ -16,13 +16,21 @@ export const Events: React.FC = () => {
   const itemsPerPage = 6;
 
   useEffect(() => {
-    setEvents(eventService.getAll());
+    const fetchEvents = async () => {
+      try {
+        const fetchedEvents = await eventService.getAll();
+        setEvents(fetchedEvents);
+      } catch (error) {
+        console.error('Error fetching events:', error);
+      }
+    };
+
+    fetchEvents();
   }, []);
 
   const filteredEvents = useMemo(() => {
     let filtered = events;
 
-    // Apply search filter
     if (searchQuery) {
       filtered = filtered.filter(event =>
         event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -30,30 +38,56 @@ export const Events: React.FC = () => {
       );
     }
 
-    // Apply type filter
     if (activeFilter !== 'All') {
       filtered = filtered.filter(event =>
-        event.type.some(t => t.toLowerCase() === activeFilter.toLowerCase())
+        event.eventTypes.some(t => t.toLowerCase() === activeFilter.toLowerCase())
       );
     }
 
     return filtered;
   }, [events, searchQuery, activeFilter]);
 
+  const totalPages = Math.max(1, Math.ceil(filteredEvents.length / itemsPerPage));
+
+  useEffect(() => {
+    if (currentPage > totalPages) {
+      setCurrentPage(1);
+    }
+  }, [totalPages, currentPage]);
+
   const paginatedEvents = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     return filteredEvents.slice(startIndex, startIndex + itemsPerPage);
   }, [filteredEvents, currentPage]);
 
-  const totalPages = Math.ceil(filteredEvents.length / itemsPerPage);
-
   const renderBanner = (event: Event) => {
+    // If custom banner image is provided, use it (check both banner === 'custom' and direct bannerImage)
+    if (event.bannerImage || (event.banner === 'custom' && event.bannerImage)) {
+      return (
+        <div className="relative h-48 overflow-hidden rounded-t-xl">
+          <img
+            src={event.bannerImage}
+            alt={event.title}
+            className="object-cover w-full h-full"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = 'https://via.placeholder.com/800x400/333/666?text=No+Image';
+            }}
+          />
+          {event.bannerText && (
+            <div className="absolute inset-0 flex items-center justify-center p-6 text-white">
+              <div className="text-center whitespace-pre-line">{event.bannerText}</div>
+            </div>
+          )}
+        </div>
+      );
+    }
+    
+    // Les bannières restent identiques à votre version originale
     if (event.banner === 'africa-blockchain-festival') {
       return (
         <div className="relative h-48 overflow-hidden bg-teal-900 rounded-t-xl">
-          <div className="absolute px-3 py-1 text-xs font-bold text-black bg-orange-500 rounded top-4 right-4">
-            SAVE THE DATE
-          </div>
+          <div className="absolute px-3 py-1 text-xs font-bold text-black bg-orange-500 rounded top-4 right-4">SAVE THE DATE</div>
           <div className="absolute inset-0 flex flex-col justify-center p-6 text-white">
             <div className="space-y-1 text-sm font-medium">
               <div>7th - 9th November 2025</div>
@@ -63,7 +97,6 @@ export const Events: React.FC = () => {
         </div>
       );
     }
-
     if (event.banner === 'blockf3st-africa') {
       return (
         <div className="relative h-48 overflow-hidden bg-blue-900 rounded-t-xl">
@@ -79,74 +112,60 @@ export const Events: React.FC = () => {
         </div>
       );
     }
-
     if (event.banner === 'aptos-meet-build') {
-      return (
-        <div className="relative h-48 overflow-hidden bg-blue-800 rounded-t-xl">
-          <div className="absolute inset-0 flex flex-col justify-center p-6 text-white">
-            <div className="mb-2 text-xs font-bold">APTOS</div>
-            <div className="mb-2 text-3xl font-bold">
-              Meet <span className="text-blue-400">Build</span>
+        return (
+          <div className="relative h-48 overflow-hidden bg-blue-800 rounded-t-xl">
+            <div className="absolute inset-0 flex flex-col justify-center p-6 text-white">
+              <div className="mb-2 text-xs font-bold">APTOS</div>
+              <div className="mb-2 text-3xl font-bold">Meet <span className="text-blue-400">Build</span></div>
+              <div className="text-xs text-gray-300">Opolo Hub, UniBen Benin City, Edo State</div>
             </div>
-            <div className="text-xs text-gray-300">Opolo Hub, UniBen Benin City, Edo State</div>
           </div>
-        </div>
-      );
+        );
     }
-
     if (event.banner === 'aptos-bootcamp') {
-      return (
-        <div className="relative h-48 overflow-hidden rounded-t-xl bg-slate-900">
-          <div className="absolute inset-0 flex flex-col justify-center p-6 text-xs text-white">
-            <div className="mb-2 font-bold">MOVE BOOTCAMP</div>
-            <div className="mb-1 font-semibold text-coinlect-accent">Hackathon Pool: $100,000 USD</div>
-            <div className="text-gray-400 space-y-0.5">
-              <div>Main Track: Build The Future Of Defi On Aptos</div>
-              <div>Best Tech Implementation</div>
-              <div>Top University Team</div>
+        return (
+          <div className="relative h-48 overflow-hidden rounded-t-xl bg-slate-900">
+            <div className="absolute inset-0 flex flex-col justify-center p-6 text-xs text-white">
+              <div className="mb-2 font-bold">MOVE BOOTCAMP</div>
+              <div className="mb-1 font-semibold text-coinlect-accent">Hackathon Pool: $100,000 USD</div>
+              <div className="text-gray-400 space-y-0.5">
+                <div>Main Track: Build The Future Of Defi On Aptos</div>
+                <div>Best Tech Implementation</div>
+                <div>Top University Team</div>
+              </div>
             </div>
           </div>
-        </div>
-      );
+        );
     }
-
     if (event.banner === 'mantle-meetup') {
-      return (
-        <div className="relative h-48 overflow-hidden rounded-t-xl bg-gradient-to-br from-pink-400 via-pink-300 to-green-400">
-          <div className="absolute inset-0 flex flex-col justify-center p-6 text-black">
-            <div className="mb-2 text-sm font-bold">Developer Meetup with Mantle</div>
-            <div className="space-y-1 text-xs">
-              <div>10:00 AM - 3:00 PM</div>
-              <div>5th July, 2025</div>
-              <div>Cafe One, Yaba, Lagos</div>
+        return (
+          <div className="relative h-48 overflow-hidden rounded-t-xl bg-gradient-to-br from-pink-400 via-pink-300 to-green-400">
+            <div className="absolute inset-0 flex flex-col justify-center p-6 text-black">
+              <div className="mb-2 text-sm font-bold">Developer Meetup with Mantle</div>
+              <div className="space-y-1 text-xs">
+                <div>10:00 AM - 3:00 PM</div>
+                <div>5th July, 2025</div>
+                <div>Cafe One, Yaba, Lagos</div>
+              </div>
             </div>
-            <div className="absolute w-16 h-16 rounded-lg bottom-4 right-4 bg-green-500/30"></div>
           </div>
-        </div>
-      );
+        );
     }
-
     if (event.banner === 'stellar-wacon') {
-      return (
-        <div className="relative h-48 overflow-hidden bg-gray-800 rounded-t-xl">
-          <div className="absolute inset-0 flex flex-col justify-center p-6 text-white">
-            <div className="mb-2 text-xs font-bold text-gray-400">Stellar West Africa Conference 2025</div>
-            <div className="mb-4 text-2xl font-bold">Where Blockchain Meets the Real World</div>
-            <div className="space-y-1 text-xs text-gray-300">
-              <div className="flex items-center gap-2">
-                <Calendar size={14} />
-                <span>May 31st, 2025.</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <MapPin size={14} />
-                <span>Lagos, Nigeria</span>
+        return (
+          <div className="relative h-48 overflow-hidden bg-gray-800 rounded-t-xl">
+            <div className="absolute inset-0 flex flex-col justify-center p-6 text-white">
+              <div className="mb-2 text-xs font-bold text-gray-400">Stellar West Africa Conference 2025</div>
+              <div className="mb-4 text-2xl font-bold">Where Blockchain Meets the Real World</div>
+              <div className="space-y-1 text-xs text-gray-300">
+                <div className="flex items-center gap-2"><Calendar size={14} /><span>May 31st, 2025.</span></div>
+                <div className="flex items-center gap-2"><MapPin size={14} /><span>Lagos, Nigeria</span></div>
               </div>
             </div>
           </div>
-        </div>
-      );
+        );
     }
-
     return (
       <div className="relative h-48 overflow-hidden bg-gray-800 rounded-t-xl">
         <div className="absolute inset-0 flex items-center justify-center p-6 text-white">
@@ -157,16 +176,11 @@ export const Events: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] pt-24 pb-20">
+    <div className="min-h-screen pt-24 pb-20 bg-black">
       <div className="container px-6 mx-auto max-w-7xl">
-        {/* Header Section */}
         <div className="mb-8">
           <div className="flex flex-col gap-6 mb-6 md:flex-row md:items-center md:justify-between">
-            <h1 className="text-4xl font-extrabold text-white md:text-5xl">
-              UPCOMING EVENTS
-            </h1>
-            
-            {/* Search Bar */}
+            <h1 className="text-4xl font-extrabold text-white md:text-5xl">UPCOMING EVENTS</h1>
             <div className="relative w-full max-w-md">
               <Search className="absolute text-gray-400 transform -translate-y-1/2 left-4 top-1/2" size={20} />
               <input
@@ -179,19 +193,15 @@ export const Events: React.FC = () => {
             </div>
           </div>
 
-          {/* Filter Buttons */}
-          <div className="flex flex-wrap gap-3">
+          <div className="flex w-full gap-2 pb-2 mb-12 overflow-x-auto md:pb-0 scrollbar-hide">
             {FILTERS.map((filter) => (
               <button
                 key={filter}
-                onClick={() => {
-                  setActiveFilter(filter);
-                  setCurrentPage(1);
-                }}
-                className={`px-5 py-2 rounded-full text-sm font-semibold transition-all ${
+                onClick={() => { setActiveFilter(filter); setCurrentPage(1); }}
+                className={`whitespace-nowrap px-4 py-2 rounded-full text-xs font-bold border transition-all ${
                   activeFilter === filter
-                    ? 'bg-coinlect-accent text-black'
-                    : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10 hover:text-white'
+                    ? 'bg-white text-black border-white'
+                    : 'bg-transparent border-white/10 text-gray-400 hover:border-white/30 hover:text-white'
                 }`}
               >
                 {filter}
@@ -200,32 +210,22 @@ export const Events: React.FC = () => {
           </div>
         </div>
 
-        {/* Events Grid */}
         <div className="grid grid-cols-1 gap-6 mb-12 md:grid-cols-2 lg:grid-cols-3">
           {paginatedEvents.map((event) => (
             <ScrollReveal key={event.id}>
               <div className="overflow-hidden transition-all border cursor-pointer group bg-black/50 border-white/10 rounded-xl hover:border-coinlect-accent/50">
                 {renderBanner(event)}
-                
                 <div className="p-6">
-                  {/* Event Type Badge */}
                   <div className="flex flex-wrap gap-2 mb-4">
-                    {event.type.map((type, idx) => (
-                      <span
-                        key={idx}
-                        className="px-3 py-1 text-xs font-bold tracking-wider text-gray-400 uppercase border rounded-full bg-white/5 border-white/10"
-                      >
+                    {event.eventTypes.map((type, idx) => (
+                      <span key={idx} className="px-3 py-1 text-xs font-bold tracking-wider text-gray-400 uppercase border rounded-full bg-white/5 border-white/10">
                         {type}
                       </span>
                     ))}
                   </div>
-
-                  {/* Event Title */}
                   <h3 className="mb-4 text-xl font-bold text-white transition-colors line-clamp-2 group-hover:text-coinlect-accent">
                     {event.title}
                   </h3>
-
-                  {/* Event Details */}
                   <div className="mb-6 space-y-3">
                     <div className="flex items-start gap-3 text-sm text-gray-400">
                       <Calendar className="mt-0.5 flex-shrink-0" size={16} />
@@ -236,8 +236,6 @@ export const Events: React.FC = () => {
                       <span>{event.location}</span>
                     </div>
                   </div>
-
-                  {/* Arrow Button */}
                   <div className="flex justify-end">
                     <div className="flex items-center justify-center w-10 h-10 transition-all border rounded-full bg-white/5 border-white/10 group-hover:bg-coinlect-accent group-hover:border-coinlect-accent">
                       <ArrowRight className="text-gray-400 transition-colors group-hover:text-black" size={20} />
@@ -249,36 +247,36 @@ export const Events: React.FC = () => {
           ))}
         </div>
 
-        {/* Pagination */}
-        <div className="flex items-center justify-between pt-8 border-t border-white/10">
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-400">Page</span>
-            <div className="relative">
-              <select
-                value={currentPage}
-                onChange={(e) => setCurrentPage(Number(e.target.value))}
-                aria-label="Select page number"
-                className="px-4 py-2 pr-8 text-sm text-white border rounded-lg appearance-none cursor-pointer bg-black/50 border-white/10 focus:outline-none focus:border-coinlect-accent"
-              >
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                  <option key={page} value={page} className="bg-black">
-                    {page}
-                  </option>
-                ))}
-              </select>
-              <ChevronDown className="absolute text-gray-400 transform -translate-y-1/2 pointer-events-none right-2 top-1/2" size={16} />
+        {/* Clean Pagination without Page Picker */}
+        {filteredEvents.length > 0 && (
+          <div className="flex items-center justify-between pt-8 border-t border-white/10">
+            <div className="text-sm font-medium text-gray-400">
+              Page <span className="text-white">{currentPage}</span> of <span className="text-white">{totalPages}</span>
             </div>
-            <span className="text-sm text-gray-400">of {totalPages}</span>
-          </div>
 
-          <button
-            onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-            disabled={currentPage >= totalPages}
-            className="flex items-center gap-2 px-6 py-2 font-semibold text-black transition-colors rounded-lg bg-coinlect-accent hover:bg-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Next <ArrowRight size={16} />
-          </button>
-        </div>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-bold text-white transition-all border rounded-lg border-white/10 hover:bg-white/5 disabled:opacity-20 disabled:cursor-not-allowed"
+              >
+                <ArrowLeft size={16} /> Previous
+              </button>
+              
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage >= totalPages}
+                className="flex items-center gap-2 px-6 py-2 text-sm font-bold text-black transition-all rounded-lg bg-coinlect-accent hover:bg-yellow-500 disabled:opacity-20 disabled:cursor-not-allowed"
+              >
+                Next <ArrowRight size={16} />
+              </button>
+            </div>
+          </div>
+        )}
+
+        {filteredEvents.length === 0 && (
+          <div className="py-20 text-center text-gray-500">Aucun événement ne correspond à vos critères.</div>
+        )}
       </div>
     </div>
   );

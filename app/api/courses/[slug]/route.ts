@@ -1,24 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { courseSchema } from '@/lib/validators';
-import { getAuthContext, unauthorized, forbidden } from '@/lib/api';
+import { getAuthUser, requireAdmin, requireAdminSlug } from '@/lib/auth-utils';
 import { UserRole, PublishStatus } from '@prisma/client';
 
-export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
+export async function GET(req: NextRequest, context: { params: Promise<{ slug: string }> }) {
+  const { slug } = await context.params;
+  const auth = await getAuthUser(req);
   const course = await prisma.course.findUnique({
-    where: { id },
-    include: { modules: { orderBy: { order: 'asc' } } },
+    where: { slug },
+    include: {
+      modules: { orderBy: { order: 'asc' } },
+      author: true
+    },
   });
   if (!course) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+
+  // Only show published courses to non-admin users
+  if (auth?.role !== UserRole.ADMIN && course.status !== PublishStatus.PUBLISHED) {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  }
+
   return NextResponse.json({ course });
 }
 
-export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const auth = await getAuthContext(req);
-  if (!auth) return unauthorized();
-  if (auth.role !== UserRole.ADMIN && auth.role !== UserRole.EDITOR) return forbidden();
+export const PATCH = requireAdminSlug(async (req: NextRequest, user, params: Promise<{ slug: string }>) => {
+  const { slug } = await params;
+  if (!slug) return NextResponse.json({ error: 'Slug required' }, { status: 400 });
 
   try {
     const body = await req.json();
@@ -28,7 +36,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     }
     const data = parsed.data;
     const course = await prisma.course.update({
-      where: { id },
+      where: { slug },
       data: {
         ...data,
         publishedAt: data.status === PublishStatus.PUBLISHED ? new Date() : undefined,
@@ -39,20 +47,18 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     console.error('Course update error', err);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
-}
+});
 
-export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const auth = await getAuthContext(req);
-  if (!auth) return unauthorized();
-  if (auth.role !== UserRole.ADMIN && auth.role !== UserRole.EDITOR) return forbidden();
+export const DELETE = requireAdminSlug(async (req: NextRequest, user, params: Promise<{ slug: string }>) => {
+  const { slug } = await params;
+  if (!slug) return NextResponse.json({ error: 'Slug required' }, { status: 400 });
 
   try {
-    await prisma.course.delete({ where: { id } });
+    await prisma.course.delete({ where: { slug } });
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error('Course delete error', err);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
-}
+});
 

@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { registerSchema } from '@/lib/validators';
-import { hashPassword, signAccessToken, signRefreshToken } from '@/lib/auth';
+import { hashPassword, signRefreshToken } from '@/lib/auth';
 import { UserRole } from '@prisma/client';
+import { serialize } from 'cookie';
 
 export async function POST(req: NextRequest) {
   try {
@@ -30,9 +31,9 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    const payload = { sub: user.id, role: user.role };
-    const accessToken = await signAccessToken(payload);
-    const refreshToken = await signRefreshToken(payload);
+    // Create refresh token
+    const tokenPayload = { sub: user.id, role: user.role };
+    const refreshToken = await signRefreshToken(tokenPayload);
 
     await prisma.refreshToken.create({
       data: {
@@ -42,11 +43,19 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return NextResponse.json({
-      user: { id: user.id, email: user.email, name: user.name, role: user.role },
-      accessToken,
-      refreshToken,
+    // Set the refresh token cookie
+    const cookie = serialize('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+      path: '/',
     });
+
+    const response = NextResponse.json({
+      user: { id: user.id, email: user.email, name: user.name, role: user.role },
+    });
+    response.headers.set('Set-Cookie', cookie);
+    return response;
   } catch (err) {
     console.error('Register error', err);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

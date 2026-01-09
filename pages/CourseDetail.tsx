@@ -1,49 +1,98 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { COURSES_DATA } from '../mockData';
+import { Course } from '../types';
 import { Button } from '../components/Button';
 import { ScrollReveal } from '../components/ScrollReveal';
-import { ArrowLeft, Clock, Layers, PlayCircle, CheckCircle } from 'lucide-react';
+import { ArrowLeft, VideoOff } from 'lucide-react';
 
 export const CourseDetail: React.FC = () => {
   const params = useParams();
-  const courseId = params?.courseId as string;
-  const course = COURSES_DATA.find(c => c.id === Number(courseId));
+  const courseSlug = params?.courseSlug as string;
+  const [course, setCourse] = useState<Course | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [videoError, setVideoError] = useState(false);
+
+  // Helper functions for video detection
+  const getYouTubeVideoId = (url: string): string => {
+    const match = url.match(/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/);
+    return match ? match[1] : '';
+  };
+
+  const getVimeoVideoId = (url: string): string => {
+    const match = url.match(/vimeo\.com\/(\d+)/);
+    return match ? match[1] : '';
+  };
+
+  useEffect(() => {
+    const fetchCourse = async () => {
+      try {
+        setLoading(true);
+        setVideoError(false); // Reset video error state
+        const response = await fetch(`/api/courses/${courseSlug}`);
+        if (response.ok) {
+          const data = await response.json();
+          setCourse(data.course);
+        } else {
+          setCourse(null);
+        }
+      } catch (error) {
+        console.error('Error fetching course:', error);
+        setCourse(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (courseSlug) {
+      fetchCourse();
+    } else {
+      setLoading(false);
+    }
+  }, [courseSlug]);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen gap-4 px-6 text-center bg-black">
+        <div className="w-12 h-12 border-b-2 border-white rounded-full animate-spin"></div>
+        <p className="text-white">Chargement du cours...</p>
+      </div>
+    );
+  }
 
   if (!course) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen gap-4 px-6 text-center">
-        <h1 className="text-2xl font-bold text-white">Course Not Found</h1>
+      <div className="flex flex-col items-center justify-center min-h-screen gap-4 px-6 text-center bg-black">
+        <h1 className="text-2xl font-bold tracking-tighter text-white uppercase">Cours non trouvé</h1>
         <Link href="/academy">
-          <Button variant="secondary" withArrow>Back to Academy</Button>
+          <Button variant="secondary" className="rounded-none" withArrow>Retour à l&apos;Académie</Button>
         </Link>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen pt-24 pb-20 bg-[#0a0a0a]">
+    <div className="min-h-screen pt-24 pb-20 bg-black">
 
       {/* Course Header */}
       <div className="bg-[#111] border-b border-white/5 pb-16 pt-8 relative overflow-hidden">
         <div className="container relative z-10 px-6 mx-auto">
           <div className="flex items-start justify-between">
-            <Link href="/academy" className="inline-flex items-center gap-2 mb-8 text-sm text-gray-500 transition-colors hover:text-white">
-                <ArrowLeft size={16} /> Retour à l&apos;Académie
+            <Link href="/academy" className="inline-flex items-center gap-2 mb-8 text-[11px] font-black uppercase tracking-widest text-gray-500 transition-colors hover:text-white">
+                <ArrowLeft size={14} /> Retour à l&apos;Académie
             </Link>
           </div>
           
           <ScrollReveal>
             <div className="grid items-center gap-12 lg:grid-cols-2">
               <div>
-                <div className="flex items-center gap-3 mb-4">
-                  <span className="px-3 py-1 text-xs font-bold tracking-wider uppercase border rounded bg-coinlect-accent/10 text-coinlect-accent border-coinlect-accent/20">
+                <div className="flex items-center gap-3 mb-6">
+                  <span className="px-3 py-1 text-[10px] font-black tracking-widest uppercase border rounded-none bg-coinlect-accent/10 text-coinlect-accent border-coinlect-accent/20">
                     {course.category}
                   </span>
-                  <span className={`px-3 py-1 rounded text-xs font-bold border ${
+                  <span className={`px-3 py-1 rounded-none text-[10px] font-black tracking-widest uppercase border ${
                       course.level === 'Débutant' ? 'bg-green-500/10 text-green-400 border-green-500/20' : 
                       course.level === 'Intermédiaire' ? 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20' : 
                       'bg-red-500/10 text-red-400 border-red-500/20'
@@ -52,101 +101,87 @@ export const CourseDetail: React.FC = () => {
                   </span>
                 </div>
                 
-                <h1 className="mb-6 text-3xl font-bold leading-tight text-white md:text-5xl">
+                <h1 className="mb-6 text-2xl font-black leading-tight tracking-tighter text-left text-white md:text-4xl ">
                   {course.title}
                 </h1>
-                
-                <div className="flex flex-wrap items-center gap-6 mb-8 text-sm text-gray-400">
-                  <div className="flex items-center gap-2">
-                    <Clock size={18} className="text-coinlect-accent" />
-                    <span>{course.duration} de contenu</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Layers size={18} className="text-coinlect-accent" />
-                    <span>{course.modules} Modules</span>
-                  </div>
-                </div>
-
               </div>
 
-              {/* Video Preview / Hero Image */}
-              <div className="relative overflow-hidden border shadow-2xl aspect-video rounded-2xl border-white/10 group">
-                <img src={course.image} alt={course.title} className="object-cover w-full h-full transition-transform duration-700 opacity-80 group-hover:scale-105" />
-                <div className="absolute inset-0 transition-colors bg-black/40 group-hover:bg-black/30"></div>
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-20 h-20 rounded-full bg-coinlect-accent text-black flex items-center justify-center shadow-[0_0_30px_rgba(245,158,11,0.5)] transform group-hover:scale-110 transition-transform duration-300">
-                    <PlayCircle size={40} fill="currentColor" className="text-black" />
+              {/* Video Preview - Direct from Database */}
+              <div className="relative overflow-hidden bg-black border rounded-none shadow-2xl aspect-video border-white/10">
+                {course.videoLink && course.videoLink.trim() !== '' && !videoError ? (
+                  <>
+                    {/* YouTube Video */}
+                    {getYouTubeVideoId(course.videoLink) ? (
+                      <iframe
+                        src={`https://www.youtube.com/embed/${getYouTubeVideoId(course.videoLink)}`}
+                        title={`${course.title} - YouTube Video`}
+                        className="w-full h-full"
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        onError={() => setVideoError(true)}
+                      />
+                    ) : getVimeoVideoId(course.videoLink) ? (
+                      /* Vimeo Video */
+                      <iframe
+                        src={`https://player.vimeo.com/video/${getVimeoVideoId(course.videoLink)}`}
+                        title={`${course.title} - Vimeo Video`}
+                        className="w-full h-full"
+                        frameBorder="0"
+                        allow="autoplay; fullscreen; picture-in-picture"
+                        allowFullScreen
+                        onError={() => setVideoError(true)}
+                      />
+                    ) : (
+                      /* Direct Video File */
+                      <video
+                        src={course.videoLink}
+                        controls
+                        playsInline
+                        className="object-cover w-full h-full"
+                        poster={course.image}
+                        onError={() => setVideoError(true)}
+                      />
+                    )}
+                  </>
+                ) : (
+                  /* Fallback when no video or video failed to load */
+                  <div className="flex flex-col items-center justify-center w-full h-full gap-4 bg-neutral-900">
+                    <VideoOff size={48} className="text-white/10" />
+                    <p className="text-[10px] font-black uppercase tracking-widest text-gray-600">
+                      {course.videoLink ? 'Vidéo non disponible' : 'Aucun aperçu disponible'}
+                    </p>
                   </div>
-                </div>
-                <div className="absolute bottom-4 left-4 bg-black/80 backdrop-blur px-3 py-1.5 rounded text-xs font-bold text-white">
-                  Aperçu Gratuit
-                </div>
+                )}
               </div>
             </div>
           </ScrollReveal>
         </div>
       </div>
 
+      {/* Main Content Area */}
       <div className="container px-6 py-16 mx-auto">
-        <div className="grid gap-12 lg:grid-cols-3">
-          
-          {/* Main Content Area */}
-          <div className="space-y-12 lg:col-span-2">
-            
-            {/* About Section */}
-            <ScrollReveal>
-              <section>
-                <h3 className="mb-6 text-2xl font-bold text-white">À propos de ce cours</h3>
-                <div className="space-y-4 leading-relaxed text-gray-400">
-                  <p>
-                    Ce cours a été conçu pour vous fournir une compréhension approfondie du sujet. 
-                    Que vous soyez débutant ou que vous cherchiez à affiner vos compétences, 
-                    notre approche structurée vous guidera à travers les concepts clés avec des exemples pratiques.
-                  </p>
-                  <p>
-                    {course.description} À la fin de ce parcours, vous serez capable de comprendre les mécanismes sous-jacents, 
-                    d&apos;analyser les tendances du marché et de prendre des décisions éclairées basées sur des données réelles.
-                  </p>
-                </div>
-              </section>
-            </ScrollReveal>
-
-
-          </div>
-
-          {/* Sidebar */}
-          <div className="lg:col-span-1">
-            <div className="sticky space-y-6 top-28">
-              
-              <div className="p-6 border bg-[#0F0F0F] rounded-2xl border-white/10">
-                 <h4 className="mb-4 font-bold text-white">Ce que vous apprendrez</h4>
-                 <ul className="space-y-3">
-                    <li className="flex items-start gap-3 text-sm text-gray-400">
-                      <CheckCircle size={16} className="mt-0.5 flex-shrink-0 text-coinlect-accent" />
-                      Compréhension complète des bases
-                    </li>
-                    <li className="flex items-start gap-3 text-sm text-gray-400">
-                      <CheckCircle size={16} className="mt-0.5 flex-shrink-0 text-coinlect-accent" />
-                      Analyses techniques et fondamentales
-                    </li>
-                    <li className="flex items-start gap-3 text-sm text-gray-400">
-                      <CheckCircle size={16} className="mt-0.5 flex-shrink-0 text-coinlect-accent" />
-                      Gestion des risques et sécurité
-                    </li>
-                    <li className="flex items-start gap-3 text-sm text-gray-400">
-                      <CheckCircle size={16} className="mt-0.5 flex-shrink-0 text-coinlect-accent" />
-                      Utilisation des outils Web3
-                    </li>
-                 </ul>
+        <div className="max-w-3xl">
+          <ScrollReveal>
+            <section>
+              <h3 className="pl-4 mb-8 text-xl font-black tracking-widest text-left text-white uppercase border-l-2 border-coinlect-accent">
+                À propos de ce cours
+              </h3>
+              <div className="space-y-6 text-xs font-light leading-relaxed text-left text-gray-400 md:text-xl">
+                {course.about ? (
+                  <div className="text-sm whitespace-pre-line">{course.about}</div>
+                ) : (
+                  <>
+                    <p>{course.description}</p>
+                    <p className="text-sm font-bold tracking-widest text-red-600 uppercase md:text-2xl">Not financial advice</p>
+                  </>
+                )}
               </div>
-
-            </div>
-          </div>
-
+            </section>
+          </ScrollReveal>
         </div>
       </div>
     </div>
   );
 };
-
 export default CourseDetail;

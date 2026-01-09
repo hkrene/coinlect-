@@ -1,25 +1,75 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+
+export const dynamic = 'force-dynamic';
+export const generateStaticParams = () => [];
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
-import { ARTICLES_DATA } from '../mockData';
+import { articleService } from '../services/db';
+import { Article } from '../types';
 import { Button } from '../components/Button';
 import { ScrollReveal } from '../components/ScrollReveal';
 import { useLanguage } from '../contexts/LanguageContext';
 import { ArrowLeft, Clock, Calendar, Twitter, Facebook, Link as LinkIcon, Check, Share2, Tag, ChevronRight } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 export const ArticleDetail: React.FC = () => {
   const params = useParams();
-  const articleId = params?.articleId as string;
-  const article = ARTICLES_DATA.find(a => a.id === Number(articleId));
+  const articleSlug = params?.articleSlug as string;
+  const [article, setArticle] = useState<Article | null>(null);
+  const [relatedArticles, setRelatedArticles] = useState<Article[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { t } = useLanguage();
   const [copied, setCopied] = useState(false);
 
-  if (!article) {
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Fetch article directly by slug from API
+        const response = await fetch(`/api/articles/${articleSlug}`);
+        if (response.ok) {
+          const data = await response.json();
+          setArticle(data.article);
+
+          // Get related articles
+          const articles = await articleService.getAll();
+          const related = articles.filter(a => a.id !== data.article.id).slice(0, 2);
+          setRelatedArticles(related);
+        } else {
+          setError('Article not found');
+        }
+      } catch (error) {
+        console.error('Error fetching article:', error);
+        setError('Failed to load article');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (articleSlug) {
+      fetchData();
+    }
+  }, [articleSlug]);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen gap-4 px-6 text-center bg-black">
+        <div className="w-12 h-12 border-b-2 border-white rounded-full animate-spin"></div>
+        <p className="text-white">Chargement de l&apos;article...</p>
+      </div>
+    );
+  }
+
+  if (error || !article) {
     return (
       <div className="container flex flex-col items-center justify-center min-h-screen px-6 pt-32 mx-auto text-center">
-        <h2 className="mb-4 text-2xl font-bold">Article Not Found</h2>
+        <h2 className="mb-4 text-2xl font-bold">{error || 'Article Not Found'}</h2>
         <Link href="/academy">
           <Button variant="secondary" withArrow>{t.academy.article.backToAcademy}</Button>
         </Link>
@@ -28,16 +78,18 @@ export const ArticleDetail: React.FC = () => {
   }
 
   const handleCopyLink = () => {
-    navigator.clipboard.writeText(window.location.href);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    if (typeof window !== 'undefined') {
+      navigator.clipboard.writeText(window.location.href);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
-  const shareUrl = encodeURIComponent(window.location.href);
+  const shareUrl = typeof window !== 'undefined' ? encodeURIComponent(window.location.href) : '';
   const shareText = encodeURIComponent(article.title);
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] pb-24">
+    <div className="min-h-screen pb-24 bg-black">
       {/* Progress Bar (Simulated) */}
       <div className="fixed top-0 left-0 z-50 w-full h-1 bg-white/5">
          <div className="w-1/3 h-full bg-coinlect-accent"></div>
@@ -65,15 +117,23 @@ export const ArticleDetail: React.FC = () => {
             </span>
          </div>
 
-         <h1 className="mb-8 text-3xl font-extrabold leading-tight text-white md:text-5xl">
+         <h1 className="mb-8 text-2xl font-extrabold leading-tight text-white md:text-4xl">
             {article.title}
          </h1>
 
          <div className="flex items-center justify-between py-6 border-y border-white/10">
              <div className="flex items-center gap-4">
-                <img src={article.authorImage} alt={article.author} className="w-12 h-12 rounded-full border-2 border-[#0a0a0a] ring-2 ring-white/10" />
+                <img
+                  src={article.authorImage || 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765185502/clclogo_p2v5bp.jpg'}
+                  alt={article.authorName || article.author?.name || 'CoinLect'}
+                  className="w-12 h-12 rounded-full border-2 border-[#0a0a0a] ring-2 ring-white/10"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765185502/clclogo_p2v5bp.jpg';
+                  }}
+                />
                 <div>
-                    <p className="text-sm font-bold text-white">{article.author}</p>
+                    <p className="text-sm font-bold text-white">{article.authorName || article.author?.name || 'Author'}</p>
                     <p className="text-xs text-gray-500">{t.academy.article.writtenBy}</p>
                 </div>
              </div>
@@ -111,7 +171,15 @@ export const ArticleDetail: React.FC = () => {
       {/* Featured Image */}
       <div className="container max-w-5xl px-6 mx-auto mb-12">
           <div className="relative aspect-video md:aspect-[21/9] rounded-2xl overflow-hidden shadow-2xl border border-white/10">
-              <img src={article.image} alt={article.title} className="object-cover w-full h-full" />
+              <img
+                src={article.image}
+                alt={article.title}
+                className="object-cover w-full h-full"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765185502/clclogo_p2v5bp.jpg';
+                }}
+              />
           </div>
       </div>
 
@@ -122,19 +190,50 @@ export const ArticleDetail: React.FC = () => {
                  <p className="mb-10 text-xl font-medium leading-relaxed text-white lead md:text-2xl">
                      {article.excerpt}
                  </p>
-                 
-                 {article.content.map((paragraph, idx) => (
-                     <p key={idx} className="mb-6 leading-relaxed text-gray-300">
-                         {paragraph}
-                     </p>
-                 ))}
 
-                 <h3 className="mt-12 mb-6 text-2xl font-bold text-white">Key Takeaways</h3>
-                 <ul className="space-y-2 text-gray-300">
-                    <li>• Understanding market cycles is crucial for long-term success.</li>
-                    <li>• Risk management should always be the priority.</li>
-                    <li>• Fundamental analysis helps identify undervalued assets.</li>
-                 </ul>
+                 <div className="leading-relaxed text-gray-300">
+                     <ReactMarkdown
+                         remarkPlugins={[remarkGfm]}
+                         components={{
+                             h1: ({children}) => <h2 className="mt-12 mb-6 text-3xl font-bold text-white">{children}</h2>,
+                             h2: ({children}) => <h3 className="mt-10 mb-4 text-2xl font-bold text-white">{children}</h3>,
+                             h3: ({children}) => <h4 className="mt-8 mb-3 text-xl font-bold text-white">{children}</h4>,
+                             p: ({children}) => <p className="mb-6 leading-relaxed">{children}</p>,
+                             ul: ({children}) => <ul className="mb-6 space-y-2 list-disc list-inside">{children}</ul>,
+                             ol: ({children}) => <ol className="mb-6 space-y-2 list-decimal list-inside">{children}</ol>,
+                             blockquote: ({children}) => <blockquote className="pl-4 my-6 italic text-gray-400 border-l-4 border-coinlect-accent">{children}</blockquote>,
+                             code: ({children}) => <code className="px-2 py-1 text-sm bg-gray-800 rounded">{children}</code>,
+                             pre: ({children}) => <pre className="p-4 my-6 overflow-x-auto bg-gray-800 rounded">{children}</pre>,
+                             img: ({src, alt}) => (
+                                 <img
+                                     src={src}
+                                     alt={alt}
+                                     className="h-auto max-w-full my-6 rounded-lg shadow-lg"
+                                     onError={(e) => {
+                                         const target = e.target as HTMLImageElement;
+                                         target.src = 'https://via.placeholder.com/800x400/333/666?text=Image+Not+Found';
+                                     }}
+                                 />
+                             ),
+                             a: ({href, children}) => (
+                                 <a href={href} className="underline text-coinlect-accent hover:text-coinlect-accent/80" target="_blank" rel="noopener noreferrer">
+                                     {children}
+                                 </a>
+                             )
+                         }}
+                     >
+                         {article.content}
+                     </ReactMarkdown>
+                 </div>
+
+                 {article.keyTakeaways && (
+                   <>
+                     <h3 className="mt-12 mb-6 text-2xl font-bold text-white">Key Takeaways</h3>
+                     <div className="text-gray-300 whitespace-pre-line">
+                       {article.keyTakeaways}
+                     </div>
+                   </>
+                 )}
              </div>
          </ScrollReveal>
 
@@ -147,28 +246,24 @@ export const ArticleDetail: React.FC = () => {
              ))}
          </div>
 
-         {/* Author Bio Box */}
-         <div className="flex flex-col items-center gap-6 p-8 mt-12 text-center border bg-white/5 rounded-xl border-white/10 md:flex-row md:items-start md:text-left">
-             <img src={article.authorImage} alt={article.author} className="w-20 h-20 border-2 rounded-full border-coinlect-accent" />
-             <div>
-                 <h4 className="mb-2 text-lg font-bold text-white">About {article.author}</h4>
-                 <p className="mb-4 text-sm text-gray-400">
-                     Senior Crypto Analyst at Coinlect. Specialized in DeFi protocols and on-chain data analysis. 
-                     Helping over 100k students understand the complexities of the blockchain.
-                 </p>
-                 <button className="text-sm font-bold text-coinlect-accent hover:underline">View all posts</button>
-             </div>
-         </div>
       </div>
 
       {/* Related Articles */}
       <div className="container max-w-5xl px-6 mx-auto mt-24">
          <h3 className="pl-4 mb-8 text-2xl font-bold text-white border-l-4 border-coinlect-accent">Read Next</h3>
          <div className="grid gap-8 md:grid-cols-2">
-            {ARTICLES_DATA.filter(a => a.id !== article.id).slice(0, 2).map(related => (
-                <Link key={related.id} href={`/academy/article/${related.id}`} className="flex flex-col gap-4 p-4 transition-colors bg-transparent group md:flex-row hover:bg-white/5 rounded-xl">
+            {relatedArticles.map(related => (
+                <Link key={related.id} href={`/academy/article/${related.slug}`} className="flex flex-col gap-4 p-4 transition-colors bg-transparent group md:flex-row hover:bg-white/5 rounded-xl">
                     <div className="flex-shrink-0 w-full h-32 overflow-hidden rounded-lg md:w-48">
-                        <img src={related.image} alt={related.title} className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110" />
+                        <img
+                          src={related.image}
+                          alt={related.title}
+                          className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = 'https://via.placeholder.com/300x200/333/666?text=No+Image';
+                          }}
+                        />
                     </div>
                     <div className="flex flex-col justify-center">
                         <span className="mb-2 text-xs font-bold uppercase text-coinlect-accent">{related.category}</span>
@@ -182,5 +277,11 @@ export const ArticleDetail: React.FC = () => {
     </div>
   );
 };
+
+export async function getServerSideProps() {
+  return {
+    props: {},
+  };
+}
 
 export default ArticleDetail;

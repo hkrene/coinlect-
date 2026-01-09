@@ -1,20 +1,23 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface User {
   id: string;
   email: string;
   name: string | null;
-  role: 'ADMIN' | 'EDITOR' | 'USER';
+  avatar: string | null;
+  role: 'ADMIN' | 'USER';
 }
 
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isAdmin: boolean;
+  isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
-  register: (firstName: string, lastName: string, email: string, password: string) => Promise<void>;
+  register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => void;
   error: string | null;
   refreshUser: () => Promise<void>;
@@ -22,81 +25,11 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-function getAccessToken(): string | null {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem('accessToken');
-}
-
-function getRefreshToken(): string | null {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem('refreshToken');
-}
-
-async function refreshAccessToken(): Promise<string | null> {
-  const refreshToken = getRefreshToken();
-  if (!refreshToken) return null;
-
-  try {
-    const res = await fetch('/api/auth/refresh', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ refreshToken }),
-    });
-
-    if (!res.ok) return null;
-
-    const data = await res.json();
-    if (data.accessToken) {
-      localStorage.setItem('accessToken', data.accessToken);
-      return data.accessToken;
-    }
-    return null;
-  } catch {
-    return null;
-  }
-}
-
-async function fetchWithAuth(url: string, options: RequestInit = {}): Promise<Response> {
-  let token = getAccessToken();
-  
-  if (!token) {
-    token = await refreshAccessToken();
-    if (!token) {
-      throw new Error('Not authenticated');
-    }
-  }
-
-  const response = await fetch(url, {
-    ...options,
-    headers: {
-      ...options.headers,
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-  });
-
-  // If token expired, try refreshing
-  if (response.status === 401) {
-    const newToken = await refreshAccessToken();
-    if (newToken) {
-      return fetch(url, {
-        ...options,
-        headers: {
-          ...options.headers,
-          'Authorization': `Bearer ${newToken}`,
-          'Content-Type': 'application/json',
-        },
-      });
-    }
-  }
-
-  return response;
-}
-
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
   // Check for existing session on mount
   useEffect(() => {
@@ -105,40 +38,19 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const refreshUser = async () => {
     try {
-      const token = getAccessToken();
-      if (!token) {
-        setIsLoading(false);
-        return;
-      }
-
       const res = await fetch('/api/auth/me', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+        credentials: 'include' // Include cookies in the request
       });
 
       if (res.ok) {
         const data = await res.json();
         setUser(data.user);
-        localStorage.setItem('coinlect_current_user', JSON.stringify(data.user));
       } else {
-        // Try refreshing token
-        const newToken = await refreshAccessToken();
-        if (newToken) {
-          const retryRes = await fetch('/api/auth/me', {
-            headers: {
-              'Authorization': `Bearer ${newToken}`,
-            },
-          });
-          if (retryRes.ok) {
-            const retryData = await retryRes.json();
-            setUser(retryData.user);
-            localStorage.setItem('coinlect_current_user', JSON.stringify(retryData.user));
-          }
-        }
+        setUser(null);
       }
     } catch (err) {
       console.error('Failed to refresh user', err);
+      setUser(null);
     } finally {
       setIsLoading(false);
     }
@@ -155,32 +67,22 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       const data = await res.json();
 
-      if (!res.ok) {
-        setError(data.error || 'Login failed');
-        return;
-      }
-
-      // Store tokens and user
-      if (data.accessToken) {
-        localStorage.setItem('accessToken', data.accessToken);
-      }
-      if (data.refreshToken) {
-        localStorage.setItem('refreshToken', data.refreshToken);
-      }
-      if (data.user) {
+      if (res.ok && data.user) {
         setUser(data.user);
-        localStorage.setItem('coinlect_current_user', JSON.stringify(data.user));
+      } else {
+        throw new Error(data.error || 'Login failed. Please check your credentials and try again.');
       }
     } catch (err) {
-      setError('Network error. Please try again.');
+      const errorMessage = err instanceof Error ? err.message : 'Network error. Please try again.';
+      setError(errorMessage);
       console.error('Login error', err);
+      throw err;
     }
   };
 
-  const register = async (firstName: string, lastName: string, email: string, password: string) => {
+  const register = async (name: string, email: string, password: string) => {
     setError(null);
     try {
-      const name = `${firstName} ${lastName}`.trim();
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -189,45 +91,30 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       const data = await res.json();
 
-      if (!res.ok) {
-        setError(data.error || 'Registration failed');
-        return;
-      }
-
-      // Store tokens and user
-      if (data.accessToken) {
-        localStorage.setItem('accessToken', data.accessToken);
-      }
-      if (data.refreshToken) {
-        localStorage.setItem('refreshToken', data.refreshToken);
-      }
-      if (data.user) {
+      if (res.ok && data.user) {
         setUser(data.user);
-        localStorage.setItem('coinlect_current_user', JSON.stringify(data.user));
+      } else {
+        throw new Error(data.error || 'Registration failed. Please try again.');
       }
     } catch (err) {
-      setError('Network error. Please try again.');
+      const errorMessage = err instanceof Error ? err.message : 'Network error. Please try again.';
+      setError(errorMessage);
       console.error('Register error', err);
+      throw err;
     }
   };
 
   const logout = async () => {
     try {
-      const refreshToken = getRefreshToken();
-      if (refreshToken) {
-        await fetch('/api/auth/logout', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ refreshToken }),
-        });
-      }
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include'
+      });
     } catch (err) {
       console.error('Logout error', err);
     } finally {
       setUser(null);
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      localStorage.removeItem('coinlect_current_user');
+      // Redirect to home page after logout
       if (typeof window !== 'undefined') {
         window.location.href = "/";
       }
@@ -235,12 +122,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      isAuthenticated: !!user, 
-      isAdmin: user?.role === 'ADMIN' || user?.role === 'EDITOR', 
-      login, 
-      register, 
+    <AuthContext.Provider value={{
+      user,
+      isAuthenticated: !!user,
+      isAdmin: user?.role === 'ADMIN',
+      isLoading,
+      login,
+      register,
       logout,
       error,
       refreshUser
@@ -249,9 +137,6 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     </AuthContext.Provider>
   );
 };
-
-// Export fetchWithAuth for use in other components
-export { fetchWithAuth };
 
 export const useAuth = () => {
   const context = useContext(AuthContext);

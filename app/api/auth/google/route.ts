@@ -30,6 +30,7 @@ export async function POST(req: NextRequest) {
     const email = payload.email;
     const googleId = payload.sub;
     const name = payload.name || email;
+    const avatar = payload.picture || null;
 
     const user = await prisma.user.upsert({
       where: { email },
@@ -37,12 +38,14 @@ export async function POST(req: NextRequest) {
         googleId,
         provider: 'google',
         name,
+        avatar,
       },
       create: {
         email,
         googleId,
         provider: 'google',
         name,
+        avatar,
         role: UserRole.USER,
       },
     });
@@ -59,11 +62,21 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return NextResponse.json({
-      user: { id: user.id, email: user.email, name: user.name, role: user.role },
+    const response = NextResponse.json({
+      user: { id: user.id, email: user.email, name: user.name, role: user.role, avatar: user.avatar },
       accessToken,
       refreshToken,
     });
+
+    // Set refresh token cookie
+    response.cookies.set('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+    });
+
+    return response;
   } catch (err) {
     console.error('Google auth error', err);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });

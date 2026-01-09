@@ -45,7 +45,7 @@ export const Ticker: React.FC = () => {
   };
 
   return (
-    <div className="sticky top-[80px] z-40 w-full py-3 overflow-hidden border-y border-white/5 bg-black/80 backdrop-blur-sm">
+    <div className="sticky top-[60px] md:top-[72px] z-40 w-full py-3 overflow-hidden bg-black/80 backdrop-blur-sm border-t border-white/5">
       <div className="flex min-w-full gap-12 animate-scroll whitespace-nowrap hover:pause-animation">
         {/* Triple list for seamless loop */}
         {[...items, ...items, ...items].map((coin, index) => {
@@ -59,7 +59,7 @@ export const Ticker: React.FC = () => {
               )}
               
               <span className="font-bold text-gray-200 uppercase">{coin.symbol}</span>
-              <span className="font-mono text-gray-400">{formatPrice(coin.current_price)}</span>
+              <span className="text-gray-400">{formatPrice(coin.current_price)}</span>
               
               <span className={`font-medium ${change >= 0 ? 'text-green-500' : 'text-red-500'}`}>
                 {change >= 0 ? '+' : ''}

@@ -12,7 +12,6 @@ datasource db {
 // Enums
 enum UserRole {
   ADMIN
-  EDITOR
   USER
 }
 
@@ -33,6 +32,7 @@ model User {
   email          String          @unique
   passwordHash   String?
   name           String?
+  avatar         String?         // Profile picture URL
   role           UserRole        @default(USER)
   provider       String?         // local | google
   googleId       String?         @unique
@@ -42,9 +42,11 @@ model User {
 
   courses        Course[]        @relation("CourseAuthor")
   articles       Article[]       @relation("ArticleAuthor")
+  events         Event[]         @relation("EventAuthor")
   enrollments    Enrollment[]
   progress       Progress[]
   refreshTokens  RefreshToken[]
+  sessions       Session[]
 }
 
 model Course {
@@ -56,6 +58,8 @@ model Course {
   seoDescription String?
   status        PublishStatus   @default(DRAFT)
   publishedAt   DateTime?
+  image         String?
+  videoLink     String?
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
 
@@ -93,6 +97,11 @@ model Article {
   seoDescription String?
   status         PublishStatus @default(DRAFT)
   publishedAt    DateTime?
+  featured       Boolean       @default(false)
+  image          String?
+  authorImage    String?
+  keyTakeaways   String?
+  authorName     String?
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
@@ -100,6 +109,28 @@ model Article {
   author         User?         @relation("ArticleAuthor", fields: [authorId], references: [id])
 
   featuredItems  FeaturedItem[]
+}
+
+model Event {
+  id             String        @id @default(uuid())
+  title          String
+  slug           String        @unique
+  date           String
+  location       String
+  description    String?
+  banner         String
+  bannerImage    String?
+  bannerText     String?
+  eventTypes     String[]
+  seoTitle       String?
+  seoDescription String?
+  status         PublishStatus @default(DRAFT)
+  publishedAt    DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  authorId       String?
+  author         User?         @relation("EventAuthor", fields: [authorId], references: [id])
 }
 
 model FeaturedItem {
@@ -143,12 +174,38 @@ model Progress {
   @@unique([userId, moduleId])
 }
 
+model Deal {
+  id          String   @id @default(uuid())
+  title       String
+  description String
+  details     String?
+  category    String
+  link        String
+  image       String?
+  discount    String?
+  code        String?
+  exclusive   Boolean  @default(false)
+  verified    Boolean  @default(false)
+  featured    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
 model RefreshToken {
   id        String   @id @default(uuid())
   userId    String
   token     String   @unique
   expiresAt DateTime
   revokedAt DateTime?
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Session {
+  id        String   @id @default(uuid())
+  userId    String
+  expiresAt DateTime
   createdAt DateTime @default(now())
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
