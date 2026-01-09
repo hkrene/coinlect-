@@ -105,7 +105,6 @@ export interface Event {
   description?: string;
   banner: string;
   bannerImage?: string;
-  bannerText?: string;
   eventTypes: string[];
   seoTitle?: string;
   seoDescription?: string;
@@ -117,6 +116,7 @@ export interface Event {
   author?: DBUser;
   // Legacy field for frontend compatibility
   type?: string[]; // Keep for backward compatibility
+  url?: string; // New field for external event source URL
 }
 
 /**

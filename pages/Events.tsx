@@ -1,19 +1,23 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { Search, ArrowRight, Calendar, MapPin, ArrowLeft } from 'lucide-react';
+import { Search, ArrowRight, Calendar, MapPin, ArrowLeft, ExternalLink } from 'lucide-react';
 import { ScrollReveal } from '../components/ScrollReveal';
 import { eventService } from '../services/db';
 import { Event } from '../types';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const FILTERS = ['All', 'Conference', 'Meetup', 'Web3', 'Workshop', 'Hackathon', 'Mixer'];
-
 export const Events: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [activeFilter, setActiveFilter] = useState('All');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
+  const { t } = useLanguage();
+
+  const canonicalFilters = ['All', 'Conference', 'Meetup', 'Web3', 'Workshop', 'Hackathon', 'Mixer'];
+  const displayFilters = t.events.filters;
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -74,97 +78,8 @@ export const Events: React.FC = () => {
               target.src = 'https://via.placeholder.com/800x400/333/666?text=No+Image';
             }}
           />
-          {event.bannerText && (
-            <div className="absolute inset-0 flex items-center justify-center p-6 text-white">
-              <div className="text-center whitespace-pre-line">{event.bannerText}</div>
-            </div>
-          )}
         </div>
       );
-    }
-    
-    // Les bannières restent identiques à votre version originale
-    if (event.banner === 'africa-blockchain-festival') {
-      return (
-        <div className="relative h-48 overflow-hidden bg-teal-900 rounded-t-xl">
-          <div className="absolute px-3 py-1 text-xs font-bold text-black bg-orange-500 rounded top-4 right-4">SAVE THE DATE</div>
-          <div className="absolute inset-0 flex flex-col justify-center p-6 text-white">
-            <div className="space-y-1 text-sm font-medium">
-              <div>7th - 9th November 2025</div>
-              <div className="text-xs text-gray-300">Kigali Convention Center, Rwanda</div>
-            </div>
-          </div>
-        </div>
-      );
-    }
-    if (event.banner === 'blockf3st-africa') {
-      return (
-        <div className="relative h-48 overflow-hidden bg-blue-900 rounded-t-xl">
-          <div className="absolute inset-0 flex items-center gap-4 p-6 text-white">
-            <div className="flex items-center gap-2">
-              <div className="w-12 h-12 bg-red-500 rounded"></div>
-              <div className="w-12 h-12 bg-blue-500 rounded"></div>
-              <div className="w-12 h-12 bg-yellow-500 rounded"></div>
-              <div className="w-12 h-12 bg-green-500 rounded"></div>
-            </div>
-            <div className="text-lg font-bold">BLOCKF3ST AFRICA</div>
-          </div>
-        </div>
-      );
-    }
-    if (event.banner === 'aptos-meet-build') {
-        return (
-          <div className="relative h-48 overflow-hidden bg-blue-800 rounded-t-xl">
-            <div className="absolute inset-0 flex flex-col justify-center p-6 text-white">
-              <div className="mb-2 text-xs font-bold">APTOS</div>
-              <div className="mb-2 text-3xl font-bold">Meet <span className="text-blue-400">Build</span></div>
-              <div className="text-xs text-gray-300">Opolo Hub, UniBen Benin City, Edo State</div>
-            </div>
-          </div>
-        );
-    }
-    if (event.banner === 'aptos-bootcamp') {
-        return (
-          <div className="relative h-48 overflow-hidden rounded-t-xl bg-slate-900">
-            <div className="absolute inset-0 flex flex-col justify-center p-6 text-xs text-white">
-              <div className="mb-2 font-bold">MOVE BOOTCAMP</div>
-              <div className="mb-1 font-semibold text-coinlect-accent">Hackathon Pool: $100,000 USD</div>
-              <div className="text-gray-400 space-y-0.5">
-                <div>Main Track: Build The Future Of Defi On Aptos</div>
-                <div>Best Tech Implementation</div>
-                <div>Top University Team</div>
-              </div>
-            </div>
-          </div>
-        );
-    }
-    if (event.banner === 'mantle-meetup') {
-        return (
-          <div className="relative h-48 overflow-hidden rounded-t-xl bg-gradient-to-br from-pink-400 via-pink-300 to-green-400">
-            <div className="absolute inset-0 flex flex-col justify-center p-6 text-black">
-              <div className="mb-2 text-sm font-bold">Developer Meetup with Mantle</div>
-              <div className="space-y-1 text-xs">
-                <div>10:00 AM - 3:00 PM</div>
-                <div>5th July, 2025</div>
-                <div>Cafe One, Yaba, Lagos</div>
-              </div>
-            </div>
-          </div>
-        );
-    }
-    if (event.banner === 'stellar-wacon') {
-        return (
-          <div className="relative h-48 overflow-hidden bg-gray-800 rounded-t-xl">
-            <div className="absolute inset-0 flex flex-col justify-center p-6 text-white">
-              <div className="mb-2 text-xs font-bold text-gray-400">Stellar West Africa Conference 2025</div>
-              <div className="mb-4 text-2xl font-bold">Where Blockchain Meets the Real World</div>
-              <div className="space-y-1 text-xs text-gray-300">
-                <div className="flex items-center gap-2"><Calendar size={14} /><span>May 31st, 2025.</span></div>
-                <div className="flex items-center gap-2"><MapPin size={14} /><span>Lagos, Nigeria</span></div>
-              </div>
-            </div>
-          </div>
-        );
     }
     return (
       <div className="relative h-48 overflow-hidden bg-gray-800 rounded-t-xl">
@@ -194,17 +109,17 @@ export const Events: React.FC = () => {
           </div>
 
           <div className="flex w-full gap-2 pb-2 mb-12 overflow-x-auto md:pb-0 scrollbar-hide">
-            {FILTERS.map((filter) => (
+            {canonicalFilters.map((filterKey, index) => (
               <button
-                key={filter}
-                onClick={() => { setActiveFilter(filter); setCurrentPage(1); }}
+                key={filterKey}
+                onClick={() => { setActiveFilter(filterKey); setCurrentPage(1); }}
                 className={`whitespace-nowrap px-4 py-2 rounded-full text-xs font-bold border transition-all ${
-                  activeFilter === filter
+                  activeFilter === filterKey
                     ? 'bg-white text-black border-white'
                     : 'bg-transparent border-white/10 text-gray-400 hover:border-white/30 hover:text-white'
                 }`}
               >
-                {filter}
+                {displayFilters[index] || filterKey}
               </button>
             ))}
           </div>
@@ -237,9 +152,21 @@ export const Events: React.FC = () => {
                     </div>
                   </div>
                   <div className="flex justify-end">
-                    <div className="flex items-center justify-center w-10 h-10 transition-all border rounded-full bg-white/5 border-white/10 group-hover:bg-coinlect-accent group-hover:border-coinlect-accent">
-                      <ArrowRight className="text-gray-400 transition-colors group-hover:text-black" size={20} />
-                    </div>
+                    {event.url ? (
+                      <a
+                        href={event.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center w-10 h-10 transition-all border rounded-full bg-white/5 border-white/10 group-hover:bg-coinlect-accent group-hover:border-coinlect-accent"
+                        aria-label="View Event Details"
+                      >
+                        <ExternalLink className="text-gray-400 transition-colors group-hover:text-black" size={20} />
+                      </a>
+                    ) : (
+                      <div className="flex items-center justify-center w-10 h-10 transition-all border rounded-full bg-white/5 border-white/10 group-hover:bg-coinlect-accent group-hover:border-coinlect-accent">
+                        <ArrowRight className="text-gray-400 transition-colors group-hover:text-black" size={20} />
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

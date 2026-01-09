@@ -51,18 +51,18 @@ export const articleSchema = z.object({
 
 // Event validators
 export const eventSchema = z.object({
-  title: z.string().min(2),
-  slug: z.string().min(2),
-  date: z.string().min(2),
-  location: z.string().min(2),
-  description: z.string().optional(),
-  banner: z.string().min(1),
-  bannerImage: z.string().url().optional(),
-  bannerText: z.string().optional(),
-  eventTypes: z.array(z.string()).default([]),
-  seoTitle: z.string().optional(),
-  seoDescription: z.string().optional(),
-  status: z.enum(['DRAFT', 'PUBLISHED']).optional(),
+    title: z.string().min(2),
+    slug: z.string().min(2),
+    date: z.string().min(2),
+    location: z.string().min(2),
+    description: z.string().optional(),
+    banner: z.string().min(1),
+    bannerImage: z.string().url().optional(),
+    eventTypes: z.array(z.string()).default([]),
+    seoTitle: z.string().optional(),
+    seoDescription: z.string().optional(),
+    status: z.enum(['DRAFT', 'PUBLISHED']).optional(),
+    url: z.string().url().optional(),
 });
 
 // Featured validators

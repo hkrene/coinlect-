@@ -245,8 +245,8 @@ export const Academy: React.FC = () => {
           {/* Main Tabs */}
           <div className="flex flex-col items-center justify-between gap-6 mb-12 md:flex-row">
               <div className="flex p-1 bg-[#111] rounded-xl border border-white/5 w-full md:w-auto">
-                  <button onClick={() => setActiveTab('courses')} className={`flex-1 md:flex-none px-8 py-3 rounded-lg text-sm font-bold transition-all ${activeTab === 'courses' ? 'bg-coinlect-accent text-black' : 'text-gray-400 hover:text-white'}`}>Cours</button>
-                  <button onClick={() => setActiveTab('articles')} className={`flex-1 md:flex-none px-8 py-3 rounded-lg text-sm font-bold transition-all ${activeTab === 'articles' ? 'bg-coinlect-accent text-black' : 'text-gray-400 hover:text-white'}`}>Articles & Analyse</button>
+                  <button onClick={() => setActiveTab('courses')} className={`flex-1 md:flex-none px-8 py-3 rounded-lg text-sm font-bold transition-all ${activeTab === 'courses' ? 'bg-coinlect-accent text-black' : 'text-gray-400 hover:text-white'}`}>{t.academy.tabs.courses}</button>
+                  <button onClick={() => setActiveTab('articles')} className={`flex-1 md:flex-none px-8 py-3 rounded-lg text-sm font-bold transition-all ${activeTab === 'articles' ? 'bg-coinlect-accent text-black' : 'text-gray-400 hover:text-white'}`}>{t.academy.tabs.articles}</button>
               </div>
               {activeTab === 'courses' && (
                   <div className="flex w-full gap-2 pb-2 overflow-x-auto md:w-auto md:pb-0 scrollbar-hide">
