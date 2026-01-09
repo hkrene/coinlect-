@@ -8,7 +8,18 @@
 @tailwind utilities;
 
 body {
+  font-family: 'Jura', sans-serif;
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Apply Orbitron to all headings and titles */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Orbitron', sans-serif;
+}
+
+/* Utility class for titles that aren't headings */
+.font-title {
+  font-family: 'Orbitron', sans-serif;
 }
 
 .glass-card {

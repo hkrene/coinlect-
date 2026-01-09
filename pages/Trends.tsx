@@ -229,22 +229,20 @@ export const Trends: React.FC = () => {
                                     <th className="p-3 pl-4 pr-2 text-left sm:p-3 sm:pl-4 sm:pr-2 md:p-6 md:pl-8 md:pr-6">Asset</th>
                                     <th className="p-3 px-2 text-left sm:p-3 sm:px-2 md:p-6 md:px-6">Price</th>
                                     <th className="p-3 px-2 text-left sm:p-3 sm:px-2 md:p-6 md:px-6">24h Change</th>
-                                    <th className="p-3 px-2 text-right sm:p-3 sm:px-2 md:p-6 md:px-6">24h Volume</th>
-                                    <th className="p-3 pl-2 pr-4 text-right sm:p-3 sm:pl-2 sm:pr-4 md:p-6 md:pl-6 md:pr-8">Market Cap</th>
+                                    <th className="hidden p-3 px-2 text-right sm:p-3 sm:px-2 md:table-cell md:p-6 md:px-6">24h Volume</th>
+                                    <th className="hidden p-3 pl-2 pr-4 text-right sm:p-3 sm:pl-2 sm:pr-4 md:table-cell md:p-6 md:pl-6 md:pr-8">Market Cap</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-white/5">
                                 {loading && coins.length === 0 ? (
-                                    // Skeleton Loader
-                                    Array.from({ length: 10 }).map((_, i) => (
-                                        <tr key={i} className="animate-pulse">
-                                            <td className="p-3 pl-4 pr-2 sm:p-3 sm:pl-4 sm:pr-2 md:p-6 md:pl-8 md:pr-6"><div className="w-32 h-10 rounded bg-white/5"></div></td>
-                                            <td className="p-3 px-2 sm:p-3 sm:px-2 md:p-6 md:px-6"><div className="w-20 h-6 ml-auto rounded bg-white/5"></div></td>
-                                            <td className="p-3 px-2 sm:p-3 sm:px-2 md:p-6 md:px-6"><div className="w-16 h-6 ml-auto rounded bg-white/5"></div></td>
-                                            <td className="p-3 px-2 sm:p-3 sm:px-2 md:p-6 md:px-6"><div className="w-24 h-6 ml-auto rounded bg-white/5"></div></td>
-                                            <td className="p-3 pl-2 pr-4 sm:p-3 sm:pl-2 sm:pr-4 md:p-6 md:pl-6 md:pr-8"><div className="h-6 ml-auto rounded w-28 bg-white/5"></div></td>
-                                        </tr>
-                                    ))
+                                    <tr>
+                                        <td colSpan={5} className="p-12">
+                                            <div className="flex flex-col items-center justify-center gap-4">
+                                                <div className="w-12 h-12 border-b-2 border-white rounded-full animate-spin"></div>
+                                                <p className="text-white">Chargement du marché...</p>
+                                            </div>
+                                        </td>
+                                    </tr>
                                 ) : (
                                     coins.map((coin) => (
                                         <tr key={coin.id} className="transition-colors hover:bg-white/5 group">
@@ -271,10 +269,10 @@ export const Trends: React.FC = () => {
                                                     {Math.abs(coin.price_change_percentage_24h).toFixed(2)}%
                                                 </div>
                                             </td>
-                                            <td className="p-3 px-2 font-mono text-xs text-right text-gray-400 sm:p-3 sm:px-2 md:text-sm md:p-6 md:px-6">
+                                            <td className="hidden p-3 px-2 font-mono text-xs text-right text-gray-400 sm:p-3 sm:px-2 md:table-cell md:text-sm md:p-6 md:px-6">
                                                 ${formatCompactNumber(coin.total_volume)}
                                             </td>
-                                            <td className="p-3 pl-2 pr-4 font-mono text-xs text-right text-gray-400 sm:p-3 sm:pl-2 sm:pr-4 md:text-sm md:p-6 md:pl-6 md:pr-8">
+                                            <td className="hidden p-3 pl-2 pr-4 font-mono text-xs text-right text-gray-400 sm:p-3 sm:pl-2 sm:pr-4 md:table-cell md:text-sm md:p-6 md:pl-6 md:pr-8">
                                                 ${formatCompactNumber(coin.market_cap)}
                                             </td>
                                         </tr>
@@ -304,10 +302,9 @@ export const Trends: React.FC = () => {
             </ScrollReveal>
 
             {newsLoading && news.length === 0 ? (
-               <div className="grid gap-8 md:grid-cols-3">
-                   {Array.from({length: 6}).map((_, i) => (
-                       <div key={i} className="h-64 bg-[#0F0F0F] border border-white/10 rounded-2xl animate-pulse"></div>
-                   ))}
+               <div className="flex flex-col items-center justify-center gap-4 py-20">
+                   <div className="w-12 h-12 border-b-2 border-white rounded-full animate-spin"></div>
+                   <p className="text-white">Chargement des actualités...</p>
                </div>
             ) : (
                 <div className="grid gap-8 md:grid-cols-3">

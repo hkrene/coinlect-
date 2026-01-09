@@ -43,7 +43,7 @@ export const Deals: React.FC = () => {
     <div className="min-h-screen pt-24 pb-20 bg-black">
       
       {/* SECTION HEADER: Style Dokploy avec marge ajustée */}
-      <section className="relative w-full pt-48 pb-24 overflow-hidden bg-black">
+      <section className="relative w-full pt-16 pb-6 overflow-hidden bg-black">
         {/* Background Grid */}
         <div aria-hidden className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px]" />
 

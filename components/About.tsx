@@ -59,9 +59,9 @@ export const About: React.FC = () => {
     return (
       <section className="py-24 bg-[#0a0a0a]">
         <div className="container px-6 mx-auto">
-          <div className="text-center">
-            <div className="w-8 h-8 mx-auto mb-4 border-4 rounded-full border-coinlect-accent border-t-transparent animate-spin"></div>
-            <p className="text-gray-400">Loading featured articles...</p>
+          <div className="flex flex-col items-center justify-center gap-4">
+            <div className="w-12 h-12 border-b-2 border-white rounded-full animate-spin"></div>
+            <p className="text-white">Chargement des articles...</p>
           </div>
         </div>
       </section>

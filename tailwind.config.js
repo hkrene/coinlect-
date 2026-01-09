@@ -8,6 +8,11 @@ module.exports = {
   darkMode: 'class',
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Jura', 'sans-serif'],
+        orbitron: ['Orbitron', 'sans-serif'],
+        jura: ['Jura', 'sans-serif'],
+      },
       colors: {
         coinlect: {
           black: '#0a0a0a',

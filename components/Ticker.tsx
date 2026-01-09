@@ -45,7 +45,7 @@ export const Ticker: React.FC = () => {
   };
 
   return (
-    <div className="sticky top-[80px] z-40 w-full py-3 overflow-hidden border-y border-white/5 bg-black/80 backdrop-blur-sm">
+    <div className="sticky top-[72px] z-40 w-full py-3 overflow-hidden bg-black/80 backdrop-blur-sm border-t border-white/5">
       <div className="flex min-w-full gap-12 animate-scroll whitespace-nowrap hover:pause-animation">
         {/* Triple list for seamless loop */}
         {[...items, ...items, ...items].map((coin, index) => {

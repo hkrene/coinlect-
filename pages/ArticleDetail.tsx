@@ -59,9 +59,9 @@ export const ArticleDetail: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="container flex flex-col items-center justify-center min-h-screen px-6 pt-32 mx-auto text-center">
-        <div className="w-8 h-8 border-4 rounded-full border-coinlect-accent border-t-transparent animate-spin"></div>
-        <p className="mt-4 text-gray-400">Loading article...</p>
+      <div className="flex flex-col items-center justify-center min-h-screen gap-4 px-6 text-center bg-black">
+        <div className="w-12 h-12 border-b-2 border-white rounded-full animate-spin"></div>
+        <p className="text-white">Chargement de l&apos;article...</p>
       </div>
     );
   }

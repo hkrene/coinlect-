@@ -77,7 +77,7 @@ export const Community: React.FC = () => {
     <div className="min-h-screen pt-24 pb-20 bg-black">
       
       {/* SECTION HEADER: Style Dokploy */}
-      <section className="relative w-full pt-48 pb-24 overflow-hidden bg-black">
+      <section className="relative w-full pt-16 pb-12 overflow-hidden bg-black">
         <div aria-hidden className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:64px_64px]" />
 
         <div className="relative z-10 w-full px-6 mx-auto max-w-7xl">
