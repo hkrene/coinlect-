@@ -94,16 +94,16 @@ export const Testimonials: React.FC = () => {
         {hasMounted && (
           <div className="grid grid-cols-1 gap-8 mb-16 text-center md:grid-cols-3">
             <div className="flex flex-col items-center justify-center p-6 bg-white/[0.02] border border-white/5 rounded-xl">
-              <p className="text-4xl font-bold text-coinlect-accent">1.9 million+</p>
-              <p className="text-sm text-white">Customers</p>
+              <p className="text-4xl font-bold text-coinlect-accent">1.000+</p>
+              <p className="text-sm text-white">Members</p>
             </div>
             <div className="flex flex-col items-center justify-center p-6 bg-white/[0.02] border border-white/5 rounded-xl">
               <p className="text-4xl font-bold text-coinlect-accent">4.000+</p>
               <p className="text-sm text-white">Satisfaction rate</p>
             </div>
             <div className="flex flex-col items-center justify-center p-6 bg-white/[0.02] border border-white/5 rounded-xl">
-              <p className="text-4xl font-bold text-coinlect-accent">5.000+</p>
-              <p className="text-sm text-white">Download</p>
+              <p className="text-4xl font-bold text-coinlect-accent">100+</p>
+              <p className="text-sm text-white">Resources</p>
             </div>
           </div>
         )}
