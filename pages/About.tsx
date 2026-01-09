@@ -37,15 +37,6 @@ const TEAM_MEMBERS: TeamMember[] = [
     },
   },
   {
-    name: "Ben Tshimanga",
-    title: "CTO",
-    image: "https://res.cloudinary.com/drsd8adkq/image/upload/v1766396457/bentshims_bv8gyi.jpg",
-    socials: {
-      twitter: "https://x.com/tshims_ben15226",
-      linkedin: "https://www.linkedin.com/in/ben-shimanga/",
-    },
-  },
-  {
     name: "Tresor Graphiste",
     title: "Design & Brand Lead",
     image: "https://res.cloudinary.com/drsd8adkq/image/upload/v1766394673/tresor-graph_gmcz1r.jpg",
@@ -54,15 +45,15 @@ const TEAM_MEMBERS: TeamMember[] = [
       linkedin: "https://www.linkedin.com/in/tresor-graphiste-88831538a ",
     },
   },
-  {
-    name: "Dev Minga",
-    title: "Design & Brand Director",
-    image: "https://res.cloudinary.com/drsd8adkq/image/upload/v1766397326/dev-minga_bjxnx7.jpg",
-    socials: {
-      twitter: "#",
-      linkedin: "https://www.linkedin.com/in/dev-minga-930806300/",
-    },
-  },
+  // {
+  //   name: "Dev Minga",
+  //   title: "Design & Brand Director",
+  //   image: "https://res.cloudinary.com/drsd8adkq/image/upload/v1766397326/dev-minga_bjxnx7.jpg",
+  //   socials: {
+  //     twitter: "#",
+  //     linkedin: "https://www.linkedin.com/in/dev-minga-930806300/",
+  //   },
+  // },
   {
     name: "Sylvain Kaman'da",
     title: "Community Manager Lead",
@@ -70,6 +61,15 @@ const TEAM_MEMBERS: TeamMember[] = [
     socials: {
       twitter: "https://x.com/ShekinahKamanda",
       linkedin: "https://www.linkedin.com/in/sylvain-kaman-da-212370279/",
+    },
+  },
+  {
+    name: "Ben Tshimanga",
+    title: "Active Member",
+    image: "https://res.cloudinary.com/drsd8adkq/image/upload/v1766396457/bentshims_bv8gyi.jpg",
+    socials: {
+      twitter: "https://x.com/tshims_ben15226",
+      linkedin: "https://www.linkedin.com/in/ben-shimanga/",
     },
   },
   {
@@ -143,14 +143,14 @@ export const About: React.FC = () => {
                 la jeunesse de l’Afrique francophone.
               </p>
 
-              <p className="mb-4 text-sm leading-relaxed text-gray-400">
+              <p className="mb-4 text-sm leading-relaxed text-gray-400 md:text-xl">
                 À travers nos contenus éducatifs, nos formations et notre communauté
                 en ligne, nous aidons chaque apprenant à transformer la curiosité en
                 compétences concrètes. Nous ne faisons pas la promotion aveugle de
                 tendances : nous expliquons, formons et structurons la compréhension.
               </p>
 
-              <p className="text-sm leading-relaxed text-gray-400">
+              <p className="text-sm leading-relaxed text-gray-400 md:text-xl">
                 CoinLect Academy construit une nouvelle génération de talents africains
                 capables de comprendre, créer et innover dans l’économie numérique
                 mondiale.
@@ -191,19 +191,19 @@ export const About: React.FC = () => {
                 Notre <span className="text-coinlect-accent">Mission</span>
               </h2>
 
-              <p className="mb-4 text-sm leading-relaxed text-gray-400">
+              <p className="mb-4 text-sm leading-relaxed text-gray-400 md:text-xl">
                 Notre mission est de démocratiser l’éducation crypto et Web3 afin de
                 favoriser une adoption massive, responsable et durable une personne
                 à la fois.
               </p>
 
-              <p className="mb-4 text-sm leading-relaxed text-gray-400">
+              <p className="mb-4 text-sm leading-relaxed text-gray-400 md:text-xl">
                 Nous proposons des contenus clairs, pratiques et impartiaux, conçus
                 pour répondre aux réalités économiques et technologiques de l’Afrique
                 francophone.
               </p>
 
-              <p className="text-sm leading-relaxed text-gray-400">
+                <p className="text-sm leading-relaxed text-gray-400 md:text-xl">
                 CoinLect Academy s’engage à fournir une information honnête, sans
                 promesses irréalistes ni discours trompeurs. Notre objectif est
                 d’autonomiser chaque apprenant pour qu’il puisse prendre des décisions
@@ -222,7 +222,7 @@ export const About: React.FC = () => {
 
             <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
               {TEAM_MEMBERS.map((member, index) => (
-                <div key={index} className="flex flex-col items-center">
+                <div key={index} className="flex flex-col items-center justify-center">
                   <img
                     src={member.image}
                     alt={member.name}

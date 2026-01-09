@@ -61,8 +61,8 @@ export const Header: React.FC = () => {
   };
 
   const logoSrc = pathname?.startsWith('/academy') 
-    ? "https://res.cloudinary.com/drsd8adkq/image/upload/v1765187893/coinLect-academ_our9m2.jpg"
-    : "https://res.cloudinary.com/drsd8adkq/image/upload/v1765187097/coinlect-0_denz8g.jpg";
+    ? "https://res.cloudinary.com/drsd8adkq/image/upload/v1767997893/coinlect-0_denz8g-removebg-preview_kwnhri.png"
+    : "https://res.cloudinary.com/drsd8adkq/image/upload/v1767997894/coinLect-academ_our9m2-removebg-preview_rkzqik.png";
 
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-black/90 backdrop-blur-md border-b border-white/5 py-4' : 'bg-transparent py-6'}`}>
