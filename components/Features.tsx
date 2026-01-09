@@ -44,13 +44,12 @@ export const Features: React.FC = () => {
         {/* Feature 1: Clean Image Preview */}
         <div className="grid items-center gap-16 md:grid-cols-2">
             <div className="md:p-8">
-                <h2 className="mb-6 text-4xl font-bold leading-tight text-white md:text-5xl">
-                    {t.features.buyTitle} <br/>
-                    <span className="text-coinlect-accent">{t.features.buyTitleSuffix}</span>
+                <h2 className="mb-6 text-2xl font-bold leading-tight text-white md:text-4xl">
+                    {t.features.buyTitle} <span className="text-coinlect-accent">{t.features.buyTitleSuffix}</span>
                 </h2>
-                <div className="mb-10 space-y-6 text-base leading-relaxed text-gray-400">
-                    <p>{t.features.buyDesc1}</p>
-                    <p>{t.features.buyDesc2}</p>
+                <div className="mb-10 space-y-6 text-xs leading-relaxed text-gray-400">
+                    <span>{t.features.buyDesc1}</span>
+                    <span>{t.features.buyDesc2}</span>
                 </div>
                 <Link href={isAuthenticated ? "/academy" : "/register"}>
                     <div className="inline-flex items-center justify-between w-full md:w-auto min-w-[220px] border border-white/10 rounded-full px-8 py-4 hover:bg-white hover:text-black transition-all group cursor-pointer">
@@ -64,7 +63,7 @@ export const Features: React.FC = () => {
             <div className="relative h-[450px] w-full bg-[#0F0F0F] rounded-3xl overflow-hidden border border-white/5 shadow-2xl">
                 <img
                   src={rotatingImages[currentImageIndex]}
-                  className="w-full h-full object-cover transition-opacity duration-1000"
+                  className="object-cover w-full h-full transition-opacity duration-1000"
                   alt="Security Preview"
                   key={currentImageIndex}
                 />
@@ -73,7 +72,7 @@ export const Features: React.FC = () => {
                 <div className="absolute inset-0 bg-gradient-to-tr from-black/60 via-transparent to-transparent"></div>
 
                 {/* Simple Indicators */}
-                <div className="absolute bottom-6 right-8 flex gap-2">
+                <div className="absolute flex gap-2 bottom-6 right-8">
                   {rotatingImages.map((_, index) => (
                     <div
                       key={index}
@@ -89,13 +88,13 @@ export const Features: React.FC = () => {
         {/* Feature 2: Clean Image Preview */}
         <div className="grid items-center gap-16 md:grid-cols-2">
              <div className="md:order-2 md:p-8">
-                <h2 className="mb-6 text-4xl font-bold leading-tight text-white md:text-5xl">
+                <h2 className="mb-6 text-2xl font-bold leading-tight text-white md:text-4xl">
                     <span className="md:inline">{t.features.communityTitle} </span>
                     <span className="text-coinlect-accent">{t.features.communityTitleSuffix}</span>
                 </h2>
-                <div className="mb-10 space-y-6 text-base leading-relaxed text-gray-400">
-                    <p>{t.features.communityDesc1}</p>
-                    <p>{t.features.communityDesc2}</p>
+                <div className="mb-10 space-y-6 text-xs leading-relaxed text-gray-400">
+                    <span>{t.features.communityDesc1}</span>
+                    <span>{t.features.communityDesc2}</span>
                 </div>
                 <Link href="/community">
                     <div className="inline-flex items-center justify-between w-full md:w-auto min-w-[220px] border border-white/10 rounded-full px-8 py-4 hover:bg-white hover:text-black transition-all group cursor-pointer">
@@ -115,7 +114,7 @@ export const Features: React.FC = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
 
                 {/* Community Image Indicators */}
-                <div className="absolute bottom-6 right-8 flex gap-2">
+                <div className="absolute flex gap-2 bottom-6 right-8">
                   {communityImages.map((_, index) => (
                     <div
                       key={index}
