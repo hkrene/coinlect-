@@ -175,20 +175,17 @@ export const Header: React.FC = () => {
                </div>
                {isAuthenticated && (
                 <button onClick={() => setIsProfileModalOpen(true)} className="flex items-center gap-2 py-1 pl-2 pr-3 transition-colors border rounded-full border-white/10 bg-white/5 hover:bg-white/10 group">
-                  <img
-                    src={user?.avatar || undefined}
-                    alt={user?.name || user?.email || 'User'}
-                    className="object-cover w-8 h-8 rounded-full bg-gradient-to-br from-coinlect-accent to-purple-600"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      const initials = (user?.name || user?.email || 'U').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-                      target.style.display = 'none';
-                      const parent = target.parentElement;
-                      if (parent) {
-                        parent.innerHTML = `<div class="w-8 h-8 rounded-full bg-gradient-to-br from-coinlect-accent to-purple-600 flex items-center justify-center text-xs font-semibold text-white">${initials}</div>`;
-                      }
-                    }}
-                  />
+                  {user?.avatar ? (
+                    <img
+                      src={user.avatar}
+                      alt={user.name || user.email || 'User'}
+                      className="object-cover w-8 h-8 rounded-full bg-gradient-to-br from-coinlect-accent to-purple-600"
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center w-8 h-8 text-xs font-semibold text-white rounded-full bg-gradient-to-br from-coinlect-accent to-purple-600">
+                      {(user?.name || user?.email || 'U').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+                    </div>
+                  )}
                 </button>
               )}
              </div>
