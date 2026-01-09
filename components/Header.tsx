@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Button } from './Button';
 import { ProfileDropdown } from './ProfileDropdown';
+import { ProfileModal } from './ProfileModal';
 import { NavItem } from '../types';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -15,6 +16,7 @@ export const Header: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [academyDropdownOpen, setAcademyDropdownOpen] = useState(false);
   const [mobileAcademyDropdownOpen, setMobileAcademyDropdownOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const pathname = usePathname();
   const { t, language, setLanguage } = useLanguage();
   const { user, isAuthenticated, logout, isAdmin } = useAuth();
@@ -172,13 +174,29 @@ export const Header: React.FC = () => {
                  </button>
                </div>
                {isAuthenticated && (
-                <ProfileDropdown />
+                <button onClick={() => setIsProfileModalOpen(true)} className="flex items-center gap-2 py-1 pl-2 pr-3 transition-colors border rounded-full border-white/10 bg-white/5 hover:bg-white/10 group">
+                  <img
+                    src={user?.avatar || undefined}
+                    alt={user?.name || user?.email || 'User'}
+                    className="object-cover w-8 h-8 rounded-full bg-gradient-to-br from-coinlect-accent to-purple-600"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      const initials = (user?.name || user?.email || 'U').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+                      target.style.display = 'none';
+                      const parent = target.parentElement;
+                      if (parent) {
+                        parent.innerHTML = `<div class="w-8 h-8 rounded-full bg-gradient-to-br from-coinlect-accent to-purple-600 flex items-center justify-center text-xs font-semibold text-white">${initials}</div>`;
+                      }
+                    }}
+                  />
+                </button>
               )}
              </div>
              {!isAuthenticated && <Link href="/register" className="flex-grow"><Button variant="outline" className="w-full px-4 py-2 text-xs text-white border-white/20" onClick={() => setMobileMenuOpen(false)}>{t.nav.getStarted}</Button></Link>}
            </div>
         </div>
       )}
+      <ProfileModal isOpen={isProfileModalOpen} onClose={() => setIsProfileModalOpen(false)} />
     </header>
   );
 };
