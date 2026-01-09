@@ -18,25 +18,25 @@ interface TestimonialCardProps {
 }
 
 const TestimonialCard: React.FC<TestimonialCardProps> = ({ testimonial, index }) => (
-  <div className="flex-shrink-0 w-full max-w-sm p-6 transition-all duration-300 bg-black border rounded-xl border-white/10 hover:border-coinlect-accent/50 group">
-    <div className="flex items-start gap-4 mb-4">
+  <div className="flex-shrink-0 w-full max-w-sm p-6 transition-all duration-300 bg-white/[0.02] border border-white/5 rounded-xl hover:border-coinlect-accent/50 group">
+    <div className="flex items-center gap-4 mb-4">
       <img
         src={testimonial.avatar}
         alt={testimonial.name}
-        className="flex-shrink-0 w-12 h-12 rounded-full object-cover border-2 border-white/10"
+        className="flex-shrink-0 object-cover w-12 h-12 border rounded-full border-white/10"
       />
-      <div className="flex-1">
+      <div>
         <h4 className="font-semibold text-white">{testimonial.name}</h4>
         <p className="text-sm text-gray-400">{testimonial.role}</p>
-        <div className="flex gap-1 mt-2">
-          {[...Array(5)].map((_, i) => (
-            <Star key={i} size={14} className="fill-yellow-400 text-yellow-400" />
-          ))}
-        </div>
       </div>
     </div>
-    <blockquote className="text-sm text-gray-300 leading-relaxed italic">
-      &ldquo;{testimonial.content}&rdquo;
+    <div className="flex gap-1 mb-4">
+      {[...Array(5)].map((_, i) => (
+        <Star key={i} size={16} className="text-yellow-400 fill-yellow-400" />
+      ))}
+    </div>
+    <blockquote className="text-base leading-relaxed text-gray-300 font-body">
+      {testimonial.content}
     </blockquote>
   </div>
 );
@@ -44,7 +44,12 @@ const TestimonialCard: React.FC<TestimonialCardProps> = ({ testimonial, index })
 export const Testimonials: React.FC = () => {
   const { t } = useLanguage();
   const [isUserInteracting, setIsUserInteracting] = useState(false);
+  const [hasMounted, setHasMounted] = useState(false);
   const mobileScrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setHasMounted(true);
+  }, []);
 
   // Split testimonials into chunks for scrolling animation
   const testimonials = t.testimonials.items;
@@ -77,14 +82,31 @@ export const Testimonials: React.FC = () => {
       <div className="container relative z-10 px-6 mx-auto">
         <ScrollReveal>
           <div className="mb-12 text-center">
-            <h2 className="mb-4 text-3xl font-bold">
+            <h2 className="mb-4 text-3xl font-bold font-heading">
               {t.testimonials.title} <span className="text-coinlect-accent">{t.testimonials.titleSuffix}</span>
             </h2>
-            <p className="max-w-xl mx-auto text-sm text-gray-500">
+            <p className="max-w-xl mx-auto text-base text-gray-500 font-body">
               {t.testimonials.desc}
             </p>
           </div>
         </ScrollReveal>
+
+        {hasMounted && (
+          <div className="grid grid-cols-1 gap-8 mb-16 text-center md:grid-cols-3">
+            <div className="flex flex-col items-center justify-center p-6 bg-white/[0.02] border border-white/5 rounded-xl">
+              <p className="text-4xl font-bold text-coinlect-accent">1.9 million+</p>
+              <p className="text-sm text-white">Customers</p>
+            </div>
+            <div className="flex flex-col items-center justify-center p-6 bg-white/[0.02] border border-white/5 rounded-xl">
+              <p className="text-4xl font-bold text-coinlect-accent">4.000+</p>
+              <p className="text-sm text-white">Satisfaction rate</p>
+            </div>
+            <div className="flex flex-col items-center justify-center p-6 bg-white/[0.02] border border-white/5 rounded-xl">
+              <p className="text-4xl font-bold text-coinlect-accent">5.000+</p>
+              <p className="text-sm text-white">Download</p>
+            </div>
+          </div>
+        )}
 
         {/* Mobile: Single row scrolling with manual control */}
         <div className="md:hidden">
