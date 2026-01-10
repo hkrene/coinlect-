@@ -33,7 +33,6 @@ export const POST = requireAdmin(async (req: NextRequest, user) => {
         description: data.description,
         banner: data.banner,
         bannerImage: data.bannerImage,
-        bannerText: data.bannerText,
         eventTypes: data.eventTypes,
         seoTitle: data.seoTitle,
         seoDescription: data.seoDescription,

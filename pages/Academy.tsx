@@ -32,12 +32,14 @@ export const Academy: React.FC = () => {
   const canonicalCategories = ["All", "Blockchain", "Trading", "DeFi", "NFT", "Security", "Mining"];
 
   // Create mapping between canonical and display categories
-  const categoryMapping: { [key: string]: string } = {};
-  canonicalCategories.forEach((canonical, index) => {
-    categoryMapping[canonical] = displayCategories[index] || canonical;
-    // Also map display names back to canonical
-    categoryMapping[displayCategories[index] || canonical] = canonical;
-  });
+  const categoryMapping = React.useMemo(() => {
+    const mapping: { [key: string]: string } = {};
+    canonicalCategories.forEach((canonical, index) => {
+      mapping[canonical] = displayCategories[index] || canonical;
+      mapping[displayCategories[index] || canonical] = canonical;
+    });
+    return mapping;
+  }, [canonicalCategories, displayCategories]);
 
   // Use React Query hooks
   const { data: courses = [], isLoading: coursesLoading, error: coursesError } = useCourses();
