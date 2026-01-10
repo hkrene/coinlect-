@@ -1,6 +1,19 @@
 import type { Metadata } from 'next';
 import './globals.css';
 import { Providers } from './providers';
+import { Orbitron, Jura } from 'next/font/google';
+
+const orbitron = Orbitron({
+  subsets: ['latin'],
+  weight: ['400', '500', '700'],
+  variable: '--font-orbitron',
+});
+
+const jura = Jura({
+  subsets: ['latin'],
+  weight: ['400', '500', '700'],
+  variable: '--font-jura',
+});
 
 export const metadata: Metadata = {
   title: 'Coinlect',
@@ -18,13 +31,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fr" className="scroll-smooth">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&display=swap" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css2?family=Jura:wght@400;500;700&display=swap" rel="stylesheet" />
-      </head>
+    <html lang="fr" className={`${orbitron.variable} ${jura.variable} scroll-smooth`}>
       <body className={`bg-black text-white`} suppressHydrationWarning={true}>
         <Providers>
           {children}

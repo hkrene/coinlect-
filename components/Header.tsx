@@ -61,8 +61,8 @@ export const Header: React.FC = () => {
   };
 
   const logoSrc = pathname?.startsWith('/academy') 
-    ? "https://res.cloudinary.com/drsd8adkq/image/upload/v1767997893/coinlect-0_denz8g-removebg-preview_kwnhri.png"
-    : "https://res.cloudinary.com/drsd8adkq/image/upload/v1767997894/coinLect-academ_our9m2-removebg-preview_rkzqik.png";
+    ? "https://res.cloudinary.com/drsd8adkq/image/upload/v1767997894/coinLect-academ_our9m2-removebg-preview_rkzqik.png"
+    : "https://res.cloudinary.com/drsd8adkq/image/upload/v1767997893/coinlect-0_denz8g-removebg-preview_kwnhri.png";
 
   return (
     <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-black/90 backdrop-blur-md border-b border-white/5 py-4' : 'bg-transparent py-6'}`}>
@@ -116,16 +116,18 @@ export const Header: React.FC = () => {
 
         {/* Desktop Actions */}
         <div className="items-center hidden gap-4 lg:flex">
-          <div className="relative flex items-center">
-            <button onClick={() => { setLanguage('fr'); window.location.reload(); }} className={`relative z-10 w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all ${language === 'fr' ? 'border-coinlect-accent bg-black text-gray-200' : 'border-white/10 bg-black text-gray-500'}`}>
-              <span className="text-xs font-semibold">FR</span>
-            </button>
-            <button onClick={() => { setLanguage('en'); window.location.reload(); }} className={`relative -ml-3 z-0 w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all ${language === 'en' ? 'border-coinlect-accent bg-black text-gray-200' : 'border-white/10 bg-black text-gray-500'}`}>
-              <span className="text-xs font-semibold">EN</span>
-            </button>
-          </div>
-          <Link href="/donate"><Button className="px-4 py-2 text-xs">{t.nav.donate}</Button></Link>
-          {!isAuthenticated && <Link href="/register"><Button variant="outline" className="px-4 py-2 text-xs text-white border-white/20">{t.nav.getStarted}</Button></Link>}
+          {hasMounted && (
+            <div className="relative flex items-center">
+              <button onClick={() => { setLanguage('fr'); window.location.reload(); }} className={`relative z-10 w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all ${language === 'fr' ? 'border-coinlect-accent bg-black text-gray-200' : 'border-white/10 bg-black text-gray-500'}`}>
+                <span className="text-xs font-semibold">FR</span>
+              </button>
+              <button onClick={() => { setLanguage('en'); window.location.reload(); }} className={`relative -ml-3 z-0 w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all ${language === 'en' ? 'border-coinlect-accent bg-black text-gray-200' : 'border-white/10 bg-black text-gray-500'}`}>
+                <span className="text-xs font-semibold">EN</span>
+              </button>
+            </div>
+          )}
+          <Link href="/donate"><Button className="px-4 py-2 text-xs">{hasMounted && t.nav.donate}</Button></Link>
+          {!isAuthenticated && <Link href="/register"><Button variant="outline" className="px-4 py-2 text-xs text-white border-white/20">{hasMounted && t.nav.getStarted}</Button></Link>}
           {isAuthenticated && (
             <ProfileDropdown />
           )}
@@ -133,7 +135,7 @@ export const Header: React.FC = () => {
 
         {/* Mobile Toggle */}
         <div className="flex items-center gap-3 lg:hidden">
-          <Link href="/donate"><Button className="px-3 py-1.5 text-xs h-8 shadow-none">{t.nav.donate}</Button></Link>
+          <Link href="/donate"><Button className="px-3 py-1.5 text-xs h-8 shadow-none">{hasMounted && t.nav.donate}</Button></Link>
           <button className="p-1 text-white" onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>{mobileMenuOpen ? <X /> : <Menu />}</button>
         </div>
       </div>
@@ -169,32 +171,34 @@ export const Header: React.FC = () => {
              );
            })}
            <div className="flex flex-col gap-2 pt-4 mt-4 border-t border-white/10">
-             <div className="flex items-center justify-between">
-               <div className="relative flex items-center flex-none">
-                 <button onClick={() => { setLanguage('fr'); window.location.reload(); }} className={`relative z-10 w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all ${language === 'fr' ? 'border-coinlect-accent bg-black text-gray-200' : 'border-white/10 bg-black text-gray-500'}`}>
-                   <span className="text-xs font-semibold">FR</span>
-                 </button>
-                 <button onClick={() => { setLanguage('en'); window.location.reload(); }} className={`relative -ml-3 z-0 w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all ${language === 'en' ? 'border-coinlect-accent bg-black text-gray-200' : 'border-white/10 bg-black text-gray-500'}`}>
-                   <span className="text-xs font-semibold">EN</span>
-                 </button>
+             {hasMounted && (
+               <div className="flex items-center justify-between">
+                 <div className="relative flex items-center flex-none">
+                   <button onClick={() => { setLanguage('fr'); window.location.reload(); }} className={`relative z-10 w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all ${language === 'fr' ? 'border-coinlect-accent bg-black text-gray-200' : 'border-white/10 bg-black text-gray-500'}`}>
+                     <span className="text-xs font-semibold">FR</span>
+                   </button>
+                   <button onClick={() => { setLanguage('en'); window.location.reload(); }} className={`relative -ml-3 z-0 w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all ${language === 'en' ? 'border-coinlect-accent bg-black text-gray-200' : 'border-white/10 bg-black text-gray-500'}`}>
+                     <span className="text-xs font-semibold">EN</span>
+                   </button>
+                 </div>
+                 {isAuthenticated && (
+                  <button onClick={() => setIsProfileModalOpen(true)} className="flex items-center gap-2 py-1 pl-2 pr-3 transition-colors border rounded-full border-white/10 bg-white/5 hover:bg-white/10 group">
+                    {user?.avatar ? (
+                      <img
+                        src={user.avatar}
+                        alt={user.name || user.email || 'User'}
+                        className="object-cover w-8 h-8 rounded-full bg-gradient-to-br from-coinlect-accent to-purple-600"
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center w-8 h-8 text-xs font-semibold text-white rounded-full bg-gradient-to-br from-coinlect-accent to-purple-600">
+                        {(user?.name || user?.email || 'U').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+                      </div>
+                    )}
+                  </button>
+                )}
                </div>
-               {isAuthenticated && (
-                <button onClick={() => setIsProfileModalOpen(true)} className="flex items-center gap-2 py-1 pl-2 pr-3 transition-colors border rounded-full border-white/10 bg-white/5 hover:bg-white/10 group">
-                  {user?.avatar ? (
-                    <img
-                      src={user.avatar}
-                      alt={user.name || user.email || 'User'}
-                      className="object-cover w-8 h-8 rounded-full bg-gradient-to-br from-coinlect-accent to-purple-600"
-                    />
-                  ) : (
-                    <div className="flex items-center justify-center w-8 h-8 text-xs font-semibold text-white rounded-full bg-gradient-to-br from-coinlect-accent to-purple-600">
-                      {(user?.name || user?.email || 'U').split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
-                    </div>
-                  )}
-                </button>
-              )}
-             </div>
-             {!isAuthenticated && <Link href="/register" className="flex-grow"><Button variant="outline" className="w-full px-4 py-2 text-xs text-white border-white/20" onClick={() => setMobileMenuOpen(false)}>{t.nav.getStarted}</Button></Link>}
+             )}
+             {!isAuthenticated && <Link href="/register" className="flex-grow"><Button variant="outline" className="w-full px-4 py-2 text-xs text-white border-white/20" onClick={() => setMobileMenuOpen(false)}>{hasMounted && t.nav.getStarted}</Button></Link>}
            </div>
         </div>
       )}

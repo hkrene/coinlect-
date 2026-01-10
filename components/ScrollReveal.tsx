@@ -38,12 +38,14 @@ export const ScrollReveal: React.FC<ScrollRevealProps> = ({
       }
     );
 
+    let currentRef: HTMLDivElement | null = null;
     if (ref.current) {
-      observer.observe(ref.current);
+      currentRef = ref.current;
+      observer.observe(currentRef);
     }
 
     return () => {
-      if (ref.current) observer.unobserve(ref.current);
+      if (currentRef) observer.unobserve(currentRef);
       clearTimeout(fallbackTimer);
     };
   }, [threshold, isVisible]);

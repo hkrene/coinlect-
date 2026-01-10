@@ -116,7 +116,7 @@ export const Trends: React.FC = () => {
     } finally {
         if (!isBackground) setNewsLoading(false);
     }
-  }, [news.length]);
+  }, [news.length, language]);
 
   const fetchMarketData = async () => {
     try {
@@ -163,7 +163,7 @@ export const Trends: React.FC = () => {
         clearInterval(marketInterval);
         clearInterval(newsInterval);
     };
-  }, []);
+  }, [fetchNews]);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('en-US', {

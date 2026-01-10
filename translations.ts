@@ -215,6 +215,7 @@ export const translations = {
         subtitle: "Rejoignez une communauté mondiale et informez-vous gratuitement sur les cryptomonnaies et la blockchain !",
         searchPlaceholder: "Rechercher dans le glossaire...",
         filters: ["Tous", "Blockchain", "Trading", "DeFi", "NFT", "Sécurité", "Mining"],
+        tabs: { courses: "Cours", articles: "Articles & Analyse" },
         availableCourses: "Cours Disponibles",
         results: "résultats",
         devSpace: "Espace Développeur",
@@ -316,6 +317,14 @@ export const translations = {
       exclusive: "Exclusivité Coinlect",
       coupon: "Code Promo",
       noDealsFound: "Aucune offre trouvée pour cette catégorie."
+    },
+    events: {
+      title: "Événements",
+      titleSuffix: "à Venir",
+      subtitle: "Rejoignez les conférences, meetups et hackathons blockchain et crypto partout dans le monde.",
+      searchPlaceholder: "Rechercher un événement...",
+      filters: ["Tous", "Conférence", "Meetup", "Web3", "Workshop", "Hackathon", "Mixer"],
+      noEventsFound: "Aucun événement trouvé pour cette catégorie."
     },
     auth: {
         welcome: "Bon retour",
@@ -558,6 +567,7 @@ export const translations = {
         subtitle: "Join a global community and learn about cryptocurrencies and blockchain for free!",
         searchPlaceholder: "Search glossary...",
         filters: ["All", "Blockchain", "Trading", "DeFi", "NFT", "Security", "Mining"],
+        tabs: { courses: "Courses", articles: "Articles & Analysis" },
         availableCourses: "Available Courses",
         results: "results",
         devSpace: "Developer Space",
@@ -659,6 +669,14 @@ export const translations = {
       exclusive: "Coinlect Exclusive",
       coupon: "Promo Code",
       noDealsFound: "No deals found for this category."
+    },
+    events: {
+      title: "Upcoming",
+      titleSuffix: "Events",
+      subtitle: "Join blockchain and crypto conferences, meetups, and hackathons worldwide.",
+      searchPlaceholder: "Search for an event...",
+      filters: ["All", "Conference", "Meetup", "Web3", "Workshop", "Hackathon", "Mixer"],
+      noEventsFound: "No events found for this category."
     },
     auth: {
         welcome: "Welcome Back",

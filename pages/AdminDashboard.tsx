@@ -115,7 +115,7 @@ export const AdminDashboard: React.FC = () => {
     date: new Date().toLocaleDateString('fr-FR'),
   });
 
-  const [eventForm, setEventForm] = useState<Omit<Event, 'id' | 'slug'> & { slug: string }>({
+  const [eventForm, setEventForm] = useState<Omit<Event, 'id' | 'createdAt' | 'updatedAt' | 'slug' | 'authorId' | 'author' | 'publishedAt' | 'type' | 'bannerText'> & { slug: string }>({
     title: '',
     slug: '',
     date: '',
@@ -123,18 +123,11 @@ export const AdminDashboard: React.FC = () => {
     description: '',
     banner: 'custom',
     bannerImage: '',
-    bannerText: '',
     eventTypes: [],
     seoTitle: '',
     seoDescription: '',
     status: 'DRAFT',
-    publishedAt: undefined,
-    createdAt: '',
-    updatedAt: '',
-    authorId: undefined,
-    author: undefined,
-    // Legacy field for compatibility
-    type: []
+    url: ''
   });
 
   const [dealForm, setDealForm] = useState<Omit<Deal, 'id'> & { status: PublishStatus }>({
@@ -399,7 +392,8 @@ export const AdminDashboard: React.FC = () => {
     try {
       const eventData = {
         ...eventForm,
-        eventTypes: eventForm.eventTypes || []
+        eventTypes: eventForm.eventTypes || [],
+        url: eventForm.url || undefined,
       };
       if (editingItem) {
         // Update existing event
@@ -440,17 +434,11 @@ export const AdminDashboard: React.FC = () => {
         description: '',
         banner: 'custom',
         bannerImage: '',
-        bannerText: '',
         eventTypes: [],
         seoTitle: '',
         seoDescription: '',
         status: 'DRAFT',
-        publishedAt: undefined,
-        createdAt: '',
-        updatedAt: '',
-        authorId: undefined,
-        author: undefined,
-        type: []
+        url: ''
       });
     } catch (error) {
       console.error('Error saving event:', error);
@@ -514,11 +502,11 @@ export const AdminDashboard: React.FC = () => {
   };
 
   const toggleEventType = (type: string) => {
-    const types = eventForm.type || [];
+    const types = eventForm.eventTypes || [];
     if (types.includes(type)) {
-      setEventForm({ ...eventForm, type: types.filter(t => t !== type) });
+      setEventForm({ ...eventForm, eventTypes: types.filter(t => t !== type) });
     } else {
-      setEventForm({ ...eventForm, type: [...types, type] });
+      setEventForm({ ...eventForm, eventTypes: [...types, type] });
     }
   };
 
@@ -760,7 +748,7 @@ export const AdminDashboard: React.FC = () => {
                 <div key={e.id} className="bg-[#111] p-4 rounded-xl border border-white/10 flex justify-between items-center group">
                   <div className="flex items-center gap-4">
                     <div className="flex flex-wrap gap-1">
-                      {(e.type || []).map((t, idx) => (
+                      {(e.eventTypes || []).map((t, idx) => (
                         <span key={idx} className="px-2 py-1 text-[10px] font-bold text-gray-400 uppercase bg-white/5 rounded">{t}</span>
                       ))}
                     </div>
@@ -781,16 +769,11 @@ export const AdminDashboard: React.FC = () => {
                         description: e.description || '',
                         banner: e.banner || '',
                         bannerImage: e.bannerImage || '',
-                        bannerText: e.bannerText || '',
                         eventTypes: e.eventTypes || [],
                         seoTitle: e.seoTitle || '',
                         seoDescription: e.seoDescription || '',
                         status: e.status || 'DRAFT',
-                        publishedAt: e.publishedAt || undefined,
-                        createdAt: e.createdAt || '',
-                        updatedAt: e.updatedAt || '',
-                        authorId: e.authorId || undefined,
-                        author: e.author || undefined
+                        url: e.url || '',
                       });
                       setIsModalOpen(true);
                     }} className="p-2 text-blue-500 hover:text-blue-400" aria-label="Edit event"><FileText size={18} /></button>
@@ -1012,6 +995,7 @@ export const AdminDashboard: React.FC = () => {
                             frameBorder="0"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                             allowFullScreen
+                            title="YouTube video player"
                             onError={() => {
                               const container = document.querySelector('.video-preview') as HTMLElement;
                               if (container) {
@@ -1026,6 +1010,7 @@ export const AdminDashboard: React.FC = () => {
                             frameBorder="0"
                             allow="autoplay; fullscreen; picture-in-picture"
                             allowFullScreen
+                            title="Vimeo video player"
                             onError={() => {
                               const container = document.querySelector('.video-preview') as HTMLElement;
                               if (container) {
@@ -1233,6 +1218,13 @@ export const AdminDashboard: React.FC = () => {
                       onChange={e => setEventForm({...eventForm, location: e.target.value})} 
                     />
                   </div>
+                  <input 
+                    type="url"
+                    placeholder="URL de l'événement (optionnel)" 
+                    className="w-full p-4 text-white bg-black border outline-none border-white/10 rounded-xl focus:border-coinlect-accent" 
+                    value={eventForm.url || ''}
+                    onChange={e => setEventForm({...eventForm, url: e.target.value})}
+                  />
                   <div className="space-y-3">
                     <label className="block text-sm font-bold text-gray-400">Type d&apos;événement</label>
                     <div className="flex flex-wrap gap-2">
@@ -1242,7 +1234,7 @@ export const AdminDashboard: React.FC = () => {
                           type="button"
                           onClick={() => toggleEventType(type)}
                           className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${
-                            (eventForm.type || []).includes(type)
+                            (eventForm.eventTypes || []).includes(type)
                               ? 'bg-coinlect-accent text-black'
                               : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
                           }`}
@@ -1294,13 +1286,6 @@ export const AdminDashboard: React.FC = () => {
                     )}
                   </div>
                   <textarea 
-                    placeholder="Texte de la bannière (optionnel, utilisez \\n pour les sauts de ligne)" 
-                    className="w-full h-24 p-4 text-white bg-black border outline-none border-white/10 rounded-xl" 
-                    value={eventForm.bannerText}
-                    onChange={e => setEventForm({...eventForm, bannerText: e.target.value})} 
-                    aria-label="Banner text"
-                  />
-                  <textarea 
                     placeholder="Description (optionnel)" 
                     className="w-full h-32 p-4 text-white bg-black border outline-none border-white/10 rounded-xl" 
                     value={eventForm.description}
@@ -1315,7 +1300,6 @@ export const AdminDashboard: React.FC = () => {
                       onChange={e => setEventForm({
                         ...eventForm,
                         status: e.target.checked ? 'PUBLISHED' : 'DRAFT',
-                        publishedAt: e.target.checked ? new Date().toISOString() : undefined
                       })}
                       className="border-gray-600 rounded"
                     />
