@@ -89,7 +89,7 @@ export const Academy: React.FC = () => {
       setActiveCategory('All');
       setActiveTab('courses');
     }
-  }, [searchParams]);
+  }, [searchParams, categoryMapping]);
 
   // React Query handles all data fetching and invalidation automatically
 
@@ -349,39 +349,39 @@ export const Academy: React.FC = () => {
             logo: "https://cryptologos.cc/logos/ethereum-eth-logo.svg?v=024", 
             desc: "Le standard des smart contracts. Apprenez à utiliser Hardhat et Solidity.", 
             links: [
-              { name: "Hardhat Guide", href: "#" },
-              { name: "Solidity", href: "#" }
+              { name: "Hardhat Guide", href: "https://hardhat.org/" },
+              { name: "Solidity", href: "https://www.soliditylang.org/" }
             ] 
           },
           { 
             title: "Bitcoin", 
             logo: "https://cryptologos.cc/logos/bitcoin-btc-logo.svg?v=024", 
             desc: "Explorez la couche de base et les solutions L2 comme Lightning et Stacks.", 
-            links: [{ name: "Lightning", href: "#" }] 
+            links: [{ name: "Lightning", href: "https://lightning.network/" }] 
           },
           { 
             title: "Base (L2)", 
             logo: "https://cdn.brandfetch.io/id6XsSOVVS/w/400/h/400/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1757929784005", 
             desc: "L'écosystème L2 de Coinbase. Compatibilité EVM totale.", 
-            links: [{ name: "Base Docs", href: "#" }] 
+            links: [{ name: "Base Docs", href: "https://www.base.org/" }] 
           },
           { 
             title: "TON Network", 
             logo: "https://cryptologos.cc/logos/toncoin-ton-logo.svg?v=024", 
             desc: "Adoption de masse via Telegram. Développez avec FunC et Tact.", 
-            links: [{ name: "TON SDK", href: "#" }] 
+            links: [{ name: "TON SDK", href: "https://docs.ton.org/" }] 
           },
           { 
             title: "Sui Blockchain", 
             logo: "https://cryptologos.cc/logos/sui-sui-logo.svg?v=024", 
             desc: "Modèle objet via Move. Performance extrême pour le gaming.", 
-            links: [{ name: "Sui Move", href: "#" }] 
+            links: [{ name: "Sui Move", href: "https://www.sui.io/" }] 
           },
           { 
-            title: "BNB Smart Chain", 
+            title: "Binance Smart Chain", 
             logo: "https://cryptologos.cc/logos/bnb-bnb-logo.svg?v=024", 
             desc: "La blockchain EVM pour la DeFi. Compatible tools Ethereum.", 
-            links: [{ name: "BSC Dev", href: "#" }] 
+            links: [{ name: "BSC Dev", href: "https://www.bnbchain.org/en" }] 
           }
         ].map((item, index) => (
           <div 
