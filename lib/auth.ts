@@ -6,11 +6,12 @@ const ACCESS_TOKEN_TTL = 60 * 15; // 15 minutes
 const REFRESH_TOKEN_TTL = 60 * 60 * 24 * 7; // 7 days
 
 const JWT_SECRET = process.env.JWT_SECRET;
+
 if (!JWT_SECRET) {
-  console.warn('JWT_SECRET is not set. Set it in .env.local');
+  throw new Error('JWT_SECRET is not set. Please set it in your environment variables.');
 }
 
-const secretKey = JWT_SECRET ? new TextEncoder().encode(JWT_SECRET) : undefined;
+const secretKey = new TextEncoder().encode(JWT_SECRET);
 
 export async function hashPassword(password: string) {
   return bcrypt.hash(password, 12);
