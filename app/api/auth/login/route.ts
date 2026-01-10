@@ -54,8 +54,11 @@ export async function POST(req: NextRequest) {
     });
     response.headers.set('Set-Cookie', cookie);
     return response;
-  } catch (err) {
+  } catch (err: any) {
     console.error('Login error', err);
+    if (err.message === 'JWT_SECRET missing') {
+      return NextResponse.json({ error: 'Server configuration error: JWT_SECRET is not set.' }, { status: 500 });
+    }
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

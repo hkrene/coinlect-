@@ -38,8 +38,11 @@ export async function GET(req: NextRequest) {
     });
 
   return NextResponse.json({ user });
-  } catch (err) {
+  } catch (err: any) {
     console.error('Auth check error:', err);
+    if (err.message === 'JWT_SECRET missing') {
+      return NextResponse.json({ error: 'Server configuration error: JWT_SECRET is not set.' }, { status: 500 });
+    }
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
