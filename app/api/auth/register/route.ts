@@ -46,7 +46,8 @@ export async function POST(req: NextRequest) {
     // Set the refresh token cookie
     const cookie = serialize('refreshToken', refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production', // Ensure secure cookies in production
+
       maxAge: 60 * 60 * 24 * 7, // 7 days
       path: '/',
     });
@@ -56,8 +57,8 @@ export async function POST(req: NextRequest) {
     });
     response.headers.set('Set-Cookie', cookie);
     return response;
-  } catch (err) {
-    console.error('Register error', err);
+  } catch (err: any) {
+    console.error('Register error:', err.message, err.stack);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

@@ -68,14 +68,12 @@ export const Academy: React.FC = () => {
     const tabParam = searchParams?.get('tab');
     const categoryParam = searchParams?.get('category');
 
-    // Handle tab switching
+    // Handle tab switching based on URL parameter, only if present
     if (tabParam === 'articles') {
       setActiveTab('articles');
     } else if (categoryParam === 'reviews' || categoryParam === 'guides') {
       // Reviews and guides should always show articles tab
       setActiveTab('articles');
-    } else {
-      setActiveTab('courses');
     }
 
     // Handle category filtering
@@ -86,8 +84,8 @@ export const Academy: React.FC = () => {
       };
       const mappedCategory = urlCategoryMapping[categoryParam] || categoryMapping[categoryParam] || 'All';
       setActiveCategory(mappedCategory);
-    } else {
-      // If no category param (e.g., /academy), reset to show all courses
+    } else if (!tabParam) {
+      // If no category param and no tab param, reset to show all courses and courses tab
       setActiveCategory('All');
       setActiveTab('courses');
     }
