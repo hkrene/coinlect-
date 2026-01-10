@@ -29,7 +29,7 @@ export const Academy: React.FC = () => {
 
   // Academy category system similar to deals
   const displayCategories = t.academy.filters;
-  const canonicalCategories = ["All", "Blockchain", "Trading", "DeFi", "NFT", "Security", "Mining"];
+  const canonicalCategories = React.useMemo(() => ["All", "Blockchain", "Trading", "DeFi", "NFT", "Security", "Mining"], []);
 
   // Create mapping between canonical and display categories
   const categoryMapping = React.useMemo(() => {
