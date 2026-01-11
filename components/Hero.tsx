@@ -30,7 +30,8 @@ export const Hero: React.FC = () => {
         </h1>
         
         <p className="max-w-4xl mx-auto mb-10 text-sm leading-relaxed text-gray-400 md:text-lg">
-          {t.hero.subtitle}
+          <span className="md:hidden">{t.hero.subtitleMobile}</span>
+          <span className="hidden md:inline">{t.hero.subtitle}</span>
         </p>
         
         <div className="flex flex-wrap items-center justify-center gap-4">
