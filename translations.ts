@@ -24,9 +24,9 @@ export const translations = {
       donate: "Faire un don",
     },
     hero: {
-      titlePrefix: "Yekola, Zwà mpe Somba ",
-      subtitle: "La plateforme crypto de référence pour l'Afrique Francophone. Apprenez, maîtrisez et sécurisez votre avenir numérique avec Coinlect Academy.",
-      ctaDonation: "Faire un don",
+      titlePrefix: "Propulser l'Afrique Francophone vers la Maîtrise du ",
+      subtitle: "Accélérez votre transition vers l'économie numérique. Coinlect Academy déploie les outils d'apprentissage et de sécurisation indispensables pour piloter votre avenir sur la blockchain avec succès.",
+      ctaDonation: "Rejoindre sur Telegram",
       ctaStart: "Commencer"
     },
     footer: {
@@ -388,10 +388,9 @@ export const translations = {
       donate: "Donate",
     },
     hero: {
-      titlePrefix: "Learn, Earn and Buy ",
-      subtitle: "The leading crypto platform for Francophone Africa. Learn, master, and secure your digital future with Coinlect Academy.",
-      
-      ctaDonation: "Donate",
+      titlePrefix: "Empowering Francophone Africa through ",
+      subtitle: "The leading ecosystem to learn, earn, and secure your digital assets. Join thousands of Africans building their future on the blockchain with Coinlect Academy.",
+      ctaDonation: "Join our Telegram",
       ctaStart: "Get Started"
     },
     footer: {

@@ -26,7 +26,7 @@ export const Hero: React.FC = () => {
       <div className="container relative z-10 px-6 mx-auto text-center">
         <h1 className="mb-8 text-5xl font-bold tracking-tight md:text-7xl">
           <span className="text-white">{t.hero.titlePrefix}</span>
-          <span className="inline-block transition-transform duration-300 transform cursor-default text-coinlect-accent hover:scale-105">Bitcoin</span>
+          <span className="inline-block transition-transform duration-300 transform cursor-default text-coinlect-accent hover:scale-105">Web3</span>
         </h1>
         
         <p className="max-w-2xl mx-auto mb-10 text-lg leading-relaxed text-gray-400">
