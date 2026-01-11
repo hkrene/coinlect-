@@ -24,7 +24,7 @@ export const Hero: React.FC = () => {
       <div className="absolute right-1/4 top-0 h-full w-[1px] bg-gradient-to-b from-transparent via-white/10 to-transparent"></div>
 
       <div className="container relative z-10 px-6 mx-auto text-center">
-        <h1 className="mb-8 text-3xl font-bold tracking-tight md:text-7xl">
+        <h1 className="mb-8 text-4xl font-bold tracking-tight md:text-7xl">
           <span className="text-white">{t.hero.titlePrefix}</span>
           <span className="inline-block transition-transform duration-300 transform cursor-default text-coinlect-accent hover:scale-105">Web3</span>
         </h1>
