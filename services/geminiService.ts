@@ -1,6 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 
-export const getGeminiResponse = async (userMessage: string): Promise<string> => {
+export const getGeminiResponse = async (userMessage: string, userLanguage?: string): Promise<string> => {
   const apiKey = process.env.GEMINI_API_KEY;
   
   // Debug logging
@@ -17,8 +17,17 @@ export const getGeminiResponse = async (userMessage: string): Promise<string> =>
     const ai = new GoogleGenAI({ apiKey });
     const model = "gemini-2.5-flash"; 
     
+    // Determine the response language based on user input and interface language
+    const isFrenchUser = userLanguage === 'fr' ||
+                        /bonjour|salut|merci|comment|pourquoi|quand|où|qui|quoi|comment/i.test(userMessage) ||
+                        userMessage.includes('?') && !userMessage.includes('? ') && /est|est-ce|sont|avez|êtes|sommes/i.test(userMessage);
+
+    const responseLanguage = isFrenchUser ? 'French' : 'English';
+
+    console.log('Detected user language:', responseLanguage, 'based on userLanguage:', userLanguage, 'and message:', userMessage.substring(0, 50));
+
     const config = {
-      systemInstruction: "You are CoinlectAI, a helpful assistant for the Coinlect cryptocurrency platform. You answer questions about crypto trading, blockchain concepts, and how to use the Coinlect platform. Keep answers concise, friendly, and professional. Use French or English depending on the user's input.",
+      systemInstruction: "You are CoinlectAI, a helpful assistant for the Coinlect cryptocurrency education platform. You answer questions about crypto trading, blockchain concepts, and how to use the Coinlect platform for education purporse only. Keep answers concise, friendly, and professional. Use French or English depending on the user's input.",
     };
 
     const response = await ai.models.generateContent({
