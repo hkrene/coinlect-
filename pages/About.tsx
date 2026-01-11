@@ -3,6 +3,7 @@
 import React from 'react';
 import { ScrollReveal } from '../components/ScrollReveal';
 import { Linkedin, Twitter } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface TeamMember {
   name: string;
@@ -124,6 +125,8 @@ const VOLUNTEERS: Volunteer[] = [
 ];
 
 export const About: React.FC = () => {
+  const { t } = useLanguage();
+
   return (
     <div className="min-h-screen pt-32 pb-20 bg-black">
       <div className="container px-6 mx-auto max-w-7xl">
@@ -133,27 +136,19 @@ export const About: React.FC = () => {
           <div className="flex flex-col items-center gap-12 mb-20 md:flex-row md:justify-between">
             <div className="md:w-1/2">
               <h1 className="mb-6 text-4xl font-extrabold text-white md:text-5xl">
-                À propos de <span className="text-coinlect-accent">CoinLect</span>
+                {t.aboutAcademy.title.split(' ')[0]} <span className="text-coinlect-accent">{t.aboutAcademy.title.split(' ')[1]}</span>
               </h1>
 
               <p className="mb-4 text-sm text-gray-400 eading-relaxed md:text-xl">
-                CoinLect Academy est née d’une conviction simple : l’éducation est la clé
-                de l’adoption et de l’inclusion financière. Notre mission est de rendre
-                l’apprentissage de la crypto, du Web3 et de la blockchain accessible à
-                la jeunesse de l’Afrique francophone.
+                {t.aboutAcademy.description.para1}
               </p>
 
               <p className="mb-4 text-sm leading-relaxed text-gray-400 md:text-xl">
-                À travers nos contenus éducatifs, nos formations et notre communauté
-                en ligne, nous aidons chaque apprenant à transformer la curiosité en
-                compétences concrètes. Nous ne faisons pas la promotion aveugle de
-                tendances : nous expliquons, formons et structurons la compréhension.
+                {t.aboutAcademy.description.para2}
               </p>
 
               <p className="text-sm leading-relaxed text-gray-400 md:text-xl">
-                CoinLect Academy construit une nouvelle génération de talents africains
-                capables de comprendre, créer et innover dans l’économie numérique
-                mondiale.
+                {t.aboutAcademy.description.para3}
               </p>
             </div>
 
@@ -188,26 +183,19 @@ export const About: React.FC = () => {
 
             <div className="md:w-1/2">
               <h2 className="mb-6 text-4xl font-extrabold text-white md:text-5xl">
-                Notre <span className="text-coinlect-accent">Mission</span>
+                {t.aboutAcademy.missionTitle.split(' ')[0]} <span className="text-coinlect-accent">{t.aboutAcademy.missionTitle.split(' ')[1]}</span>
               </h2>
 
               <p className="mb-4 text-sm leading-relaxed text-gray-400 md:text-xl">
-                Notre mission est de démocratiser l’éducation crypto et Web3 afin de
-                favoriser une adoption massive, responsable et durable une personne
-                à la fois.
+                {t.aboutAcademy.mission.para1}
               </p>
 
               <p className="mb-4 text-sm leading-relaxed text-gray-400 md:text-xl">
-                Nous proposons des contenus clairs, pratiques et impartiaux, conçus
-                pour répondre aux réalités économiques et technologiques de l’Afrique
-                francophone.
+                {t.aboutAcademy.mission.para2}
               </p>
 
                 <p className="text-sm leading-relaxed text-gray-400 md:text-xl">
-                CoinLect Academy s’engage à fournir une information honnête, sans
-                promesses irréalistes ni discours trompeurs. Notre objectif est
-                d’autonomiser chaque apprenant pour qu’il puisse prendre des décisions
-                éclairées et bâtir son avenir financier.
+                {t.aboutAcademy.mission.para3}
               </p>
             </div>
           </div>
@@ -217,7 +205,7 @@ export const About: React.FC = () => {
         <ScrollReveal delay={400}>
           <div className="mb-16 text-center">
             <h2 className="mb-12 text-4xl font-extrabold text-white md:text-5xl">
-              Meet Our <span className="text-coinlect-accent">Team<span className='hidden md:inline'> Members</span></span>
+              {t.aboutAcademy.teamTitle.split(' ')[0]} {t.aboutAcademy.teamTitle.split(' ')[1]} <span className="text-coinlect-accent">{t.aboutAcademy.teamTitle.split(' ')[2]}<span className='hidden md:inline'> {t.aboutAcademy.teamTitle.split(' ')[3]}</span></span>
             </h2>
 
             <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
@@ -265,7 +253,7 @@ export const About: React.FC = () => {
 <ScrollReveal delay={500}>
   <div className="mb-16 text-center">
     <h2 className="mb-12 text-4xl font-extrabold text-white md:text-5xl">
-      Our <span className="text-coinlect-accent">Volunteers</span>
+      {t.aboutAcademy.volunteersTitle.split(' ')[0]} <span className="text-coinlect-accent">{t.aboutAcademy.volunteersTitle.split(' ')[1]}</span>
     </h2>
 
     <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">

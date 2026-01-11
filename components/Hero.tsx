@@ -34,7 +34,7 @@ export const Hero: React.FC = () => {
         </p>
         
         <div className="flex flex-wrap items-center justify-center gap-4">
-          <Link href="/donate">
+          <Link href="https://t.me/coinlect_academy">
             <Button variant="primary" className="min-w-[140px] font-bold">
               {t.hero.ctaDonation}
             </Button>
