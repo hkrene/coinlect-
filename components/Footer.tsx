@@ -164,8 +164,8 @@ export const Footer: React.FC = () => {
                     </div>
                 </div>
                 <div className="flex items-center gap-4 my-4 md:mb-0">
-                    <span className="text-xs text-gray-500">© 2025 Coinlect. {t.footer.rights}</span>
-                    <a href="http://hirwarene-dev.netlify.app" className="text-xs text-gray-500" target="_blank" rel="noopener noreferrer">
+                    <span className="text-xs text-gray-500">© 2026 Coinlect. {t.footer.rights}</span>
+                    <a href="https://www.hirwarene.xyz/" className="text-xs text-gray-500" target="_blank" rel="noopener noreferrer">
                 <span>Designed by <span  className='text-blue-500'>Hkrene</span></span>
                 </a>
                 </div>
