@@ -163,7 +163,7 @@ export const Trends: React.FC = () => {
         clearInterval(marketInterval);
         clearInterval(newsInterval);
     };
-  }, [fetchNews]);
+  }, [fetchNews, language]);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('en-US', {
