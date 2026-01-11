@@ -73,15 +73,6 @@ const TEAM_MEMBERS: TeamMember[] = [
       linkedin: "https://www.linkedin.com/in/ben-shimanga/",
     },
   },
-  {
-    name: "Emmanuel Kayombo",
-    title: "Active Member at UNH",
-    image: "https://res.cloudinary.com/drsd8adkq/image/upload/v1766406311/emmailka_jgzlqy.jpg",
-    socials: {
-      twitter: "https://x.com/",
-      linkedin: "https://www.linkedin.com/in/emmanuel-kayombo-0b4b8b2b2/",
-    },
-  },
 ];
 
 const VOLUNTEERS: Volunteer[] = [
@@ -114,12 +105,12 @@ const VOLUNTEERS: Volunteer[] = [
     },
   },
   {
-    name: "John X",
-    title: "Active Member",
-    image: "https://res.cloudinary.com/drsd8adkq/image/upload/v1766400615/coinlect-fest_hreelt.jpg",
+    name: "Emmanuel Kayombo",
+    title: "Active Member at UNH",
+    image: "https://res.cloudinary.com/drsd8adkq/image/upload/v1766406311/emmailka_jgzlqy.jpg",
     socials: {
-      twitter: "#",
-      linkedin: "#",
+      twitter: "https://x.com/",
+      linkedin: "https://www.linkedin.com/in/emmanuel-kayombo-0b4b8b2b2/",
     },
   },
 ];
