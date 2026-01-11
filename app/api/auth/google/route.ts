@@ -4,9 +4,13 @@ import { prisma } from '@/lib/prisma';
 import { signAccessToken, signRefreshToken } from '@/lib/auth';
 import { UserRole } from '@prisma/client';
 
-const clientId = process.env.GOOGLE_CLIENT_ID;
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 
-const client = clientId ? new OAuth2Client(clientId) : null;
+if (!GOOGLE_CLIENT_ID) {
+  throw new Error('GOOGLE_CLIENT_ID is not set.');
+}
+
+const client = new OAuth2Client(GOOGLE_CLIENT_ID);
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,13 +18,10 @@ export async function POST(req: NextRequest) {
     if (!idToken || typeof idToken !== 'string') {
       return NextResponse.json({ error: 'idToken required' }, { status: 400 });
     }
-    if (!client) {
-      return NextResponse.json({ error: 'Google OAuth not configured' }, { status: 500 });
-    }
 
     const ticket = await client.verifyIdToken({
       idToken,
-      audience: clientId,
+      audience: GOOGLE_CLIENT_ID,
     });
     const payload = ticket.getPayload();
     if (!payload?.email || !payload.sub) {
@@ -71,14 +72,20 @@ export async function POST(req: NextRequest) {
     // Set refresh token cookie
     response.cookies.set('refreshToken', refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production',
       sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 7, // 7 days
     });
 
     return response;
-  } catch (err) {
+  } catch (err: any) {
     console.error('Google auth error', err);
+    if (err.message === 'GOOGLE_CLIENT_ID is not set.') {
+      return NextResponse.json({ error: 'Server configuration error: GOOGLE_CLIENT_ID is not set.' }, { status: 500 });
+    }
+    if (err.message === 'JWT_SECRET missing') {
+      return NextResponse.json({ error: 'Server configuration error: JWT_SECRET is not set.' }, { status: 500 });
+    }
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

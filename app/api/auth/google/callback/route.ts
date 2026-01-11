@@ -4,10 +4,17 @@ import { prisma } from '@/lib/prisma';
 import { signAccessToken, signRefreshToken } from '@/lib/auth';
 import { UserRole } from '@prisma/client';
 
-const clientId = process.env.GOOGLE_CLIENT_ID;
-const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 
-const client = clientId && clientSecret ? new OAuth2Client(clientId, clientSecret) : null;
+if (!GOOGLE_CLIENT_ID) {
+  throw new Error('GOOGLE_CLIENT_ID is not set.');
+}
+if (!GOOGLE_CLIENT_SECRET) {
+  throw new Error('GOOGLE_CLIENT_SECRET is not set.');
+}
+
+const client = new OAuth2Client(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET);
 
 export async function GET(req: NextRequest) {
   try {
@@ -18,9 +25,6 @@ export async function GET(req: NextRequest) {
       return NextResponse.redirect(new URL('/login?error=auth_failed', req.url));
     }
 
-    if (!client) {
-      return NextResponse.redirect(new URL('/login?error=google_not_configured', req.url));
-    }
 
     // Exchange code for tokens
     const { tokens } = await client.getToken(code);
@@ -29,7 +33,7 @@ export async function GET(req: NextRequest) {
     // Get user info
     const ticket = await client.verifyIdToken({
       idToken: tokens.id_token!,
-      audience: clientId,
+      audience: GOOGLE_CLIENT_ID,
     });
 
     const payload = ticket.getPayload();
@@ -80,14 +84,20 @@ export async function GET(req: NextRequest) {
     // Set refresh token cookie (this is used by the auth system)
     response.cookies.set('refreshToken', refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production',
       sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 7, // 7 days
     });
 
     return response;
-  } catch (err) {
+  } catch (err: any) {
     console.error('Google OAuth callback error:', err);
+    if (err.message === 'GOOGLE_CLIENT_ID is not set.' || err.message === 'GOOGLE_CLIENT_SECRET is not set.') {
+      return NextResponse.redirect(new URL('/login?error=server_config_error', req.url));
+    }
+    if (err.message === 'JWT_SECRET missing') {
+      return NextResponse.redirect(new URL('/login?error=server_config_error', req.url));
+    }
     return NextResponse.redirect(new URL('/login?error=auth_failed', req.url));
   }
 }
