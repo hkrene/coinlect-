@@ -118,10 +118,10 @@ export const Header: React.FC = () => {
         <div className="items-center hidden gap-4 lg:flex">
           {hasMounted && (
             <div className="relative flex items-center">
-              <button onClick={() => { setLanguage('fr'); window.location.reload(); }} className={`relative z-10 w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all ${language === 'fr' ? 'border-coinlect-accent bg-black text-gray-200' : 'border-white/10 bg-black text-gray-500'}`}>
+              <button onClick={() => { setLanguage('fr');  }} className={`relative z-10 w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all ${language === 'fr' ? 'border-coinlect-accent bg-black text-gray-200' : 'border-white/10 bg-black text-gray-500'}`}>
                 <span className="text-xs font-semibold">FR</span>
               </button>
-              <button onClick={() => { setLanguage('en'); window.location.reload(); }} className={`relative -ml-3 z-0 w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all ${language === 'en' ? 'border-coinlect-accent bg-black text-gray-200' : 'border-white/10 bg-black text-gray-500'}`}>
+              <button onClick={() => { setLanguage('en');  }} className={`relative -ml-3 z-0 w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all ${language === 'en' ? 'border-coinlect-accent bg-black text-gray-200' : 'border-white/10 bg-black text-gray-500'}`}>
                 <span className="text-xs font-semibold">EN</span>
               </button>
             </div>
@@ -174,10 +174,10 @@ export const Header: React.FC = () => {
              {hasMounted && (
                <div className="flex items-center justify-between">
                  <div className="relative flex items-center flex-none">
-                   <button onClick={() => { setLanguage('fr'); window.location.reload(); }} className={`relative z-10 w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all ${language === 'fr' ? 'border-coinlect-accent bg-black text-gray-200' : 'border-white/10 bg-black text-gray-500'}`}>
+                   <button onClick={() => { setLanguage('fr');  }} className={`relative z-10 w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all ${language === 'fr' ? 'border-coinlect-accent bg-black text-gray-200' : 'border-white/10 bg-black text-gray-500'}`}>
                      <span className="text-xs font-semibold">FR</span>
                    </button>
-                   <button onClick={() => { setLanguage('en'); window.location.reload(); }} className={`relative -ml-3 z-0 w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all ${language === 'en' ? 'border-coinlect-accent bg-black text-gray-200' : 'border-white/10 bg-black text-gray-500'}`}>
+                   <button onClick={() => { setLanguage('en');  }} className={`relative -ml-3 z-0 w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all ${language === 'en' ? 'border-coinlect-accent bg-black text-gray-200' : 'border-white/10 bg-black text-gray-500'}`}>
                      <span className="text-xs font-semibold">EN</span>
                    </button>
                  </div>

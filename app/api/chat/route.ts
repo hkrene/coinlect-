@@ -3,7 +3,7 @@ import { getGeminiResponse } from '@/services/geminiService';
 
 export async function POST(request: NextRequest) {
   try {
-    const { message } = await request.json();
+    const { message, language } = await request.json();
 
     if (!message || typeof message !== 'string') {
       return NextResponse.json(
@@ -16,8 +16,9 @@ export async function POST(request: NextRequest) {
     const apiKeyAvailable = !!process.env.GEMINI_API_KEY;
     console.log('API Key available:', apiKeyAvailable);
     console.log('API Key length:', process.env.GEMINI_API_KEY?.length || 0);
+    console.log('User language:', language);
 
-    const response = await getGeminiResponse(message);
+    const response = await getGeminiResponse(message, language);
 
     return NextResponse.json({ response });
   } catch (error) {

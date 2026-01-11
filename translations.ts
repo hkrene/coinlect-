@@ -24,9 +24,9 @@ export const translations = {
       donate: "Faire un don",
     },
     hero: {
-      titlePrefix: "Yekola, Zwà mpe Somba ",
-      subtitle: "La plateforme crypto de référence pour l'Afrique Francophone. Apprenez, maîtrisez et sécurisez votre avenir numérique avec Coinlect Academy.",
-      ctaDonation: "Faire un don",
+      titlePrefix: "Propulser l'Afrique Francophone vers la Maîtrise du ",
+      subtitle: "Accélérez votre transition vers l'économie numérique. Coinlect Academy déploie les outils d'apprentissage et de sécurisation indispensables pour piloter votre avenir sur la blockchain avec succès.",
+      ctaDonation: "Rejoindre sur Telegram",
       ctaStart: "Commencer"
     },
     footer: {
@@ -161,39 +161,51 @@ export const translations = {
       desc: "Découvrez les témoignages de notre communauté grandissante.",
       items: [
         {
-          name: "Marie K.",
-          role: "Développeuse Blockchain",
-          avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
-          content: "Coinlect Academy a transformé ma compréhension de la blockchain. Les cours sont clairs, pratiques et adaptés au contexte africain."
+          name: "Hirwa Rene",
+          role: "Founder Coinlect",
+          avatar: "https://res.cloudinary.com/drsd8adkq/image/upload/v1756494553/hkrene-min_ykpodo.jpg",
+          content: "En tant que fondateur de Coinlect Academy, j’ai créé cette plateforme pour rendre la blockchain accessible grâce à une formation pratique adaptée aux réalités africaines."
         },
         {
-          name: "Jean P.",
-          role: "Investisseur Crypto",
-          avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+          name: "Jessica Zabibu",
+          role: "Trader Forex & Crypto",
+          avatar: "https://res.cloudinary.com/drsd8adkq/image/upload/v1768132876/jessicaomari_knoe6y.jpg",
           content: "Grâce à Coinlect, j'ai pu sécuriser mes premiers investissements en crypto. L'accompagnement est exceptionnel."
         },
         {
-          name: "Sophie M.",
-          role: "Étudiante",
-          avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+          name: "David Kalunga",
+          role: "Student",
+          avatar: "https://res.cloudinary.com/drsd8adkq/image/upload/v1766491935/davidkalunga_jfr0st.jpg",
+          content: "Coinlect Academy a transformé ma compréhension de la blockchain. Les cours sont clairs, pratiques et adaptés au contexte africain."
+        },
+        {
+          name: "Sylvain K.",
+          role: "CM Coinlect",
+          avatar: "https://res.cloudinary.com/drsd8adkq/image/upload/v1766394673/sylvain-kamanda_bnswmr.jpg",
           content: "Enfin une plateforme éducative en français qui explique simplement les concepts complexes de la finance décentralisée."
         },
         {
-          name: "David L.",
+          name: "Emmanuel K.",
           role: "Entrepreneur Tech",
-          avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+          avatar: "https://res.cloudinary.com/drsd8adkq/image/upload/v1766406311/emmailka_jgzlqy.jpg",
           content: "Coinlect m'a aidé à lancer mon projet NFT. Les ressources pratiques et la communauté sont incroyables."
         },
         {
-          name: "Amina T.",
+          name: "Josue Kitumaini",
+          role: "Etudiant",
+          avatar: "https://res.cloudinary.com/drsd8adkq/image/upload/v1766489997/josuecrypto_nulqyu.jpg",
+          content: "Coinlect Academy a transformé ma compréhension de la blockchain. Les cours sont clairs, pratiques et adaptés au contexte africain."
+        },
+        {
+          name: "Tresor G.",
           role: "Designer UX",
-          avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face",
+          avatar: "https://res.cloudinary.com/drsd8adkq/image/upload/v1766394673/tresor-graph_gmcz1r.jpg",
           content: "L'approche pédagogique de Coinlect est parfaite. J'ai pu comprendre Web3 sans background technique préalable."
         },
         {
-          name: "Thomas B.",
-          role: "Trader Crypto",
-          avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
+          name: "Ben Tshims",
+          role: "CEO Techlayhub",
+          avatar: "https://res.cloudinary.com/drsd8adkq/image/upload/v1766396457/bentshims_bv8gyi.jpg",
           content: "Les analyses de marché et les outils éducatifs de Coinlect sont devenus essentiels à ma stratégie d'investissement."
         }
       ]
@@ -376,9 +388,9 @@ export const translations = {
       donate: "Donate",
     },
     hero: {
-      titlePrefix: "Sell land, buy ",
-      subtitle: "The reference crypto platform for Africa and the world. Trade, learn, and secure your assets with Coinlect.",
-      ctaDonation: "Donate",
+      titlePrefix: "Empowering Francophone Africa through ",
+      subtitle: "The leading ecosystem to learn, earn, and secure your digital assets. Join thousands of Africans building their future on the blockchain with Coinlect Academy.",
+      ctaDonation: "Join our Telegram",
       ctaStart: "Get Started"
     },
     footer: {
@@ -491,11 +503,12 @@ export const translations = {
       ]
     },
     features: {
-      buyTitle: "How to",
-      buyTitleSuffix: "buy crypto?",
-      buyDesc1: "Start your crypto journey with simple and secure solutions. We guide you step by step.",
-      buyDesc2: "Access the best exchanges and tools recommended by our community of experts.",
-      buyCta: "Buy Now",
+      buyTitle: "How to avoid",
+      buyTitleSuffix: "crypto scams?",
+      buyDesc1: "Avoid crypto scams with clear guidance and proven security practices. We guide you step by step to protect your assets.",
+      buyDesc2: "Access the best exchanges and tools recommended by our expert community.",
+      buyCta: "Secure now",
+      
       communityTitle: "Join the",
       communityTitleSuffix: "Community",
       communityDesc1: "Connect with thousands of enthusiasts. Share your knowledge and stay updated.",
@@ -513,39 +526,51 @@ export const translations = {
       desc: "Discover testimonials from our growing community.",
       items: [
         {
-          name: "Marie K.",
-          role: "Blockchain Developer",
-          avatar: "https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face",
-          content: "Coinlect Academy transformed my understanding of blockchain. The courses are clear, practical and adapted to the African context."
+          name: "Hirwa Rene",
+          role: "Founder Coinlect",
+          avatar: "https://res.cloudinary.com/drsd8adkq/image/upload/v1756494553/hkrene-min_ykpodo.jpg",
+          content: "As the founder of Coinlect Academy, I built this platform to make blockchain accessible through practical, Africa-focused education."
         },
-        {
-          name: "Jean P.",
-          role: "Crypto Investor",
-          avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face",
+        { 
+          name: "Jessica Zabibu",
+          role: "Trader Forex & Crypto",
+          avatar: "https://res.cloudinary.com/drsd8adkq/image/upload/v1768132876/jessicaomari_knoe6y.jpg",
           content: "Thanks to Coinlect, I was able to secure my first crypto investments. The support is exceptional."
         },
         {
-          name: "Sophie M.",
+          name: "David Kalunga",
           role: "Student",
-          avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face",
+          avatar: "https://res.cloudinary.com/drsd8adkq/image/upload/v1766491935/davidkalunga_jfr0st.jpg",
+          content: "Coinlect Academy transformed my understanding of blockchain. The courses are clear, practical and adapted to the African context."
+        },
+        {
+          name: "Sylvain K.",
+          role: "CM Coinlect",
+          avatar: "https://res.cloudinary.com/drsd8adkq/image/upload/v1766394673/sylvain-kamanda_bnswmr.jpg",
           content: "Finally a French educational platform that simply explains complex concepts of decentralized finance."
         },
         {
-          name: "David L.",
+          name: "Emmanuel K.",
           role: "Tech Entrepreneur",
-          avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face",
+          avatar: "https://res.cloudinary.com/drsd8adkq/image/upload/v1766406311/emmailka_jgzlqy.jpg",
           content: "Coinlect helped me launch my NFT project. The practical resources and community are incredible."
         },
         {
-          name: "Amina T.",
-          role: "UX Designer",
-          avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face",
+          name: "Josue Kitumaini",
+          role: "Student",
+          avatar: "https://res.cloudinary.com/drsd8adkq/image/upload/v1766489997/josuecrypto_nulqyu.jpg",
+          content: "Coinlect Academy transformed my understanding of blockchain. The courses are clear, practical and adapted to the African context."
+        },
+        {
+          name: "Tresor G.",
+          role: "Designer UX",
+          avatar: "https://res.cloudinary.com/drsd8adkq/image/upload/v1766394673/tresor-graph_gmcz1r.jpg",
           content: "Coinlect's pedagogical approach is perfect. I was able to understand Web3 without prior technical background."
         },
         {
-          name: "Thomas B.",
-          role: "Crypto Trader",
-          avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face",
+          name: "Ben Tshims",
+          role: "CEO Techlayhub",
+          avatar: "https://res.cloudinary.com/drsd8adkq/image/upload/v1766396457/bentshims_bv8gyi.jpg",
           content: "Coinlect's market analysis and educational tools have become essential to my investment strategy."
         }
       ]

@@ -46,7 +46,7 @@ export const ChatAssistant: React.FC = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ message: currentInput }),
+        body: JSON.stringify({ message: currentInput, language }),
       });
 
       const data = await response.json();

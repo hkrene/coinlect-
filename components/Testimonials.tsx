@@ -98,7 +98,7 @@ export const Testimonials: React.FC = () => {
               <p className="text-sm text-white">Members</p>
             </div>
             <div className="flex flex-col items-center justify-center p-6 bg-white/[0.02] border border-white/5 rounded-xl">
-              <p className="text-4xl font-bold text-coinlect-accent">4.000+</p>
+              <p className="text-4xl font-bold text-coinlect-accent">99.00%</p>
               <p className="text-sm text-white">Satisfaction rate</p>
             </div>
             <div className="flex flex-col items-center justify-center p-6 bg-white/[0.02] border border-white/5 rounded-xl">

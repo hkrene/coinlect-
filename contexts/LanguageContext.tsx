@@ -14,17 +14,25 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [language, setLanguage] = useState<Language>(() => {
-    if (typeof window !== 'undefined') {
-      const storedLang = localStorage.getItem('coinlect_language');
-      return (storedLang === 'fr' || storedLang === 'en') ? storedLang : 'fr';
-    }
-    return 'fr';
-  });
+  const [language, setLanguage] = useState<Language>('fr'); // Start with consistent default
+  const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
-    localStorage.setItem('coinlect_language', language);
-  }, [language]);
+    // After hydration, read from localStorage and update if needed
+    const storedLang = localStorage.getItem('coinlect_language');
+    const initialLang = (storedLang === 'fr' || storedLang === 'en') ? storedLang : 'fr';
+
+    if (initialLang !== language) {
+      setLanguage(initialLang);
+    }
+    setIsHydrated(true);
+  }, []);
+
+  useEffect(() => {
+    if (isHydrated) {
+      localStorage.setItem('coinlect_language', language);
+    }
+  }, [language, isHydrated]);
 
   const value = {
     language,
