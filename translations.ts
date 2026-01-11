@@ -362,6 +362,22 @@ export const translations = {
         placeholder: "Posez une question sur Coinlect...",
         supportName: "Support IA Coinlect",
         typing: "L'assistant écrit..."
+    },
+    aboutAcademy: {
+      title: "À propos de Coinlect",
+      description: {
+        para1: "CoinLect Academy est née d'une conviction simple : l'éducation est la clé de l'adoption et de l'inclusion financière. Notre mission est de rendre l'apprentissage de la crypto, du Web3 et de la blockchain accessible à la jeunesse de l'Afrique francophone.",
+        para2: "À travers nos contenus éducatifs, nos formations et notre communauté en ligne, nous aidons chaque apprenant à transformer la curiosité en compétences concrètes. Nous ne faisons pas la promotion aveugle de tendances : nous expliquons, formons et structurons la compréhension.",
+        para3: "CoinLect Academy construit une nouvelle génération de talents africains capables de comprendre, créer et innover dans l'économie numérique mondiale."
+      },
+      missionTitle: "Notre Mission",
+      mission: {
+        para1: "Notre mission est de démocratiser l'éducation crypto et Web3 afin de favoriser une adoption massive, responsable et durable une personne à la fois.",
+        para2: "Nous proposons des contenus clairs, pratiques et impartiaux, conçus pour répondre aux réalités économiques et technologiques de l'Afrique francophone.",
+        para3: "CoinLect Academy s'engage à fournir une information honnête, sans promesses irréalistes ni discours trompeurs. Notre objectif est d'autonomiser chaque apprenant pour qu'il puisse prendre des décisions éclairées et bâtir son avenir financier."
+      },
+      teamTitle: "Rencontrez Notre Équipe",
+      volunteersTitle: "Nos Volontaires"
     }
   },
   en: {
@@ -727,6 +743,22 @@ export const translations = {
         placeholder: "Ask a question about Coinlect...",
         supportName: "Coinlect AI Support",
         typing: "Assistant is typing..."
+    },
+    aboutAcademy: {
+      title: "About CoinLect",
+      description: {
+        para1: "CoinLect Academy was born from a simple conviction: education is the key to adoption and financial inclusion. Our mission is to make learning about crypto, Web3, and blockchain accessible to youth in Francophone Africa.",
+        para2: "Through our educational content, training programs, and online community, we help every learner transform curiosity into concrete skills. We don't blindly promote trends: we explain, train, and structure understanding.",
+        para3: "CoinLect Academy is building a new generation of African talents capable of understanding, creating, and innovating in the global digital economy."
+      },
+      missionTitle: "Our Mission",
+      mission: {
+        para1: "Our mission is to democratize crypto and Web3 education to promote massive, responsible, and sustainable adoption, one person at a time.",
+        para2: "We provide clear, practical, and impartial content, designed to address the economic and technological realities of Francophone Africa.",
+        para3: "CoinLect Academy is committed to providing honest information without unrealistic promises or deceptive discourse. Our goal is to empower every learner to make informed decisions and build their financial future."
+      },
+      teamTitle: "Meet Our Team Members",
+      volunteersTitle: "Our Volunteers"
     }
   }
 };
