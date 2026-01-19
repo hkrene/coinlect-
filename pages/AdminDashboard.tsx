@@ -228,6 +228,14 @@ export const AdminDashboard: React.FC = () => {
           status: courseForm.status,
           image: courseForm.image,
           videoLink: courseForm.videoLink,
+          about: courseForm.about,
+          level: courseForm.level,
+          duration: courseForm.duration,
+          category: courseForm.category,
+          courseType: courseForm.courseType,
+          partnerName: courseForm.partnerName,
+          partnerLogo: courseForm.partnerLogo,
+          isPaid: courseForm.isPaid,
         };
 
         const response = await fetch(`/api/courses/${editingItem.slug}`, {
@@ -255,6 +263,14 @@ export const AdminDashboard: React.FC = () => {
           status: courseForm.status,
           image: courseForm.image,
           videoLink: courseForm.videoLink,
+          about: courseForm.about,
+          level: courseForm.level,
+          duration: courseForm.duration,
+          category: courseForm.category,
+          courseType: courseForm.courseType,
+          partnerName: courseForm.partnerName,
+          partnerLogo: courseForm.partnerLogo,
+          isPaid: courseForm.isPaid,
         };
 
         const response = await fetch('/api/courses', {
@@ -1492,6 +1508,7 @@ export const AdminDashboard: React.FC = () => {
 
                     const response = await fetch(endpoint, {
                       method: 'DELETE',
+                      credentials: 'include',
                     });
 
                     if (response.ok) {

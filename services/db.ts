@@ -34,9 +34,23 @@ export const courseService = {
       throw error;
     }
   },
-  delete: async (id: string): Promise<void> => {
+  update: async (slug: string, updates: Partial<Course>): Promise<Course> => {
+    const response = await fetch(`/api/courses/${slug}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(updates),
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ error: 'Unknown error' }));
+      throw new Error(errorData.error || 'Failed to update course');
+    }
+    const data = await response.json();
+    return data.course;
+  },
+  delete: async (slug: string): Promise<void> => {
     try {
-      const response = await fetch(`/api/courses/${id}`, {
+      const response = await fetch(`/api/courses/${slug}`, {
         method: 'DELETE',
         credentials: 'include',
       });

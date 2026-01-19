@@ -22,6 +22,15 @@ export const courseSchema = z.object({
   status: z.enum(['DRAFT', 'PUBLISHED']).optional(),
   image: z.string().optional(),
   videoLink: z.string().optional(),
+  // Optional/legacy fields used by the frontend/admin UI
+  about: z.string().optional(),
+  level: z.string().optional(),
+  duration: z.string().optional(),
+  category: z.string().optional(),
+  courseType: z.enum(['academy', 'specialization', 'university']).optional(),
+  partnerName: z.string().optional(),
+  partnerLogo: z.string().optional(),
+  isPaid: z.boolean().optional(),
 });
 
 // Module validators
