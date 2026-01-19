@@ -36,7 +36,7 @@ export function useCourse(slug: string) {
   return useQuery({
     queryKey: courseKeys.detail(slug),
     queryFn: async () => {
-      const response = await fetch(`/api/courses/${slug}`);
+      const response = await fetch(`/api/courses/${encodeURIComponent(slug)}`);
       if (!response.ok) {
         throw new Error('Failed to fetch course');
       }

@@ -96,8 +96,8 @@ export const Academy: React.FC = () => {
   const getFilteredCourses = () => courses.filter(c => {
     const isAll = activeCategory === 'All';
     const courseCategory = c.category || '';
-    const canonicalCategory = categoryMapping[courseCategory] || courseCategory;
-    return (isAll || canonicalCategory === activeCategory) && c.title.toLowerCase().includes(searchQuery.toLowerCase());
+    // Courses store canonical categories directly, so compare directly
+    return (isAll || courseCategory === activeCategory) && c.title.toLowerCase().includes(searchQuery.toLowerCase());
   });
   const getFilteredArticles = () => {
     return articles.filter(a => a.title.toLowerCase().includes(searchQuery.toLowerCase()) || (a.excerpt && a.excerpt.toLowerCase().includes(searchQuery.toLowerCase())));
