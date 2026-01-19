@@ -238,7 +238,7 @@ export const AdminDashboard: React.FC = () => {
           isPaid: courseForm.isPaid,
         };
 
-        const response = await fetch(`/api/courses/${editingItem.slug}`, {
+        const response = await fetch(`/api/courses/${encodeURIComponent(editingItem.slug)}`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
@@ -328,7 +328,7 @@ export const AdminDashboard: React.FC = () => {
     try {
       if (editingItem) {
         // Update existing article
-        const response = await fetch(`/api/articles/${editingItem.slug}`, {
+        const response = await fetch(`/api/articles/${encodeURIComponent(editingItem.slug)}`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
@@ -413,7 +413,7 @@ export const AdminDashboard: React.FC = () => {
       };
       if (editingItem) {
         // Update existing event
-        const response = await fetch(`/api/events/${editingItem.slug}`, {
+        const response = await fetch(`/api/events/${encodeURIComponent(editingItem.slug)}`, {
           method: 'PATCH',
           headers: {
             'Content-Type': 'application/json',
@@ -1501,9 +1501,9 @@ export const AdminDashboard: React.FC = () => {
 
                   try {
                     const endpoint =
-                      deleteTarget.type === 'course' ? `/api/courses/${deleteTarget.item.slug}` :
-                      deleteTarget.type === 'article' ? `/api/articles/${deleteTarget.item.slug}` :
-                      deleteTarget.type === 'event' ? `/api/events/${deleteTarget.item.slug}` :
+                      deleteTarget.type === 'course' ? `/api/courses/${encodeURIComponent(deleteTarget.item.slug)}` :
+                      deleteTarget.type === 'article' ? `/api/articles/${encodeURIComponent(deleteTarget.item.slug)}` :
+                      deleteTarget.type === 'event' ? `/api/events/${encodeURIComponent(deleteTarget.item.slug)}` :
                       `/api/deals/${deleteTarget.item.id}`;
 
                     const response = await fetch(endpoint, {

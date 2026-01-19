@@ -35,7 +35,7 @@ export const courseService = {
     }
   },
   update: async (slug: string, updates: Partial<Course>): Promise<Course> => {
-    const response = await fetch(`/api/courses/${slug}`, {
+    const response = await fetch(`/api/courses/${encodeURIComponent(slug)}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
@@ -50,7 +50,7 @@ export const courseService = {
   },
   delete: async (slug: string): Promise<void> => {
     try {
-      const response = await fetch(`/api/courses/${slug}`, {
+      const response = await fetch(`/api/courses/${encodeURIComponent(slug)}`, {
         method: 'DELETE',
         credentials: 'include',
       });
