@@ -47,6 +47,7 @@ model User {
   progress       Progress[]
   refreshTokens  RefreshToken[]
   sessions       Session[]
+  passwordResetTokens PasswordResetToken[]
 }
 
 model Course {
@@ -60,6 +61,15 @@ model Course {
   publishedAt   DateTime?
   image         String?
   videoLink     String?
+  // Optional/legacy fields used by the frontend/admin UI
+  about         String?
+  level         String?
+  duration      String?
+  category      String?
+  courseType    String?
+  partnerName   String?
+  partnerLogo   String?
+  isPaid        Boolean         @default(false)
   createdAt     DateTime        @default(now())
   updatedAt     DateTime        @updatedAt
 
@@ -209,4 +219,18 @@ model Session {
   createdAt DateTime @default(now())
 
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  tokenHash String   @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
 }

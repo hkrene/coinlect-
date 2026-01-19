@@ -99,6 +99,22 @@ export const CourseDetail: React.FC = () => {
                   }`}>
                     {course.level}
                   </span>
+                  {course.partnerName && (
+                    <span className="inline-flex items-center gap-2 px-3 py-1 text-[10px] font-black tracking-widest uppercase border rounded-none bg-white/5 text-gray-200 border-white/10">
+                      {course.partnerLogo && (
+                        <img
+                          src={course.partnerLogo}
+                          alt={course.partnerName}
+                          className="object-contain w-5 h-5"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                          }}
+                        />
+                      )}
+                      {course.partnerName}
+                    </span>
+                  )}
                 </div>
                 
                 <h1 className="mb-6 text-2xl font-black leading-tight tracking-tighter text-left text-white md:text-4xl ">

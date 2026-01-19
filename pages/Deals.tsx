@@ -73,7 +73,7 @@ export const Deals: React.FC = () => {
               <button
                 key={catKey}
                 onClick={() => setActiveCategory(catKey)}
-                className={`whitespace-nowrap px-6 py-2 rounded-none text-xs font-bold border transition-all ${
+                className={`whitespace-nowrap px-6 py-2 rounded-full text-xs font-bold border transition-all ${
                   activeCategory === catKey 
                     ? 'bg-white text-black border-white' 
                     : 'bg-transparent border-white/10 text-gray-400 hover:border-white/30 hover:text-white'
@@ -92,9 +92,9 @@ export const Deals: React.FC = () => {
                 filteredDeals.map((deal, idx) => (
                     <ScrollReveal key={deal.id} delay={idx * 50}>
                         <Link href={`/deals/${deal.id}`} className="block h-full">
-                          <div className="relative flex flex-col md:flex-row h-full overflow-hidden transition-all duration-300 border rounded-none bg-[#0a0a0a] border-white/10 hover:border-white/30 group cursor-pointer">
+                          <div className="relative flex flex-col md:flex-row h-full overflow-hidden transition-all duration-300 border rounded-2xl bg-[#0a0a0a] border-white/10 hover:border-white/30 group cursor-pointer">
                             
-                            <div className="relative w-full md:w-[380px] h-56 md:h-auto overflow-hidden bg-black flex items-center justify-center border-b md:border-b-0 md:border-r border-white/10">
+                            <div className="relative w-full md:w-[380px] h-56 md:h-auto overflow-hidden bg-black flex items-center justify-center border-b md:border-b-0 md:border-r border-white/10 md:rounded-l-2xl rounded-t-2xl md:rounded-tr-none">
                                 <img
                                   src={deal.image}
                                   alt={deal.title}
@@ -105,12 +105,12 @@ export const Deals: React.FC = () => {
                                   }}
                                 />
                                 {deal.exclusive && (
-                                    <div className="absolute top-0 left-0 bg-white text-black text-[10px] font-black uppercase tracking-widest px-3 py-1.5 z-20 flex items-center gap-1 shadow-2xl">{t.deals.exclusive}
+                                    <div className="absolute top-0 left-0 bg-white text-black text-[10px] font-black uppercase tracking-widest px-3 py-1.5 z-20 flex items-center gap-1 shadow-2xl rounded-br-lg">{t.deals.exclusive}
                                     </div>
                                 )}
                             </div>
 
-                            <div className="flex flex-col flex-grow p-8">
+                            <div className="flex flex-col flex-grow p-8 bg-transparent md:rounded-r-2xl rounded-b-2xl md:rounded-bl-none">
                                 <div className="flex flex-col mb-4">
                                     <span className="text-[10px] font-bold text-coinlect-accent uppercase tracking-[0.2em] mb-3">{deal.category}</span>
                                     <h3 className="text-2xl font-bold tracking-tight text-white md:text-3xl">{deal.title} {deal.discount && ` — ${deal.discount}`}</h3>
@@ -124,14 +124,14 @@ export const Deals: React.FC = () => {
                                           e.stopPropagation();
                                           window.open(deal.link, '_blank');
                                         }}
-                                        className="px-10 py-4 text-xs font-bold tracking-widest text-black uppercase transition-all bg-white rounded-none hover:bg-coinlect-accent"
+                                        className="px-10 py-4 text-xs font-bold tracking-widest text-black uppercase transition-all bg-white rounded-md hover:bg-coinlect-accent"
                                     >
                                         {t.deals.claim}
                                     </button>
                                     {deal.code && (
                                         <div className="flex items-center gap-3 text-xs font-bold tracking-widest text-gray-500 uppercase">
                                             <span>{t.deals.coupon} :</span>
-                                            <span className="px-4 py-2 text-white border border-dashed bg-white/5 border-white/10">{deal.code}</span>
+                                            <span className="px-4 py-2 text-white border border-dashed rounded-md bg-white/5 border-white/10">{deal.code}</span>
                                         </div>
                                     )}
                                 </div>

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { registerSchema } from '@/lib/validators';
 import { hashPassword, signRefreshToken } from '@/lib/auth';
+import { sendWelcomeEmail } from '@/lib/email';
 import { UserRole } from '@prisma/client';
 import { serialize } from 'cookie';
 
@@ -29,6 +30,11 @@ export async function POST(req: NextRequest) {
         role: UserRole.USER,
         provider: 'local',
       },
+    });
+
+    // Send welcome email (best-effort; never block signup)
+    sendWelcomeEmail({ to: user.email, name: user.name }).catch((e) => {
+      console.error('Welcome email failed', e);
     });
 
     // Create refresh token

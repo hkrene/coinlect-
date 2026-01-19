@@ -162,6 +162,22 @@ export const Academy: React.FC = () => {
                 <div className="flex flex-col flex-grow p-6">
                     <div className="flex items-center gap-2 mb-3">
                         <span className="text-coinlect-accent text-[10px] font-bold uppercase tracking-widest">{course.category}</span>
+                        {course.partnerName && (
+                          <span className="inline-flex items-center gap-2 px-2 py-1 text-[10px] font-bold uppercase tracking-widest border border-white/10 bg-white/5 text-gray-300">
+                            {course.partnerLogo && (
+                              <img
+                                src={course.partnerLogo}
+                                alt={course.partnerName}
+                                className="object-contain w-4 h-4"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.style.display = 'none';
+                                }}
+                              />
+                            )}
+                            {course.partnerName}
+                          </span>
+                        )}
                     </div>
                     <h3 className="mb-3 text-lg font-bold leading-tight text-white transition-colors line-clamp-2 group-hover:text-coinlect-accent">{course.title}</h3>
                     <p className="flex-grow mb-6 text-sm text-gray-400 line-clamp-3">{course.description}</p>

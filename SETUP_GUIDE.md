@@ -166,6 +166,18 @@ JWT_SECRET=your-super-secret-jwt-key-minimum-32-characters-long
 NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 # ============================================
+# EMAIL (RESEND)
+# ============================================
+# Used to send welcome emails + password reset emails.
+# IMPORTANT: Do NOT commit real keys to git.
+RESEND_API_KEY=re_************************
+# In production, set this to a verified sender like: Coinlect <no-reply@coinlect.com>
+# For dev/testing, Resend allows: onboarding@resend.dev
+RESEND_FROM=Coinlect <onboarding@resend.dev>
+# Base URL used in email links (reset password). For local dev:
+APP_BASE_URL=http://localhost:3000
+
+# ============================================
 # GOOGLE OAUTH CONFIGURATION
 # ============================================
 # Client ID from Google Cloud Console

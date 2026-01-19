@@ -7,7 +7,7 @@ export const courseKeys = {
   lists: () => [...courseKeys.all, 'list'] as const,
   list: (filters: Record<string, any>) => [...courseKeys.lists(), filters] as const,
   details: () => [...courseKeys.all, 'detail'] as const,
-  detail: (id: string) => [...courseKeys.details(), id] as const,
+  detail: (slug: string) => [...courseKeys.details(), slug] as const,
 };
 
 // Fetch all courses
@@ -31,19 +31,19 @@ export function useCourses(filters?: { published?: boolean }) {
   });
 }
 
-// Fetch single course
-export function useCourse(id: string) {
+// Fetch single course (by slug)
+export function useCourse(slug: string) {
   return useQuery({
-    queryKey: courseKeys.detail(id),
+    queryKey: courseKeys.detail(slug),
     queryFn: async () => {
-      const response = await fetch(`/api/courses/${id}`);
+      const response = await fetch(`/api/courses/${slug}`);
       if (!response.ok) {
         throw new Error('Failed to fetch course');
       }
       const data = await response.json();
       return data.course as Course;
     },
-    enabled: !!id,
+    enabled: !!slug,
     staleTime: 1000 * 60 * 10, // 10 minutes
   });
 }
@@ -79,8 +79,8 @@ export function useUpdateCourse() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async ({ id, updates }: { id: string; updates: Partial<Course> }) => {
-      const response = await fetch(`/api/courses/${id}`, {
+    mutationFn: async ({ slug, updates }: { slug: string; updates: Partial<Course> }) => {
+      const response = await fetch(`/api/courses/${slug}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(updates),
@@ -96,7 +96,7 @@ export function useUpdateCourse() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: courseKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: courseKeys.detail(data.id) });
+      queryClient.invalidateQueries({ queryKey: courseKeys.detail(data.slug) });
     },
   });
 }
@@ -106,8 +106,8 @@ export function useDeleteCourse() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (id: string) => {
-      const response = await fetch(`/api/courses/${id}`, {
+    mutationFn: async (slug: string) => {
+      const response = await fetch(`/api/courses/${slug}`, {
         method: 'DELETE',
       });
 
