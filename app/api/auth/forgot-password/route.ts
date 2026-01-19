@@ -44,6 +44,7 @@ export async function POST(req: NextRequest) {
     await (basePrisma as any).passwordResetToken.create({
       data: {
         userId: user.id,
+        token,
         tokenHash,
         expiresAt,
       },

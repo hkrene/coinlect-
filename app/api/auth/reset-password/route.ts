@@ -29,11 +29,16 @@ export async function POST(req: NextRequest) {
 
     // TypeScript may not see the newly generated model immediately due to caching,
     // but it exists at runtime after prisma generate
-    const reset = await (basePrisma as any).passwordResetToken.findUnique({
-      where: { tokenHash },
+    const reset = await (basePrisma as any).passwordResetToken.findFirst({
+      where: {
+        tokenHash,
+        userId,
+        usedAt: null,
+        expiresAt: { gt: new Date() }
+      },
     });
 
-    if (!reset || reset.userId !== userId || reset.usedAt || reset.expiresAt < new Date()) {
+    if (!reset) {
       return NextResponse.json({ error: 'Token is invalid or expired' }, { status: 400 });
     }
 
