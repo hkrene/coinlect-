@@ -1,7 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import crypto from 'crypto';
+import { PrismaClient } from '@prisma/client';
+import * as crypto from 'crypto';
 import { hashPassword } from '@/lib/auth';
+
+// Create a base PrismaClient instance for operations that need direct model access
+// (Accelerate extension may not expose newly added models immediately)
+const basePrisma = new PrismaClient({
+  datasourceUrl: process.env.DATABASE_URL,
+}) as PrismaClient;
 
 function sha256(input: string) {
   return crypto.createHash('sha256').update(input).digest('hex');
@@ -20,7 +27,9 @@ export async function POST(req: NextRequest) {
 
     const tokenHash = sha256(token);
 
-    const reset = await (prisma as any).passwordResetToken.findUnique({
+    // TypeScript may not see the newly generated model immediately due to caching,
+    // but it exists at runtime after prisma generate
+    const reset = await (basePrisma as any).passwordResetToken.findUnique({
       where: { tokenHash },
     });
 
@@ -30,16 +39,16 @@ export async function POST(req: NextRequest) {
 
     const newHash = await hashPassword(password);
 
-    await prisma.$transaction([
-      prisma.user.update({
+    await (basePrisma as any).$transaction([
+      basePrisma.user.update({
         where: { id: userId },
         data: { passwordHash: newHash, provider: 'local' },
       }),
-      (prisma as any).passwordResetToken.update({
+      (basePrisma as any).passwordResetToken.update({
         where: { tokenHash },
         data: { usedAt: new Date() },
       }),
-      prisma.refreshToken.deleteMany({
+      basePrisma.refreshToken.deleteMany({
         where: { userId },
       }),
     ]);
