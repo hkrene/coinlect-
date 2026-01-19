@@ -21,8 +21,14 @@ export default function ForgotPasswordPage() {
     setMessage(null);
 
     try {
-      // Call your authentication context's forgot password function here
-      // await forgotPassword(email);
+      const res = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      if (!res.ok) {
+        throw new Error('Failed to send password reset email');
+      }
       setMessage('If an account with that email exists, a password reset link has been sent.');
     } catch (err) {
       setError('Failed to send password reset email. Please try again.');
