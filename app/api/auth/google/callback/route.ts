@@ -54,9 +54,16 @@ export async function GET(req: NextRequest) {
       return NextResponse.redirect(new URL('/login?error=auth_failed', req.url));
     }
 
+    // Construct the redirect URI that was used in the authorization request
+    // This must match exactly what was sent to Google
+    const redirectUri = `${req.nextUrl.origin}/api/auth/google/callback`;
 
     // Exchange code for tokens
-    const { tokens } = await client.getToken(code);
+    // The redirect URI must match the one used in the authorization request
+    const { tokens } = await client.getToken({
+      code,
+      redirect_uri: redirectUri,
+    });
     client.setCredentials(tokens);
 
     // Get user info
@@ -137,12 +144,36 @@ export async function GET(req: NextRequest) {
     return response;
   } catch (err: any) {
     console.error('Google OAuth callback error:', err);
+    
+    // Handle specific OAuth errors
+    if (err.message?.includes('invalid_request') || err.code === 'invalid_request') {
+      const redirectUri = `${req.nextUrl.origin}/api/auth/google/callback`;
+      console.error('Invalid request - redirect URI mismatch or code already used');
+      console.error('Expected redirect URI:', redirectUri);
+      return NextResponse.redirect(
+        new URL(
+          `/login?error=oauth_config&message=${encodeURIComponent(
+            `OAuth configuration error. Please verify the redirect URI ${redirectUri} is correctly configured in Google Cloud Console.`
+          )}`,
+          req.url
+        )
+      );
+    }
+    
     if (err.message === 'GOOGLE_CLIENT_ID is not set.' || err.message === 'GOOGLE_CLIENT_SECRET is not set.') {
       return NextResponse.redirect(new URL('/login?error=server_config_error', req.url));
     }
     if (err.message === 'JWT_SECRET missing') {
       return NextResponse.redirect(new URL('/login?error=server_config_error', req.url));
     }
+    
+    // Log full error details for debugging
+    console.error('Full error details:', {
+      message: err.message,
+      code: err.code,
+      response: err.response?.data,
+    });
+    
     return NextResponse.redirect(new URL('/login?error=auth_failed', req.url));
   }
 }
