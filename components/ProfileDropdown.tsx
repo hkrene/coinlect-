@@ -81,10 +81,14 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ className = ''
           </div>
 
           <div className="py-2">
-            <button className="flex items-center w-full gap-3 px-4 py-2 text-sm text-gray-300 transition-colors hover:bg-white/10 hover:text-white">
+            <Link
+              href="/profile"
+              className="flex items-center w-full gap-3 px-4 py-2 text-sm text-gray-300 transition-colors hover:bg-white/10 hover:text-white"
+              onClick={() => setIsOpen(false)}
+            >
               <User size={16} />
               Profile
-            </button>
+            </Link>
             {isAdmin && (
               <Link
                 href="/admin"

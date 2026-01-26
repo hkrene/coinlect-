@@ -13,8 +13,15 @@ function getFromAddress() {
 
 function getAppBaseUrl() {
   // Public base URL used in email links.
-  // In dev you can set APP_BASE_URL=http://localhost:3000
-  return process.env.APP_BASE_URL || process.env.NEXT_PUBLIC_APP_BASE_URL || 'http://localhost:3000';
+  // Priority: APP_BASE_URL > NEXT_PUBLIC_APP_BASE_URL > NEXT_PUBLIC_APP_URL > localhost fallback
+  // APP_BASE_URL is preferred for server-side email generation
+  const baseUrl = process.env.APP_BASE_URL || 
+                  process.env.NEXT_PUBLIC_APP_BASE_URL || 
+                  process.env.NEXT_PUBLIC_APP_URL || 
+                  'http://localhost:3000';
+  
+  // Ensure URL doesn't end with trailing slash
+  return baseUrl.replace(/\/$/, '');
 }
 
 export async function sendWelcomeEmail(params: { to: string; name?: string | null }) {

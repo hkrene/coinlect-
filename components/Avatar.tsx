@@ -7,7 +7,7 @@ interface AvatarProps {
   src?: string | null;
   name?: string | null;
   email?: string;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | 'xl';
   className?: string;
   onClick?: () => void;
 }
@@ -23,7 +23,8 @@ export const Avatar: React.FC<AvatarProps> = ({
   const sizeClasses = {
     sm: 'w-8 h-8 text-xs',
     md: 'w-10 h-10 text-sm',
-    lg: 'w-12 h-12 text-base'
+    lg: 'w-12 h-12 text-base',
+    xl: 'w-24 h-24 text-2xl'
   };
 
   const getInitials = () => {

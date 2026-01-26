@@ -9,6 +9,7 @@ interface User {
   name: string | null;
   avatar: string | null;
   role: 'ADMIN' | 'USER';
+  createdAt?: string;
 }
 
 interface AuthContextType {
