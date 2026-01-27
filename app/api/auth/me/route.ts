@@ -23,9 +23,19 @@ export async function GET(req: NextRequest) {
     }
 
     // Get user data
-    const user = await (prisma.user as any).findUnique({
+    const user = await prisma.user.findUnique({
       where: { id: payload.sub },
-      select: { id: true, email: true, name: true, role: true, avatar: true, createdAt: true, lastActivityAt: true, dateOfBirth: true },
+      select: { 
+        id: true, 
+        email: true, 
+        name: true, 
+        role: true, 
+        avatar: true, 
+        createdAt: true, 
+        lastActivityAt: true, 
+        // @ts-ignore - dateOfBirth exists in schema but Prisma Accelerate extension affects type inference
+        dateOfBirth: true 
+      },
     });
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

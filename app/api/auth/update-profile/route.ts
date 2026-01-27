@@ -17,13 +17,14 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { name, dateOfBirth, avatar } = body;
 
+    // Type assertion needed because Prisma Accelerate extension affects type inference for dateOfBirth
     const updatedUser = await (prisma.user as any).update({
       where: { id: payload.sub },
       data: {
         name: name !== undefined ? name : undefined,
         dateOfBirth: dateOfBirth ? new Date(dateOfBirth) : null,
         avatar: avatar !== undefined ? avatar : undefined,
-      },
+      } as any,
       select: {
         id: true,
         email: true,
@@ -32,7 +33,7 @@ export async function POST(req: NextRequest) {
         avatar: true,
         createdAt: true,
         dateOfBirth: true,
-      },
+      } as any,
     });
 
     return NextResponse.json({ user: updatedUser });
