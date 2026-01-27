@@ -64,7 +64,7 @@ export const Features: React.FC = () => {
             </div>
             
             {/* Image Section - Removed Phone UI and Numbers */}
-            <div className="relative h-[450px] w-full bg-[#0F0F0F] rounded-3xl overflow-hidden border border-white/5 shadow-2xl">
+            <div className="relative h-[250px] md:h-[450px] w-full bg-[#0F0F0F] rounded-3xl overflow-hidden border border-white/5 shadow-2xl">
                 <img
                   src={rotatingImages[currentImageIndex]}
                   className="object-cover w-full h-full transition-opacity duration-1000"
@@ -108,7 +108,7 @@ export const Features: React.FC = () => {
                 </Link>
             </div>
 
-             <div className="md:order-1 relative h-[450px] w-full rounded-3xl overflow-hidden bg-[#0F0F0F] shadow-2xl">
+             <div className="md:order-1 relative h-[250px] md:h-[450px] w-full rounded-3xl overflow-hidden bg-[#0F0F0F] shadow-2xl">
                 <img
                     src={communityImages[communityImageIndex]}
                     alt="Community Assets"
