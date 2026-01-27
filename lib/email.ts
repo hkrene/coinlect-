@@ -2,19 +2,30 @@ import { Resend } from 'resend';
 
 function getResendClient() {
   const apiKey = process.env.RESEND_API_KEY;
-  if (!apiKey) return null;
+  if (!apiKey) {
+    console.warn('RESEND_API_KEY is missing. Emails will not be sent.');
+    return null;
+  }
   return new Resend(apiKey);
 }
 
 function getFromAddress() {
-  // Resend requires a verified sender domain for production. For dev, `onboarding@resend.dev` works.
-  return process.env.RESEND_FROM || 'Coinlect <onboarding@resend.dev>';
+  // Resend requires a verified sender domain for production.
+  // Using the verified domain: mail.coinlect.org
+  return process.env.RESEND_FROM || 'Coinlect <hello@mail.coinlect.org>';
 }
 
 function getAppBaseUrl() {
   // Public base URL used in email links.
-  // In dev you can set APP_BASE_URL=http://localhost:3000
-  return process.env.APP_BASE_URL || process.env.NEXT_PUBLIC_APP_BASE_URL || 'http://localhost:3000';
+  // Priority: APP_BASE_URL > NEXT_PUBLIC_APP_BASE_URL > NEXT_PUBLIC_APP_URL > VERCEL_URL > localhost fallback
+  const baseUrl = process.env.APP_BASE_URL || 
+                  process.env.NEXT_PUBLIC_APP_BASE_URL || 
+                  process.env.NEXT_PUBLIC_APP_URL || 
+                  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ||
+                  'http://localhost:3000';
+  
+  // Ensure URL doesn't end with trailing slash
+  return baseUrl.replace(/\/$/, '');
 }
 
 export async function sendWelcomeEmail(params: { to: string; name?: string | null }) {

@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/Button';
 import { ScrollReveal } from '@/components/ScrollReveal';
 import { AdBanner } from '@/components/AdBanner';
@@ -18,6 +18,30 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const { register, error } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Check for OAuth errors in URL parameters
+  useEffect(() => {
+    if (!searchParams) return;
+    
+    const params = searchParams;
+    const errorParam = params.get('error');
+    const messageParam = params.get('message');
+    
+    if (errorParam === 'oauth_config' || errorParam === 'oauth_error') {
+      setGoogleError(messageParam || 'OAuth configuration error. Please check your Google Cloud Console settings.');
+    } else if (errorParam === 'auth_failed') {
+      setGoogleError('Authentication failed. Please try again.');
+    } else if (errorParam === 'server_config_error') {
+      setGoogleError('Server configuration error. Please contact support.');
+    }
+    
+    // Clean up URL parameters after displaying error
+    if (errorParam) {
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, '', newUrl);
+    }
+  }, [searchParams]);
 
   // Load Google Identity Services script
   useEffect(() => {

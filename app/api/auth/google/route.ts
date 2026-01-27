@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { OAuth2Client } from 'google-auth-library';
 import { prisma } from '@/lib/prisma';
 import { signAccessToken, signRefreshToken } from '@/lib/auth';
+import { sendWelcomeEmail } from '@/lib/email';
 import { UserRole } from '@prisma/client';
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
@@ -33,6 +34,10 @@ export async function POST(req: NextRequest) {
     const name = payload.name || email;
     const avatar = payload.picture || null;
 
+    // Check if user exists before upsert to determine if it's a new signup
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+    const isNewUser = !existingUser;
+
     const user = await prisma.user.upsert({
       where: { email },
       update: {
@@ -50,6 +55,13 @@ export async function POST(req: NextRequest) {
         role: UserRole.USER,
       },
     });
+
+    // Send welcome email for new users (best-effort; never block signup)
+    if (isNewUser) {
+      await sendWelcomeEmail({ to: user.email, name: user.name }).catch((e) => {
+        console.error('Welcome email failed for Google signup', e);
+      });
+    }
 
     const tokenPayload = { sub: user.id, role: user.role };
     const accessToken = await signAccessToken(tokenPayload);

@@ -10,7 +10,7 @@ import { courseService, articleService, eventService, dealService } from '../ser
 import { Course, Article, Event, User, Deal } from '../types';
 import { PublishStatus } from '@prisma/client';
 import { Button } from '../components/Button';
-import { Trash2, Plus, BookOpen, FileText, LayoutDashboard, X, Check, Calendar, Star } from 'lucide-react';
+import { Trash2, Plus, BookOpen, FileText, LayoutDashboard, X, Check, Calendar, Star, Menu } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 import MDEditor from '@uiw/react-md-editor';
 
@@ -25,6 +25,7 @@ export const AdminDashboard: React.FC = () => {
   const [deals, setDeals] = useState<Deal[]>([]);
   const [users, setUsers] = useState<User[]>([]);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Modals
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -112,7 +113,7 @@ export const AdminDashboard: React.FC = () => {
     authorName: '',
     // Legacy fields for frontend compatibility (not sent to API)
     readTime: '5 min',
-    date: new Date().toLocaleDateString('fr-FR'),
+    date: new Date().toISOString().split('T')[0],
   });
 
   const [eventForm, setEventForm] = useState<Omit<Event, 'id' | 'createdAt' | 'updatedAt' | 'slug' | 'authorId' | 'author' | 'publishedAt' | 'type' | 'bannerText'> & { slug: string }>({
@@ -391,7 +392,7 @@ export const AdminDashboard: React.FC = () => {
         authorName: '',
         // Legacy fields for frontend compatibility
         readTime: '5 min',
-        date: new Date().toLocaleDateString('fr-FR'),
+        date: new Date().toISOString().split('T')[0],
       });
       // Dispatch custom event to notify other components
       if (typeof window !== 'undefined') {
@@ -530,35 +531,93 @@ export const AdminDashboard: React.FC = () => {
 
   return (
     <div className="flex min-h-screen pt-24 pb-20 text-white bg-black">
+      {/* Mobile Menu Overlay */}
+      {mobileMenuOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-black/50 md:hidden"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-64 border-r border-white/5 bg-[#111] hidden md:block fixed h-full top-20 pt-8 px-4 z-20">
+      <aside className={`w-64 border-r border-white/5 bg-[#111] fixed h-full top-20 pt-8 px-4 z-40 transform transition-transform duration-300 ease-in-out ${
+        mobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+      } md:translate-x-0 md:block`}>
         <div className="space-y-2">
-          <button onClick={() => setActiveTab('overview')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${activeTab === 'overview' ? 'bg-coinlect-accent text-black font-bold' : 'text-gray-400 hover:bg-white/5'}`}>
+          <button
+            onClick={() => {
+              setActiveTab('overview');
+              setMobileMenuOpen(false);
+            }}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${activeTab === 'overview' ? 'bg-coinlect-accent text-black font-bold' : 'text-gray-400 hover:bg-white/5'}`}
+          >
             <LayoutDashboard size={18} /> Vue d&apos;ensemble
           </button>
-          <button onClick={() => setActiveTab('courses')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${activeTab === 'courses' ? 'bg-coinlect-accent text-black font-bold' : 'text-gray-400 hover:bg-white/5'}`}>
+          <button
+            onClick={() => {
+              setActiveTab('courses');
+              setMobileMenuOpen(false);
+            }}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${activeTab === 'courses' ? 'bg-coinlect-accent text-black font-bold' : 'text-gray-400 hover:bg-white/5'}`}
+          >
             <BookOpen size={18} /> Cours
           </button>
-          <button onClick={() => setActiveTab('articles')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${activeTab === 'articles' ? 'bg-coinlect-accent text-black font-bold' : 'text-gray-400 hover:bg-white/5'}`}>
+          <button
+            onClick={() => {
+              setActiveTab('articles');
+              setMobileMenuOpen(false);
+            }}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${activeTab === 'articles' ? 'bg-coinlect-accent text-black font-bold' : 'text-gray-400 hover:bg-white/5'}`}
+          >
             <FileText size={18} /> Articles
           </button>
-          <button onClick={() => setActiveTab('events')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${activeTab === 'events' ? 'bg-coinlect-accent text-black font-bold' : 'text-gray-400 hover:bg-white/5'}`}>
+          <button
+            onClick={() => {
+              setActiveTab('events');
+              setMobileMenuOpen(false);
+            }}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${activeTab === 'events' ? 'bg-coinlect-accent text-black font-bold' : 'text-gray-400 hover:bg-white/5'}`}
+          >
             <Calendar size={18} /> Événements
           </button>
-          <button onClick={() => setActiveTab('users')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${activeTab === 'users' ? 'bg-coinlect-accent text-black font-bold' : 'text-gray-400 hover:bg-white/5'}`}>
+          <button
+            onClick={() => {
+              setActiveTab('users');
+              setMobileMenuOpen(false);
+            }}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${activeTab === 'users' ? 'bg-coinlect-accent text-black font-bold' : 'text-gray-400 hover:bg-white/5'}`}
+          >
             <Star size={18} /> Utilisateurs
           </button>
-          <button onClick={() => setActiveTab('deals')} className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${activeTab === 'deals' ? 'bg-coinlect-accent text-black font-bold' : 'text-gray-400 hover:bg-white/5'}`}>
+          <button
+            onClick={() => {
+              setActiveTab('deals');
+              setMobileMenuOpen(false);
+            }}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm transition-colors ${activeTab === 'deals' ? 'bg-coinlect-accent text-black font-bold' : 'text-gray-400 hover:bg-white/5'}`}
+          >
             <FileText size={18} /> Deals
           </button>
         </div>
       </aside>
 
-      <main className="flex-1 p-8 overflow-y-auto md:ml-64">
+      {/* Mobile Header */}
+      <div className="md:hidden fixed top-20 left-0 right-0 z-30 bg-[#111] border-b border-white/5 px-4 py-3 flex items-center justify-between">
+        <h1 className="text-lg font-bold text-white">Admin Dashboard</h1>
+        <button
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className="p-2 text-gray-400 hover:text-white"
+          aria-label="Toggle menu"
+        >
+          <Menu size={20} />
+        </button>
+      </div>
+
+      <main className="flex-1 p-4 pt-16 overflow-y-auto md:p-8 md:ml-64 md:pt-8">
         {activeTab === 'overview' && (
-          <div className="space-y-8 animate-in fade-in">
-            <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-5">
+          <div className="space-y-6 md:space-y-8 animate-in fade-in">
+            <h1 className="hidden text-2xl font-bold md:text-3xl md:block">Admin Dashboard</h1>
+              <div className="grid grid-cols-2 gap-4 md:grid-cols-5 md:gap-6">
                 {[
                   { label: 'Cours', val: courses.length, icon: <BookOpen />, color: 'text-coinlect-accent' },
                   { label: 'Articles', val: articles.length, icon: <FileText />, color: 'text-purple-500' },
@@ -617,54 +676,72 @@ export const AdminDashboard: React.FC = () => {
 
 
         {activeTab === 'courses' && (
-          <div className="space-y-6 animate-in fade-in">
-            <div className="flex items-center justify-between">
-              <h1 className="text-3xl font-bold">Catalogue des Cours</h1>
-              <Button onClick={() => { setEditingItem(null); setModalType('course'); setIsModalOpen(true); }}><Plus size={16} /> Créer un Cours</Button>
+          <div className="space-y-4 md:space-y-6 animate-in fade-in">
+            <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+              <h1 className="text-2xl font-bold md:text-3xl">Catalogue des Cours</h1>
+              <Button onClick={() => { setEditingItem(null); setModalType('course'); setIsModalOpen(true); }} className="w-full sm:w-auto">
+                <Plus size={16} className="mr-2" /> Créer un Cours
+              </Button>
             </div>
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
               {courses.map(c => (
-                <div key={c.id} className="bg-[#111] p-4 rounded-xl border border-white/10 flex justify-between items-center group">
-                  <div className="flex items-center gap-4">
-                    <img src={c.image || 'https://via.placeholder.com/80x48/333/666?text=No+Image'} className="object-cover w-20 h-12 rounded shadow" alt="" onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.src = 'https://via.placeholder.com/80x48/333/666?text=No+Image';
-                    }} />
-                    <div>
-                      <h4 className="font-bold text-white transition-colors group-hover:text-coinlect-accent">{c.title}</h4>
-                      <p className="text-[10px] text-gray-500 uppercase tracking-widest">{c.category} • {c.level}</p>
+                <div key={c.id} className="bg-[#111] p-4 rounded-xl border border-white/10 group">
+                  <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+                    <div className="flex items-center flex-1 min-w-0 gap-4">
+                      <img src={c.image || 'https://via.placeholder.com/80x48/333/666?text=No+Image'} className="flex-shrink-0 object-cover w-20 h-12 rounded shadow" alt="" onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = 'https://via.placeholder.com/80x48/333/666?text=No+Image';
+                      }} />
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-bold text-white transition-colors group-hover:text-coinlect-accent line-clamp-2">{c.title}</h4>
+                        <p className="mt-1 text-xs tracking-widest text-gray-500 uppercase">{c.category} • {c.level}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center flex-shrink-0 gap-2">
+                      <button
+                        onClick={() => {
+                          setEditingItem(c);
+                          setModalType('course');
+                          setCourseForm({
+                            title: c.title || '',
+                            slug: c.slug || '',
+                            description: c.description || '',
+                            seoTitle: c.seoTitle || '',
+                            seoDescription: c.seoDescription || '',
+                            status: c.status || 'DRAFT',
+                            publishedAt: c.publishedAt || undefined,
+                            createdAt: c.createdAt || '',
+                            updatedAt: c.updatedAt || '',
+                            authorId: c.authorId || undefined,
+                            author: c.author || undefined,
+                            about: c.about || '',
+                            level: c.level || 'Débutant',
+                            duration: c.duration || '35m',
+                            category: c.category || 'Blockchain',
+                            image: c.image || '',
+                            syllabus: c.syllabus || [],
+                            courseType: c.courseType || 'academy',
+                            videoLink: c.videoLink || ''
+                          });
+                          setIsModalOpen(true);
+                        }}
+                        className="p-2 text-blue-500 transition-colors rounded-lg hover:text-blue-400 hover:bg-blue-500/10"
+                        aria-label="Edit course"
+                      >
+                        <FileText size={18} />
+                      </button>
+                      <button
+                        onClick={() => {
+                          setDeleteTarget({ type: 'course', item: c });
+                          setDeleteDialogOpen(true);
+                        }}
+                        className="p-2 text-red-500 transition-colors rounded-lg hover:text-red-400 hover:bg-red-500/10"
+                        aria-label="Delete course"
+                      >
+                        <Trash2 size={18} />
+                      </button>
                     </div>
                   </div>
-                  <button onClick={() => {
-                    setEditingItem(c);
-                    setModalType('course');
-                    setCourseForm({
-                      title: c.title || '',
-                      slug: c.slug || '',
-                      description: c.description || '',
-                      seoTitle: c.seoTitle || '',
-                      seoDescription: c.seoDescription || '',
-                      status: c.status || 'DRAFT',
-                      publishedAt: c.publishedAt || undefined,
-                      createdAt: c.createdAt || '',
-                      updatedAt: c.updatedAt || '',
-                      authorId: c.authorId || undefined,
-                      author: c.author || undefined,
-                      about: c.about || '',
-                      level: c.level || 'Débutant',
-                      duration: c.duration || '35m',
-                      category: c.category || 'Blockchain',
-                      image: c.image || '',
-                      syllabus: c.syllabus || [],
-                      courseType: c.courseType || 'academy',
-                      videoLink: c.videoLink || ''
-                    });
-                    setIsModalOpen(true);
-                  }} className="p-2 text-blue-500 hover:text-blue-400" aria-label="Edit course"><FileText size={18} /></button>
-                  <button onClick={() => {
-                    setDeleteTarget({ type: 'course', item: c });
-                    setDeleteDialogOpen(true);
-                  }} className="p-2 text-red-500 hover:text-red-400" aria-label="Delete course"><Trash2 size={18} /></button>
                 </div>
               ))}
             </div>
@@ -672,30 +749,31 @@ export const AdminDashboard: React.FC = () => {
         )}
 
         {activeTab === 'articles' && (
-          <div className="space-y-6 animate-in fade-in">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-3xl font-bold">Articles du Blog</h1>
-              </div>
-              <Button onClick={() => { setEditingItem(null); setModalType('article'); setIsModalOpen(true); }}><Plus size={16} /> Publier un Article</Button>
+          <div className="space-y-4 md:space-y-6 animate-in fade-in">
+            <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+              <h1 className="text-2xl font-bold md:text-3xl">Articles du Blog</h1>
+              <Button onClick={() => { setEditingItem(null); setModalType('article'); setIsModalOpen(true); }} className="w-full sm:w-auto">
+                <Plus size={16} className="mr-2" /> Publier un Article
+              </Button>
             </div>
             <div className="grid gap-4">
               {articles.map(a => (
-                <div key={a.id} className="bg-[#111] p-4 rounded-xl border border-white/10 flex justify-between items-center group">
-                  <div className="flex items-center gap-4">
-                    <div className="relative">
-                      <img src={a.image || 'https://via.placeholder.com/80x48/333/666?text=No+Image'} className="object-cover w-20 h-12 rounded shadow" alt="" onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.src = 'https://via.placeholder.com/80x48/333/666?text=No+Image';
-                      }} />
-                      {a.featured && <Star className="absolute -top-2 -left-2 text-coinlect-accent" size={16} fill="currentColor" />}
+                <div key={a.id} className="bg-[#111] p-4 rounded-xl border border-white/10 group">
+                  <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+                    <div className="flex items-center flex-1 min-w-0 gap-4">
+                      <div className="relative flex-shrink-0">
+                        <img src={a.image || 'https://via.placeholder.com/80x48/333/666?text=No+Image'} className="object-cover w-20 h-12 rounded shadow" alt="" onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = 'https://via.placeholder.com/80x48/333/666?text=No+Image';
+                        }} />
+                        {a.featured && <Star className="absolute -top-2 -left-2 text-coinlect-accent" size={16} fill="currentColor" />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-bold text-white line-clamp-2">{a.title}</h4>
+                        <p className="mt-1 text-xs text-gray-500 uppercase">{a.category} • {a.date}</p>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="font-bold text-white line-clamp-1">{a.title}</h4>
-                      <p className="text-[10px] text-gray-500 uppercase">{a.category} • {a.date}</p>
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
+                    <div className="flex items-center flex-shrink-0 gap-2">
                     <button
                       onClick={async () => {
                         try {
@@ -742,38 +820,40 @@ export const AdminDashboard: React.FC = () => {
                         authorName: (a as any).authorName || '',
                         featured: a.featured || false,
                         readTime: (a as any).readTime || '5 min',
-                        date: a.createdAt ? new Date(a.createdAt).toLocaleDateString('fr-FR') : new Date().toLocaleDateString('fr-FR')
+                        date: a.createdAt ? new Date(a.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]
                       });
                       setIsModalOpen(true);
                     }} className="p-2 text-blue-500 hover:text-blue-400" aria-label="Edit article"><FileText size={18} /></button>
                   </div>
                 </div>
-              ))}
+              </div>
+            ))}
             </div>
           </div>
         )}
 
         {activeTab === 'events' && (
-          <div className="space-y-6 animate-in fade-in">
-            <div className="flex items-center justify-between">
-              <h1 className="text-3xl font-bold">Gestion des Événements</h1>
-              <Button onClick={() => { setEditingItem(null); setModalType('event'); setIsModalOpen(true); }}><Plus size={16} /> Créer un Événement</Button>
+          <div className="space-y-4 md:space-y-6 animate-in fade-in">
+            <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+              <h1 className="text-2xl font-bold md:text-3xl">Gestion des Événements</h1>
+              <Button onClick={() => { setEditingItem(null); setModalType('event'); setIsModalOpen(true); }} className="w-full sm:w-auto">
+                <Plus size={16} className="mr-2" /> Créer un Événement
+              </Button>
             </div>
             <div className="grid gap-4">
               {events.map(e => (
-                <div key={e.id} className="bg-[#111] p-4 rounded-xl border border-white/10 flex justify-between items-center group">
-                  <div className="flex items-center gap-4">
-                    <div className="flex flex-wrap gap-1">
-                      {(e.eventTypes || []).map((t, idx) => (
-                        <span key={idx} className="px-2 py-1 text-[10px] font-bold text-gray-400 uppercase bg-white/5 rounded">{t}</span>
-                      ))}
+                <div key={e.id} className="bg-[#111] p-4 rounded-xl border border-white/10 group">
+                  <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap gap-1 mb-2">
+                        {(e.eventTypes || []).map((t, idx) => (
+                          <span key={idx} className="px-2 py-1 text-[10px] font-bold text-gray-400 uppercase bg-white/5 rounded">{t}</span>
+                        ))}
+                      </div>
+                      <h4 className="font-bold text-white line-clamp-2">{e.title}</h4>
+                      <p className="mt-1 text-xs text-gray-500">{e.date} • {e.location}</p>
                     </div>
-                    <div>
-                      <h4 className="font-bold text-white line-clamp-1">{e.title}</h4>
-                      <p className="text-[10px] text-gray-500">{e.date} • {e.location}</p>
-                    </div>
-                  </div>
-                  <div className="flex gap-2">
+                    <div className="flex items-center flex-shrink-0 gap-2">
                     <button onClick={() => {
                       setEditingItem(e);
                       setModalType('event');
@@ -799,29 +879,27 @@ export const AdminDashboard: React.FC = () => {
                     }} className="p-2 text-red-500 transition-colors hover:text-red-400" aria-label="Delete event"><Trash2 size={18} /></button>
                   </div>
                 </div>
-              ))}
+              </div>
+            ))}
             </div>
           </div>
         )}
 
         {activeTab === 'users' && (
-          <div className="space-y-6 animate-in fade-in">
-            <div className="flex items-center justify-between">
-              <h1 className="text-3xl font-bold">Gestion des Utilisateurs</h1>
-            </div>
+          <div className="space-y-4 md:space-y-6 animate-in fade-in">
+            <h1 className="text-2xl font-bold md:text-3xl">Gestion des Utilisateurs</h1>
             <div className="grid gap-4">
               {users.map(u => (
-                <div key={u.id} className="bg-[#111] p-4 rounded-xl border border-white/10 flex justify-between items-center group">
-                  <div className="flex items-center gap-4">
-                    <div>
+                <div key={u.id} className="bg-[#111] p-4 rounded-xl border border-white/10 group">
+                  <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+                    <div className="flex-1">
                       <h4 className="font-bold text-white">{u.name || 'No name'}</h4>
                       <p className="text-sm text-gray-400">{u.email}</p>
-                      <p className="text-xs text-gray-500">
+                      <p className="mt-1 text-xs text-gray-500">
                         Rôle: <span className={`font-semibold ${u.role === 'ADMIN' ? 'text-coinlect-accent' : 'text-gray-400'}`}>{u.role === 'ADMIN' ? 'Admin' : 'Utilisateur'}</span>
                       </p>
                     </div>
-                  </div>
-                  <div className="flex gap-2">
+                    <div className="flex flex-col flex-shrink-0 gap-2 sm:flex-row">
                     {u.role === 'USER' && (
                       <Button
                         onClick={() => handleRoleChange(u.id, 'promote')}
@@ -846,36 +924,40 @@ export const AdminDashboard: React.FC = () => {
                     )}
                   </div>
                 </div>
-              ))}
+              </div>
+            ))}
             </div>
           </div>
         )}
 
         {activeTab === 'deals' && (
-          <div className="space-y-6 animate-in fade-in">
-            <div className="flex items-center justify-between">
-              <h1 className="text-3xl font-bold">Gestion des Deals</h1>
-              <Button onClick={() => { setEditingItem(null); setModalType('deal'); setIsModalOpen(true); }}><Plus size={16} /> Créer un Deal</Button>
+          <div className="space-y-4 md:space-y-6 animate-in fade-in">
+            <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
+              <h1 className="text-2xl font-bold md:text-3xl">Gestion des Deals</h1>
+              <Button onClick={() => { setEditingItem(null); setModalType('deal'); setIsModalOpen(true); }} className="w-full sm:w-auto">
+                <Plus size={16} className="mr-2" /> Créer un Deal
+              </Button>
             </div>
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
               {deals.map(d => (
-                <div key={d.id} className="bg-[#111] p-4 rounded-xl border border-white/10 flex justify-between items-center group">
-                  <div className="flex items-center gap-4">
-                    <img
-                      src={d.image || 'https://via.placeholder.com/60x40'}
-                      className="object-cover w-20 h-12 rounded shadow"
-                      alt="Deal image"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.src = 'https://via.placeholder.com/60x40/333/666?text=No+Image';
-                      }}
-                    />
-                    <div>
-                      <h4 className="font-bold text-white transition-colors group-hover:text-coinlect-accent">{d.title}</h4>
-                      <p className="text-[10px] text-gray-500 uppercase tracking-widest">{d.category} • {d.discount}</p>
+                <div key={d.id} className="bg-[#111] p-4 rounded-xl border border-white/10 group">
+                  <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+                    <div className="flex items-center flex-1 min-w-0 gap-4">
+                      <img
+                        src={d.image || 'https://via.placeholder.com/60x40'}
+                        className="flex-shrink-0 object-cover w-20 h-12 rounded shadow"
+                        alt="Deal image"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = 'https://via.placeholder.com/60x40/333/666?text=No+Image';
+                        }}
+                      />
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-bold text-white transition-colors group-hover:text-coinlect-accent line-clamp-2">{d.title}</h4>
+                        <p className="mt-1 text-xs tracking-widest text-gray-500 uppercase">{d.category} • {d.discount}</p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex gap-2">
+                    <div className="flex items-center flex-shrink-0 gap-2">
                     {d.featured && <Star className="text-coinlect-accent" size={18} fill="currentColor" />}
                     {d.verified && <Check className="text-green-500" size={18} />}
                     <button onClick={() => {
@@ -905,7 +987,8 @@ export const AdminDashboard: React.FC = () => {
                     }} className="p-2 text-red-500 hover:text-red-400" aria-label="Delete deal"><Trash2 size={18} /></button>
                   </div>
                 </div>
-              ))}
+              </div>
+            ))}
             </div>
           </div>
         )}
@@ -913,8 +996,8 @@ export const AdminDashboard: React.FC = () => {
 
       {/* MODAL SYSTEM */}
       {isModalOpen && (
-        <div className="fixed inset-0 bg-black/90 z-[100] flex items-center justify-center p-4 backdrop-blur-md overflow-y-auto">
-          <div className="bg-[#111] border border-white/10 rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden flex flex-col shadow-[0_0_50px_rgba(0,0,0,0.8)]">
+        <div className="fixed inset-0 bg-black/90 z-[100] flex items-center justify-center p-2 md:p-4 backdrop-blur-md overflow-y-auto">
+          <div className="bg-[#111] border border-white/10 rounded-2xl w-full max-w-4xl max-h-[95vh] md:max-h-[90vh] overflow-hidden flex flex-col shadow-[0_0_50px_rgba(0,0,0,0.8)]">
             <div className="p-6 border-b border-white/10 flex justify-between items-center bg-[#161616]">
               <h2 className="flex items-center gap-2 text-xl font-bold">
                 {modalType === 'course' ? <><BookOpen className="text-coinlect-accent" /> {editingItem ? 'Modifier le Cours' : 'Nouveau Cours Expert'}</> :
@@ -926,9 +1009,9 @@ export const AdminDashboard: React.FC = () => {
               <button onClick={() => setIsModalOpen(false)} className="text-gray-400 hover:text-white" aria-label="Close modal"><X size={24} /></button>
             </div>
 
-            <div className="flex-1 p-8 overflow-y-auto">
+            <div className="flex-1 p-4 overflow-y-auto md:p-8">
               {modalType === 'course' ? (
-                <form onSubmit={handleSaveCourse} className="space-y-10">
+                <form onSubmit={handleSaveCourse} className="space-y-6 md:space-y-10">
                   {/* Basic Meta */}
                   <div className="space-y-4">
                     <h3 className="text-sm font-bold tracking-widest uppercase text-coinlect-accent">1. Informations Générales</h3>
@@ -953,18 +1036,18 @@ export const AdminDashboard: React.FC = () => {
                       onChange={e => setCourseForm({...courseForm, about: e.target.value})}
                     />
                     <div className="grid gap-4 md:grid-cols-2">
-                       <select className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={courseForm.level} onChange={e => setCourseForm({...courseForm, level: e.target.value as any})} aria-label="Course level">
+                       <select className="p-3 text-sm text-white bg-black border outline-none md:p-4 border-white/10 rounded-xl md:text-base" value={courseForm.level} onChange={e => setCourseForm({...courseForm, level: e.target.value as any})} aria-label="Course level">
                          <option>Débutant</option><option>Intermédiaire</option><option>Avancé</option>
                        </select>
-                       <input placeholder="Durée (ex: 35m)" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={courseForm.duration} onChange={e => setCourseForm({...courseForm, duration: e.target.value})} />
+                       <input placeholder="Durée (ex: 35m)" className="p-3 text-sm text-white bg-black border outline-none md:p-4 border-white/10 rounded-xl md:text-base" value={courseForm.duration} onChange={e => setCourseForm({...courseForm, duration: e.target.value})} />
                     </div>
                     <div className="grid gap-4 md:grid-cols-2">
-                       <select className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={courseForm.category} onChange={e => setCourseForm({...courseForm, category: e.target.value})} aria-label="Course category">
+                       <select className="p-3 text-sm text-white bg-black border outline-none md:p-4 border-white/10 rounded-xl md:text-base" value={courseForm.category} onChange={e => setCourseForm({...courseForm, category: e.target.value})} aria-label="Course category">
                          {["All", "Blockchain", "Trading", "DeFi", "NFT", "Security", "Mining"].map((category, index) => (
                            <option key={category} value={category}>{t.academy.filters[index] || category}</option>
                          ))}
                        </select>
-                       <select className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={courseForm.courseType} onChange={e => setCourseForm({...courseForm, courseType: e.target.value as any})} aria-label="Course type">
+                       <select className="p-3 text-sm text-white bg-black border outline-none md:p-4 border-white/10 rounded-xl md:text-base" value={courseForm.courseType} onChange={e => setCourseForm({...courseForm, courseType: e.target.value as any})} aria-label="Course type">
                          <option value="academy">Academy</option>
                          <option value="specialization">Specialization</option>
                          <option value="university">University</option>
@@ -1064,8 +1147,8 @@ export const AdminDashboard: React.FC = () => {
                       </div>
                     )}
                     <div className="grid gap-4 md:grid-cols-2">
-                       <input placeholder="Nom du partenaire (optionnel)" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={courseForm.partnerName || ''} onChange={e => setCourseForm({...courseForm, partnerName: e.target.value || undefined})} />
-                       <input placeholder="URL du logo partenaire (optionnel)" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={courseForm.partnerLogo || ''} onChange={e => setCourseForm({...courseForm, partnerLogo: e.target.value || undefined})} />
+                       <input placeholder="Nom du partenaire (optionnel)" className="p-3 text-sm text-white bg-black border outline-none md:p-4 border-white/10 rounded-xl md:text-base" value={courseForm.partnerName || ''} onChange={e => setCourseForm({...courseForm, partnerName: e.target.value || undefined})} />
+                       <input placeholder="URL du logo partenaire (optionnel)" className="p-3 text-sm text-white bg-black border outline-none md:p-4 border-white/10 rounded-xl md:text-base" value={courseForm.partnerLogo || ''} onChange={e => setCourseForm({...courseForm, partnerLogo: e.target.value || undefined})} />
                     </div>
                     <label className="flex items-center gap-3 px-4 py-2 border cursor-pointer bg-white/5 rounded-xl border-white/10">
                       <input type="checkbox" checked={courseForm.isPaid || false} onChange={e => setCourseForm({...courseForm, isPaid: e.target.checked})} className="border-gray-600 rounded" />
@@ -1090,9 +1173,9 @@ export const AdminDashboard: React.FC = () => {
                   {/* Learning Objectives */}
 
 
-                  <div className="flex gap-4 pt-10">
-                    <Button type="button" variant="outline" className="w-1/2" onClick={() => setIsModalOpen(false)}>Annuler</Button>
-                    <Button type="submit" className="w-1/2 shadow-xl shadow-coinlect-accent/20">
+                  <div className="flex flex-col gap-4 pt-6 sm:flex-row md:pt-10">
+                    <Button type="button" variant="outline" className="w-full sm:w-1/2" onClick={() => setIsModalOpen(false)}>Annuler</Button>
+                    <Button type="submit" className="w-full shadow-xl sm:w-1/2 shadow-coinlect-accent/20">
                       {courseForm.status === 'PUBLISHED' ? 'Mettre à jour le Cours' : 'Publier le Cours'}
                     </Button>
                   </div>
@@ -1127,9 +1210,8 @@ export const AdminDashboard: React.FC = () => {
                    </div>
                    <div className="grid grid-cols-2 gap-4">
                      <input placeholder="URL Image" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={articleForm.image || ''} onChange={e => setArticleForm({...articleForm, image: e.target.value})} />
-                     <input type="date" placeholder="Date" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={articleForm.date ? new Date(articleForm.date).toISOString().split('T')[0] : ''} onChange={e => {
-                       const date = new Date(e.target.value);
-                       setArticleForm({...articleForm, date: date.toLocaleDateString('fr-FR')});
+                     <input type="date" placeholder="Date" className="p-4 text-white bg-black border outline-none border-white/10 rounded-xl" value={articleForm.date || ''} onChange={e => {
+                       setArticleForm({...articleForm, date: e.target.value});
                      }} />
                    </div>
                    {articleForm.image && (
@@ -1195,9 +1277,9 @@ export const AdminDashboard: React.FC = () => {
                      </div>
                    )}
                    <textarea placeholder="Contenu complet (Séparez les paragraphes par une nouvelle ligne)" className="w-full p-4 text-white bg-black border outline-none border-white/10 rounded-xl h-60" value={articleForm.content} onChange={e => setArticleForm({...articleForm, content: e.target.value})} />
-                   <div className="flex gap-4 pt-4">
-                     <Button type="button" variant="outline" className="w-1/2" onClick={() => setIsModalOpen(false)}>Annuler</Button>
-                     <Button type="submit" className="w-1/2">
+                   <div className="flex flex-col gap-4 pt-4 sm:flex-row">
+                     <Button type="button" variant="outline" className="w-full sm:w-1/2" onClick={() => setIsModalOpen(false)}>Annuler</Button>
+                     <Button type="submit" className="w-full sm:w-1/2">
                        {articleForm.status === 'PUBLISHED' ? 'Mettre à jour l\'Article' : 'Publier l\'Article'}
                      </Button>
                    </div>
@@ -1454,9 +1536,9 @@ export const AdminDashboard: React.FC = () => {
                       <span className="text-xs font-bold">Deal en vedette</span>
                     </label>
                   </div>
-                  <div className="flex gap-4 pt-4">
-                    <Button type="button" variant="outline" className="w-1/2" onClick={() => setIsModalOpen(false)}>Annuler</Button>
-                    <Button type="submit" className="w-1/2">
+                  <div className="flex flex-col gap-4 pt-4 sm:flex-row">
+                    <Button type="button" variant="outline" className="w-full sm:w-1/2" onClick={() => setIsModalOpen(false)}>Annuler</Button>
+                    <Button type="submit" className="w-full sm:w-1/2">
                       {editingItem ? 'Mettre à jour le Deal' : 'Créer le Deal'}
                     </Button>
                   </div>
@@ -1469,8 +1551,8 @@ export const AdminDashboard: React.FC = () => {
 
       {/* Delete Confirmation Dialog */}
       {deleteDialogOpen && deleteTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="w-full max-w-md p-6 mx-4 bg-gray-900 border border-gray-700 rounded-lg">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+          <div className="w-full max-w-md p-4 bg-gray-900 border border-gray-700 rounded-lg md:p-6">
             <h3 className="mb-4 text-lg font-bold text-white">Confirmer la suppression</h3>
             <p className="mb-6 text-gray-300">
               Êtes-vous sûr de vouloir supprimer {
@@ -1487,6 +1569,7 @@ export const AdminDashboard: React.FC = () => {
             <div className="flex justify-end gap-3">
               <Button
                 variant="outline"
+                className="w-full sm:w-auto"
                 onClick={() => {
                   setDeleteDialogOpen(false);
                   setDeleteTarget(null);
@@ -1495,7 +1578,7 @@ export const AdminDashboard: React.FC = () => {
                 Annuler
               </Button>
               <Button
-                className="text-white bg-red-600 hover:bg-red-700"
+                className="w-full text-white bg-red-600 sm:w-auto hover:bg-red-700"
                 onClick={async () => {
                   if (!deleteTarget) return;
 

@@ -27,86 +27,9 @@ export const GoogleAuthButton: React.FC<GoogleAuthButtonProps> = ({
   const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
   const isGoogleConfigured = !!clientId;
 
-  useEffect(() => {
-    // Load Google Identity Services script only once
-    if (typeof window === 'undefined' || window.google) return;
-
-    const script = document.createElement('script');
-    script.src = 'https://accounts.google.com/gsi/client';
-    script.async = true;
-    script.defer = true;
-
-    script.onload = () => {
-      if (!window.google) {
-        console.warn('Google API not loaded');
-        return;
-      }
-
-      try {
-        // Check if we're in development and warn about Google OAuth configuration
-        const isDevelopment = process.env.NODE_ENV !== 'production';
-        const currentOrigin = window.location.origin;
-
-        if (isDevelopment) {
-          console.warn('Google OAuth Configuration Check:', {
-            currentOrigin,
-            expectedOrigins: ['http://localhost:3000', 'https://your-production-domain.com'],
-            action: 'Add current origin to Google Cloud Console OAuth client authorized origins'
-          });
-        }
-
-        window.google.accounts.id.initialize({
-          client_id: clientId,
-          ux_mode: 'popup',
-          callback: async (response: any) => {
-            setIsLoading(true);
-            try {
-              const res = await fetch('/api/auth/google', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ idToken: response.credential }),
-              });
-
-              if (!res.ok) {
-                const error = await res.json();
-                throw new Error(error.error || 'Authentication failed');
-              }
-
-              const data = await res.json();
-
-              // Refresh user data from the server
-              await refreshUser();
-
-              onSuccess?.(data.user, {
-                accessToken: data.accessToken,
-                refreshToken: data.refreshToken,
-              });
-            } catch (err) {
-              const errorMessage = err instanceof Error ? err.message : 'Authentication failed';
-              onError?.(errorMessage);
-            } finally {
-              setIsLoading(false);
-            }
-          },
-        });
-      } catch (err) {
-        console.error('Failed to initialize Google Sign-In:', err);
-        onError?.('Failed to initialize Google Sign-In');
-      }
-    };
-
-    script.onerror = () => {
-      console.error('Failed to load Google Identity Services');
-      onError?.('Failed to load Google Sign-In');
-    };
-
-    document.head.appendChild(script);
-
-    // Cleanup
-    return () => {
-      // Script cleanup handled by browser
-    };
-  }, [clientId, onSuccess, onError, refreshUser]);
+  // Note: We use redirect flow directly to avoid FedCM (Federated Credential Management) issues
+  // The redirect flow is more reliable and doesn't require Google Identity Services script
+  // No need to load the script since we're using standard OAuth redirect
 
   // Only disable Google Sign-In if not configured, not in development
   if (!isGoogleConfigured) {
@@ -114,14 +37,28 @@ export const GoogleAuthButton: React.FC<GoogleAuthButtonProps> = ({
   }
 
   const handleClick = () => {
-    if (typeof window !== 'undefined' && window.google?.accounts?.id) {
-      window.google.accounts.id.prompt();
-    } else {
-      // Fallback: redirect to Google OAuth
-      const redirectUri = `${window.location.origin}/api/auth/google/callback`;
-      const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=email%20profile&access_type=offline&prompt=consent`;
-      window.location.href = googleAuthUrl;
+    if (isLoading) return; // Prevent multiple clicks
+    
+    setIsLoading(true);
+    
+    // Use redirect flow directly - most reliable method, avoids FedCM issues
+    // This provides a seamless experience without popup/FedCM complications
+    const redirectUri = `${window.location.origin}/api/auth/google/callback`;
+    
+    // Log redirect URI for debugging (helpful for OAuth configuration)
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Google OAuth Redirect URI:', redirectUri);
+      console.log('Make sure this URI is added to Google Cloud Console:');
+      console.log('1. Go to https://console.cloud.google.com/apis/credentials');
+      console.log('2. Click on your OAuth 2.0 Client ID');
+      console.log('3. Add this URI to "Authorized redirect URIs":', redirectUri);
     }
+    
+    const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=email%20profile&access_type=offline&prompt=consent`;
+    
+    // Redirect to Google OAuth
+    window.location.href = googleAuthUrl;
+    // Note: Loading state will persist until redirect completes
   };
 
   return (
