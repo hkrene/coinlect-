@@ -165,7 +165,7 @@ export const Partners: React.FC = () => {
         <div className="flex-col hidden gap-2 px-2 md:flex">
             {/* Top Row: Right to Left */}
             <div className="relative w-full overflow-hidden mask-image-gradient-sides">
-                <div className="flex gap-6 py-4 animate-scroll-left hover:pause-animation w-max">
+                <div className="flex gap-10 py-4 animate-scroll-left hover:pause-animation w-max md:gap-16">
                     {row1Display.map((partner, idx) => (
                         <a 
                             key={`row1-desktop-${partner.name}-${idx}`} 
@@ -184,7 +184,7 @@ export const Partners: React.FC = () => {
 
             {/* Bottom Row: Left to Right */}
             <div className="relative w-full overflow-hidden mask-image-gradient-sides">
-                <div className="flex gap-6 py-4 animate-scroll-right hover:pause-animation w-max">
+                <div className="flex gap-10 py-4 animate-scroll-right hover:pause-animation w-max md:gap-16">
                     {row2Display.map((partner, idx) => (
                         <a 
                             key={`row2-desktop-${partner.name}-${idx}`} 
