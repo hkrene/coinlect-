@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
     });
 
     // Send welcome email (best-effort; never block signup)
-    sendWelcomeEmail({ to: user.email, name: user.name }).catch((e) => {
+    await sendWelcomeEmail({ to: user.email, name: user.name }).catch((e) => {
       console.error('Welcome email failed', e);
     });
 

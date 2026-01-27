@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
 
     // Send welcome email for new users (best-effort; never block signup)
     if (isNewUser) {
-      sendWelcomeEmail({ to: user.email, name: user.name }).catch((e) => {
+      await sendWelcomeEmail({ to: user.email, name: user.name }).catch((e) => {
         console.error('Welcome email failed for Google signup', e);
       });
     }
