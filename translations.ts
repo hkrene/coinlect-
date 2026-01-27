@@ -156,6 +156,18 @@ export const translations = {
       titleSuffix: "affiliés & Ecosystem",
       desc: "Nous collaborons avec les leaders de l'industrie pour vous offrir le meilleur."
     },
+    statistics: {
+      title: "L'Éducation",
+      titleSuffix: "sans frontières.",
+      subtitle: "Des chiffres qui parlent d'eux-mêmes.",
+      description: "Coinlect Academy n'est pas qu'une plateforme. C'est l'épicentre de la croissance financière en Afrique francophone.",
+      stats: [
+        { value: 1000, suffix: '+', label: 'Apprenants' },
+        { value: 45, suffix: '+', label: 'Modules' },
+        { value: 98, suffix: '%', label: 'Satisfaction' },
+        { value: 10, suffix: 'M+', label: 'Target' },
+      ]
+    },
     testimonials: {
       title: "Ce que disent nos",
       titleSuffix: "utilisateurs",
@@ -559,6 +571,18 @@ export const translations = {
       title: "Affiliate",
       titleSuffix: "Partners & Ecosystem",
       desc: "We collaborate with industry leaders to offer you the best."
+    },
+    statistics: {
+      title: "Education",
+      titleSuffix: "without borders.",
+      subtitle: "Numbers that speak for themselves.",
+      description: "Coinlect Academy is more than just a platform. It's the epicenter of financial growth in Francophone Africa.",
+      stats: [
+        { value: 1000, suffix: '+', label: 'Learners' },
+        { value: 45, suffix: '+', label: 'Modules' },
+        { value: 98, suffix: '%', label: 'Satisfaction' },
+        { value: 10, suffix: 'M+', label: 'Target' },
+      ]
     },
     testimonials: {
       title: "What our",
