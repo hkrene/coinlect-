@@ -60,6 +60,9 @@ export const Testimonials: React.FC = () => {
     testimonialChunks.push(testimonials.slice(i, i + chunkSize));
   }
 
+  // For desktop: only show first 2 rows
+  const desktopChunks = testimonialChunks.slice(0, 2);
+
   // Create repeated arrays for smooth scrolling (more repetitions for seamless scrolling)
   const displayChunks = [...testimonialChunks, ...testimonialChunks, ...testimonialChunks, ...testimonialChunks, ...testimonialChunks, ...testimonialChunks];
 
@@ -90,23 +93,6 @@ export const Testimonials: React.FC = () => {
             </p>
           </div>
         </ScrollReveal>
-
-        {hasMounted && (
-          <div className="grid grid-cols-1 gap-8 mb-16 text-center md:grid-cols-3">
-            <div className="flex flex-col items-center justify-center p-6 bg-white/[0.02] border border-white/5 rounded-xl">
-              <p className="text-4xl font-bold text-coinlect-accent">1.000+</p>
-              <p className="text-sm text-white">Members</p>
-            </div>
-            <div className="flex flex-col items-center justify-center p-6 bg-white/[0.02] border border-white/5 rounded-xl">
-              <p className="text-4xl font-bold text-coinlect-accent">99.00%</p>
-              <p className="text-sm text-white">Satisfaction rate</p>
-            </div>
-            <div className="flex flex-col items-center justify-center p-6 bg-white/[0.02] border border-white/5 rounded-xl">
-              <p className="text-4xl font-bold text-coinlect-accent">100+</p>
-              <p className="text-sm text-white">Resources</p>
-            </div>
-          </div>
-        )}
 
         {/* Mobile: Single row scrolling with manual control */}
         <div className="md:hidden">
@@ -181,9 +167,9 @@ export const Testimonials: React.FC = () => {
           </div>
         </div>
 
-        {/* Desktop: Multi-row scrolling */}
+        {/* Desktop: Only 2 rows scrolling */}
         <div className="hidden gap-8 md:flex md:flex-col">
-          {testimonialChunks.map((chunk, chunkIndex) => (
+          {desktopChunks.map((chunk, chunkIndex) => (
             <div key={`chunk-${chunkIndex}`} className="relative w-full overflow-hidden mask-image-gradient-sides">
               <div className={`flex gap-6 py-4 ${chunkIndex % 2 === 0 ? 'animate-scroll-left' : 'animate-scroll-right'} hover:pause-animation`}>
                 {[...chunk, ...chunk, ...chunk, ...chunk].map((testimonial, idx) => (

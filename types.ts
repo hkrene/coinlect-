@@ -134,6 +134,7 @@ export interface Partner {
   name: string;
   description: string;
   logo: string;
+  mobileLogo?: string; // Optional mobile-specific logo URL
 }
 
 /**

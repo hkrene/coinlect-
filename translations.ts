@@ -25,7 +25,7 @@ export const translations = {
     },
     hero: {
       titlePrefix: "Propulser l'Afrique Francophone vers la Maîtrise du ",
-      subtitle: "Accélérez votre transition vers l'économie numérique. Coinlect Academy déploie les outils d'apprentissage et de sécurisation indispensables pour piloter votre avenir sur la blockchain avec succès.",
+      subtitle: "Accélérez votre transition vers l'économie numérique. Coinlect Academy déploie les outils d'apprentissage pour piloter votre avenir sur la blockchain avec succès.",
       subtitleMobile: "Former et connecter l’Afrique francophone à l’économie on-chain.",
       ctaDonation: "Rejoindre sur Telegram",
       ctaStart: "Commencer"
@@ -428,7 +428,7 @@ export const translations = {
     },
     hero: {
       titlePrefix: "Empowering Francophone Africa through ",
-      subtitle: "The leading ecosystem to learn, earn, and secure your digital assets. Join thousands of Africans building their future on the blockchain with Coinlect Academy.",
+      subtitle: "The leading ecosystem to learn and secure your digital assets. Join thousands of Africans building their future on the blockchain with Coinlect Academy.",
       subtitleMobile: "Educating and connecting Francophone Africa to the on-chain economy.",
       ctaDonation: "Join our Telegram",
       ctaStart: "Get Started"
