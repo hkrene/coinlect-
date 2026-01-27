@@ -33,6 +33,7 @@ model User {
   passwordHash   String?
   name           String?
   avatar         String?         // Profile picture URL
+  dateOfBirth    DateTime?
   role           UserRole        @default(USER)
   provider       String?         // local | google
   googleId       String?         @unique

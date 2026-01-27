@@ -2,16 +2,19 @@
 
 import React from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Avatar } from '@/components/Avatar';
 import { ScrollReveal } from '@/components/ScrollReveal';
 import { ComponentsLayout } from '../components-layout';
 import { AuthGuard } from '@/components/AuthGuard';
-import { User, Mail, Calendar, Shield, LogOut } from 'lucide-react';
+import { User, Mail, Calendar, LogOut, Edit } from 'lucide-react';
 import { Button } from '@/components/Button';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function ProfilePage() {
   const { user, logout } = useAuth();
+  const { t } = useLanguage();
   const router = useRouter();
 
   if (!user) return null;
@@ -21,12 +24,23 @@ export default function ProfilePage() {
     router.push('/');
   };
 
-  // Format date joined (assuming createdAt is available from user object)
-  // Since user object might not have createdAt, we'll show a placeholder or fetch it
-  const formatDate = (dateString: string | undefined) => {
+  const formatDate = (dateString: string | undefined | null) => {
     if (!dateString) return 'N/A';
     try {
-      return new Date(dateString).toLocaleDateString('fr-FR', {
+      return new Date(dateString).toLocaleDateString(t.common.loading === 'Chargement...' ? 'fr-FR' : 'en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+    } catch {
+      return 'N/A';
+    }
+  };
+
+  const formatDateOfBirth = (dateString: string | undefined | null) => {
+    if (!dateString) return 'N/A';
+    try {
+      return new Date(dateString).toLocaleDateString(t.common.loading === 'Chargement...' ? 'fr-FR' : 'en-US', {
         year: 'numeric',
         month: 'long',
         day: 'numeric'
@@ -46,7 +60,7 @@ export default function ProfilePage() {
 
               {/* Header Section */}
               <div className="mb-8 text-center">
-                <div className="flex justify-center mb-4">
+                <div className="relative flex justify-center mb-4 group">
                   <Avatar
                     src={user.avatar}
                     name={user.name}
@@ -57,59 +71,63 @@ export default function ProfilePage() {
                 <h1 className="mb-2 text-2xl font-bold sm:text-3xl md:text-4xl">
                   {user.name || 'Utilisateur'}
                 </h1>
-                {user.role === 'ADMIN' && (
-                  <span className="inline-block px-3 py-1 mt-2 text-xs font-bold text-purple-400 border rounded-full bg-purple-500/10 border-purple-500/20">
-                    <Shield size={12} className="inline mr-1" />
-                    Administrateur
-                  </span>
-                )}
+                <p className="text-gray-400">{user.email}</p>
               </div>
 
-              {/* Profile Information */}
-              <div className="space-y-4">
-                <div className="p-4 border rounded-lg bg-black/30 border-white/10">
-                  <div className="flex items-center gap-3 mb-2">
-                    <Mail className="text-coinlect-accent" size={18} />
-                    <h3 className="text-sm font-semibold tracking-wider text-gray-400 uppercase">Email</h3>
-                  </div>
-                  <p className="text-white">{user.email}</p>
-                </div>
-
-                <div className="p-4 border rounded-lg bg-black/30 border-white/10">
-                  <div className="flex items-center gap-3 mb-2">
+              {/* Profile Information Display */}
+              <div className="mb-10">
+                <h2 className="flex items-center gap-2 mb-6 text-xl font-bold">
+                  <User size={20} className="text-coinlect-accent" />
+                  {t.profile.personalInfo}
+                </h2>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-3 p-4 border rounded-lg bg-black/30 border-white/10">
                     <User className="text-coinlect-accent" size={18} />
-                    <h3 className="text-sm font-semibold tracking-wider text-gray-400 uppercase">Nom</h3>
-                  </div>
-                  <p className="text-white">{user.name || 'Non défini'}</p>
-                </div>
-
-                <div className="p-4 border rounded-lg bg-black/30 border-white/10">
-                  <div className="flex items-center gap-3 mb-2">
-                    <Shield className="text-coinlect-accent" size={18} />
-                    <h3 className="text-sm font-semibold tracking-wider text-gray-400 uppercase">Rôle</h3>
-                  </div>
-                  <p className="text-white">{user.role === 'ADMIN' ? 'Administrateur' : 'Utilisateur'}</p>
-                </div>
-
-                {user.createdAt && (
-                  <div className="p-4 border rounded-lg bg-black/30 border-white/10">
-                    <div className="flex items-center gap-3 mb-2">
-                      <Calendar className="text-coinlect-accent" size={18} />
-                      <h3 className="text-sm font-semibold tracking-wider text-gray-400 uppercase">Date d'inscription</h3>
+                    <div className="flex-1">
+                      <h3 className="text-xs font-semibold tracking-wider text-gray-400 uppercase">{t.profile.name}</h3>
+                      <p className="text-sm text-white">{user.name || 'N/A'}</p>
                     </div>
-                    <p className="text-white">{formatDate(user.createdAt)}</p>
                   </div>
-                )}
+                  <div className="flex items-center gap-3 p-4 border rounded-lg bg-black/30 border-white/10">
+                    <Mail className="text-coinlect-accent" size={18} />
+                    <div className="flex-1">
+                      <h3 className="text-xs font-semibold tracking-wider text-gray-400 uppercase">{t.profile.email}</h3>
+                      <p className="text-sm text-white">{user.email}</p>
+                    </div>
+                  </div>
+                  {user.dateOfBirth && (
+                    <div className="flex items-center gap-3 p-4 border rounded-lg bg-black/30 border-white/10">
+                      <Calendar className="text-coinlect-accent" size={18} />
+                      <div className="flex-1">
+                        <h3 className="text-xs font-semibold tracking-wider text-gray-400 uppercase">{t.profile.dateOfBirth}</h3>
+                        <p className="text-sm text-white">{formatDateOfBirth(user.dateOfBirth)}</p>
+                      </div>
+                    </div>
+                  )}
+                  <div className="flex items-center gap-3 p-4 border rounded-lg bg-black/30 border-white/10">
+                    <Calendar className="text-coinlect-accent" size={18} />
+                    <div className="flex-1">
+                      <h3 className="text-xs font-semibold tracking-wider text-gray-400 uppercase">{t.profile.dateJoined}</h3>
+                      <p className="text-sm text-white">{formatDate(user.createdAt)}</p>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Actions */}
               <div className="flex flex-col gap-3 mt-8 sm:flex-row">
+                <Link href="/profile/edit" className="flex-1">
+                  <Button variant="outline" className="w-full">
+                    <Edit size={16} className="mr-2" />
+                    {t.profile.editProfile}
+                  </Button>
+                </Link>
                 <Button
                   variant="outline"
                   className="flex-1"
                   onClick={() => router.push('/academy')}
                 >
-                  Voir l'Académie
+                  {t.profile.viewAcademy}
                 </Button>
                 {user.role === 'ADMIN' && (
                   <Button
@@ -117,7 +135,7 @@ export default function ProfilePage() {
                     className="flex-1"
                     onClick={() => router.push('/admin')}
                   >
-                    Panel Admin
+                    {t.profile.adminPanel}
                   </Button>
                 )}
                 <Button
@@ -125,7 +143,7 @@ export default function ProfilePage() {
                   onClick={handleLogout}
                 >
                   <LogOut size={16} className="mr-2" />
-                  Se déconnecter
+                  {t.profile.logout}
                 </Button>
               </div>
             </div>
