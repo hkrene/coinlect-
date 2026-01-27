@@ -6,30 +6,62 @@ import { ScrollReveal } from './ScrollReveal';
 import { useLanguage } from '../contexts/LanguageContext';
 
 const partners: Partner[] = [
-  { name: 'Binance', description: 'Binance est une plateforme crypto mondiale offrant des outils fiables pour trader et gérer des actifs numériques.', logo: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765268653/binance_wice95.png' },
-  { name: 'OKX', description: 'OKX est une plateforme crypto mondiale offrant des outils fiables pour trader et gérer des actifs numériques pro.', logo: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765268654/okx_tofb2z.png' },
-  { name: 'Bybit', description: 'Bybit est une plateforme crypto mondiale offrant des outils fiables pour trader et gérer des actifs numériques.', logo: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765268654/byit_lc7stv.png' },
-  { name: 'Kucoin', description: 'Kucoin est une plateforme crypto mondiale offrant fiables pour trader et gérer des actifs numériques.', logo: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765268654/kucoin_sbnxez.png' },
-  { name: 'Mexc', description: 'MEXC est une plateforme crypto mondiale offrant des outils fiables pour trader et gérer des actifs numériques ++.', logo: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765268654/mexc_w3lupl.png' },
-  { name: 'Maxuschain', description: 'Maxuschain est une plateforme crypto congolaise facilitant l\'accès aux actifs numériques.', logo: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765268653/maxus_zx68dt.png' },
-  { name: 'Weex', description: 'Weex est une plateforme crypto mondiale offrant des outils fiables pour trader et gérer des actifs numériques', logo: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765268654/weex_weulov.png' },
-  { name: 'Mbiyopay', description: 'MbiyoPay est une plateforme fintech africaine simplifiant palements numériques, les transferts d\'argent et les solutions de palement mobile et crypto.', logo: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765268654/mbiyopay_gll2cd.png' },
+  { 
+    name: 'Binance', 
+    description: 'Binance est une plateforme crypto mondiale offrant des outils fiables pour trader et gérer des actifs numériques.', 
+    logo: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765268653/binance_wice95.png',
+    mobileLogo: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1769531013/binance-logo_njktol.png'
+  },
+  { 
+    name: 'OKX', 
+    description: 'OKX est une plateforme crypto mondiale offrant des outils fiables pour trader et gérer des actifs numériques pro.', 
+    logo: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765268654/okx_tofb2z.png',
+    mobileLogo: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1769531011/okxlogo_nvyp1r.png'
+  },
+  { 
+    name: 'Bybit', 
+    description: 'Bybit est une plateforme crypto mondiale offrant des outils fiables pour trader et gérer des actifs numériques.', 
+    logo: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765268654/byit_lc7stv.png',
+    mobileLogo: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1769531011/bybitlogo_tdo9m5.svg'
+  },
+  { 
+    name: 'Kucoin', 
+    description: 'Kucoin est une plateforme crypto mondiale offrant fiables pour trader et gérer des actifs numériques.', 
+    logo: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765268654/kucoin_sbnxez.png',
+    mobileLogo: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1769531011/kucoinlogo_i1yulg.svg'
+  },
+  { 
+    name: 'Bitget', 
+    description: 'Bitget est une plateforme crypto mondiale offrant des outils fiables pour trader et gérer des actifs numériques.', 
+    logo: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1769531014/bitgetlogo_o9o3xx.png',
+    mobileLogo: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1769531014/bitgetlogo_o9o3xx.png'
+  },
+  { 
+    name: 'Mexc', 
+    description: 'MEXC est une plateforme crypto mondiale offrant des outils fiables pour trader et gérer des actifs numériques ++.', 
+    logo: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765268654/mexc_w3lupl.png',
+    mobileLogo: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1769531012/mexclogo_lgqk4w.svg'
+  },
+  { 
+    name: 'Mbiyopay', 
+    description: 'MbiyoPay est une plateforme fintech africaine simplifiant palements numériques, les transferts d\'argent et les solutions de palement mobile et crypto.', 
+    logo: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765268654/mbiyopay_gll2cd.png',
+    mobileLogo: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1769531013/mbiyopaylogo_w2hcg3.png'
+  },
+  { 
+    name: 'Bitget Wallet', 
+    description: 'Bitget Wallet est un portefeuille crypto sécurisé pour gérer vos actifs numériques.', 
+    logo: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1769531014/bitgetwallet_w6derm.png',
+    mobileLogo: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1769531014/bitgetwallet_w6derm.png'
+  },
+  { 
+    name: 'Weex', 
+    description: 'Weex est une plateforme crypto mondiale offrant des outils fiables pour trader et gérer des actifs numériques', 
+    logo: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765268654/weex_weulov.png',
+    mobileLogo: 'https://res.cloudinary.com/drsd8adkq/image/upload/v1769531011/weexlogo_ibizyc.svg'
+  },
 ];
 
-interface PartnerCardProps {
-  partner: Partner;
-  index: number;
-}
-
-const PartnerCard: React.FC<PartnerCardProps> = ({ partner, index }) => (
-  <div className="w-[120px] md:w-[280px] flex-shrink-0 group p-4 md:p-6 rounded-xl transition-all duration-300 md:border md:border-white/20 md:hover:border-coinlect-accent relative overflow-hidden flex flex-col cursor-pointer bg-black">
-      <div className="flex items-center justify-center h-12 mb-0 md:justify-start md:h-8 md:mb-3">
-          <img src={partner.logo} alt={partner.name} className="object-contain max-h-full transition-transform duration-300 filter group-hover:scale-110" />
-      </div>
-      <h3 className="hidden mb-2 text-sm font-semibold text-left text-white md:block md:text-base">{partner.name}</h3>
-      <p className="hidden md:block text-[10px] md:text-xs text-gray-400 leading-relaxed text-left">{partner.description}</p>
-  </div>
-);
 
 export const Partners: React.FC = () => {
   const { t } = useLanguage();
@@ -47,7 +79,7 @@ export const Partners: React.FC = () => {
        {/* Background Grid */}
        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[length:40px_40px]"></div>
 
-       <div className="container relative z-10 px-6 mx-auto">
+       <div className="container relative z-10 px-4 mx-auto sm:px-6">
         <ScrollReveal>
             <div className="mb-12 text-center">
             <h2 className="mb-4 text-3xl font-bold">
@@ -89,20 +121,20 @@ export const Partners: React.FC = () => {
         </ScrollReveal>
 
         {/* Mobile: Logos Only */}
-        <div className="flex flex-col gap-6 md:hidden">
+        <div className="flex flex-col gap-2 px-2 md:hidden">
             {/* Top Row: Right to Left */}
             <div className="relative w-full overflow-hidden mask-image-gradient-sides">
-                <div className="flex gap-4 py-2 animate-scroll-left hover:pause-animation w-max">
+                <div className="flex gap-4 py-3 animate-scroll-left hover:pause-animation w-max">
                     {row1Display.map((partner, idx) => (
                         <a 
                             key={`row1-mobile-${partner.name}-${idx}`} 
                             href="#" 
-                            className="flex items-center justify-center flex-shrink-0 w-20 h-20"
+                            className="flex items-center justify-center flex-shrink-0 w-20 h-20 px-2"
                         >
                             <img 
-                                src={partner.logo} 
+                                src={partner.mobileLogo || partner.logo} 
                                 alt={partner.name} 
-                                className="object-contain max-w-full max-h-full transition-transform duration-300 filter hover:scale-110" 
+                                className="object-contain max-w-full max-h-full transition-transform duration-300 hover:scale-110 logo-mono-tone"
                             />
                         </a>
                     ))}
@@ -111,17 +143,17 @@ export const Partners: React.FC = () => {
 
             {/* Bottom Row: Left to Right */}
             <div className="relative w-full overflow-hidden mask-image-gradient-sides">
-                <div className="flex gap-4 py-2 animate-scroll-right hover:pause-animation w-max">
+                <div className="flex gap-4 py-3 animate-scroll-right hover:pause-animation w-max">
                     {row2Display.map((partner, idx) => (
                         <a 
                             key={`row2-mobile-${partner.name}-${idx}`} 
                             href="#" 
-                            className="flex items-center justify-center flex-shrink-0 w-20 h-20"
+                            className="flex items-center justify-center flex-shrink-0 w-20 h-20 px-2"
                         >
                             <img 
-                                src={partner.logo} 
+                                src={partner.mobileLogo || partner.logo} 
                                 alt={partner.name} 
-                                className="object-contain max-w-full max-h-full transition-transform duration-300 filter hover:scale-110" 
+                                className="object-contain max-w-full max-h-full transition-transform duration-300 hover:scale-110 logo-mono-tone"
                             />
                         </a>
                     ))}
@@ -129,22 +161,42 @@ export const Partners: React.FC = () => {
             </div>
         </div>
 
-        {/* Desktop: Full Cards */}
-        <div className="flex-col hidden gap-6 md:flex">
+        {/* Desktop: Logos Only (Same as Mobile) */}
+        <div className="flex-col hidden gap-2 px-2 md:flex">
             {/* Top Row: Right to Left */}
             <div className="relative w-full overflow-hidden mask-image-gradient-sides">
-                <div className="flex gap-4 py-2 animate-scroll-left hover:pause-animation w-max">
+                <div className="flex gap-6 py-4 animate-scroll-left hover:pause-animation w-max">
                     {row1Display.map((partner, idx) => (
-                        <PartnerCard key={`row1-${partner.name}-${idx}`} partner={partner} index={idx} />
+                        <a 
+                            key={`row1-desktop-${partner.name}-${idx}`} 
+                            href="#" 
+                            className="flex items-center justify-center flex-shrink-0 px-3 w-28 h-28"
+                        >
+                            <img 
+                                src={partner.mobileLogo || partner.logo} 
+                                alt={partner.name} 
+                                className="object-contain max-w-full max-h-full transition-transform duration-300 hover:scale-110 logo-mono-tone" 
+                            />
+                        </a>
                     ))}
                 </div>
             </div>
 
             {/* Bottom Row: Left to Right */}
             <div className="relative w-full overflow-hidden mask-image-gradient-sides">
-                <div className="flex gap-4 py-2 animate-scroll-right hover:pause-animation w-max">
+                <div className="flex gap-6 py-4 animate-scroll-right hover:pause-animation w-max">
                     {row2Display.map((partner, idx) => (
-                        <PartnerCard key={`row2-${partner.name}-${idx}`} partner={partner} index={idx} />
+                        <a 
+                            key={`row2-desktop-${partner.name}-${idx}`} 
+                            href="#" 
+                            className="flex items-center justify-center flex-shrink-0 px-3 w-28 h-28"
+                        >
+                            <img 
+                                src={partner.mobileLogo || partner.logo} 
+                                alt={partner.name} 
+                                className="object-contain max-w-full max-h-full transition-transform duration-300 hover:scale-110 logo-mono-tone" 
+                            />
+                        </a>
                     ))}
                 </div>
             </div>
@@ -172,6 +224,10 @@ export const Partners: React.FC = () => {
         .mask-image-gradient-sides {
             mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
             -webkit-mask-image: linear-gradient(to right, transparent, black 5%, black 95%, transparent);
+        }
+        .logo-mono-tone {
+          filter: grayscale(100%) brightness(50%) invert(1);
+          opacity: 0.85;
         }
       `}</style>
     </section>
