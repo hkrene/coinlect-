@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Button } from '@/components/Button';
 import { ScrollReveal } from '@/components/ScrollReveal';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 
 export function ResetPasswordForm() {
   const params = useSearchParams();
@@ -15,6 +16,8 @@ export function ResetPasswordForm() {
 
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -42,8 +45,8 @@ export function ResetPasswordForm() {
         const data = await res.json().catch(() => ({ error: 'Failed to reset password' }));
         throw new Error(data.error || 'Failed to reset password');
       }
-      setMessage('Votre mot de passe a été mis à jour. Vous pouvez vous connecter.');
-      setTimeout(() => router.push('/login'), 1200);
+      setMessage('Votre mot de passe a été mis à jour avec succès. Redirection en cours...');
+      setTimeout(() => router.push('/academy'), 2000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to reset password. Please try again.');
     } finally {
@@ -82,31 +85,62 @@ export function ResetPasswordForm() {
         <form className="space-y-5 sm:space-y-6" onSubmit={handleSubmit}>
           <div>
             <label className="block mb-2 text-xs font-medium text-gray-400 sm:text-sm">New Password</label>
-            <input
-              type="password"
-              required
-              minLength={8}
-              className="w-full px-3 py-3 text-sm text-white transition-colors border rounded-lg sm:px-4 sm:py-3 sm:text-base bg-black/50 border-white/10 focus:outline-none focus:border-coinlect-accent focus:ring-1 focus:ring-coinlect-accent/50"
-              placeholder="********"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                required
+                minLength={8}
+                className="w-full px-3 py-3 pr-10 text-sm text-white transition-colors border rounded-lg sm:px-4 sm:py-3 sm:text-base bg-black/50 border-white/10 focus:outline-none focus:border-coinlect-accent focus:ring-1 focus:ring-coinlect-accent/50"
+                placeholder="********"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute text-gray-400 transition-colors -translate-y-1/2 right-3 top-1/2 hover:text-white"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
+            </div>
           </div>
           <div>
             <label className="block mb-2 text-xs font-medium text-gray-400 sm:text-sm">Confirm Password</label>
-            <input
-              type="password"
-              required
-              minLength={8}
-              className="w-full px-3 py-3 text-sm text-white transition-colors border rounded-lg sm:px-4 sm:py-3 sm:text-base bg-black/50 border-white/10 focus:outline-none focus:border-coinlect-accent focus:ring-1 focus:ring-coinlect-accent/50"
-              placeholder="********"
-              value={confirm}
-              onChange={(e) => setConfirm(e.target.value)}
-            />
+            <div className="relative">
+              <input
+                type={showConfirm ? 'text' : 'password'}
+                required
+                minLength={8}
+                className="w-full px-3 py-3 pr-10 text-sm text-white transition-colors border rounded-lg sm:px-4 sm:py-3 sm:text-base bg-black/50 border-white/10 focus:outline-none focus:border-coinlect-accent focus:ring-1 focus:ring-coinlect-accent/50"
+                placeholder="********"
+                value={confirm}
+                onChange={(e) => setConfirm(e.target.value)}
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirm(!showConfirm)}
+                className="absolute text-gray-400 transition-colors -translate-y-1/2 right-3 top-1/2 hover:text-white"
+                aria-label={showConfirm ? 'Hide password' : 'Show password'}
+              >
+                {showConfirm ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
+            </div>
           </div>
 
-          <Button className="justify-center w-full py-3 text-sm font-semibold sm:py-4 sm:text-base" disabled={isLoading || !canSubmit}>
-            {isLoading ? 'Saving...' : 'Reset Password'}
+          <Button 
+            type="submit"
+            className="justify-center w-full py-3 text-sm font-semibold sm:py-4 sm:text-base" 
+            disabled={isLoading || !canSubmit}
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Saving...</span>
+              </>
+            ) : (
+              'Reset Password'
+            )}
           </Button>
         </form>
 

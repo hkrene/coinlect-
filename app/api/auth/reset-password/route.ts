@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { PrismaClient } from '@prisma/client';
 import * as crypto from 'crypto';
 import { hashPassword } from '@/lib/auth';
+import { sendPasswordResetSuccessEmail } from '@/lib/email';
 
 // Create a base PrismaClient instance for operations that need direct model access
 // (Accelerate extension may not expose newly added models immediately)
@@ -42,6 +43,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Token is invalid or expired' }, { status: 400 });
     }
 
+    // Fetch user to get email before updating password
+    const user = await basePrisma.user.findUnique({
+      where: { id: userId },
+      select: { email: true },
+    });
+
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
     const newHash = await hashPassword(password);
 
     await (basePrisma as any).$transaction([
@@ -57,6 +68,11 @@ export async function POST(req: NextRequest) {
         where: { userId },
       }),
     ]);
+
+    // Send success email (don't await to avoid blocking the response)
+    sendPasswordResetSuccessEmail({ to: user.email }).catch((err) => {
+      console.error('Failed to send password reset success email:', err);
+    });
 
     return NextResponse.json({ success: true });
   } catch (err) {
