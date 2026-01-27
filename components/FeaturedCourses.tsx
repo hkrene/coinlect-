@@ -9,6 +9,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export const FeaturedCourses: React.FC = () => {
   const { language } = useLanguage();
+  const router = useRouter();
   const isFr = language === 'fr';
   const [currentIndex, setCurrentIndex] = useState(0);
 

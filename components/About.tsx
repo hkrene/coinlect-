@@ -2,13 +2,16 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useArticles } from '../hooks/useArticles';
 import { Article } from '../types';
 import { useLanguage } from '../contexts/LanguageContext';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export const About: React.FC = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const router = useRouter();
+  const isFr = language === 'fr';
   const [currentIndex, setCurrentIndex] = useState(0);
 
   // Use React Query hook for articles
@@ -54,95 +57,115 @@ export const About: React.FC = () => {
     setCurrentIndex((prev) => (prev - 1 + featuredArticles.length) % featuredArticles.length);
   };
 
-  // Show loading state or nothing if no articles
-  if (isLoading) {
-    return (
-      <section className="py-24 bg-[#0a0a0a]">
-        <div className="container px-6 mx-auto">
-          <div className="flex flex-col items-center justify-center gap-4">
-            <div className="w-12 h-12 border-b-2 border-white rounded-full animate-spin"></div>
-            <p className="text-white">Chargement des articles...</p>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
-  if (!featured || featuredArticles.length === 0) {
-    return null; // Don't show section if no featured articles
-  }
-
   return (
-    <section className="py-24 bg-[#0a0a0a]">
-       <div className="container px-6 mx-auto">
-          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-             
-            {/* Featured Main Card */}
-            <Link href={`/academy/article/${featured.slug}`} className="lg:col-span-2 relative min-h-[500px] rounded-xl overflow-hidden group cursor-pointer border border-white/5 block">
-                <img
-                    src={featured.image}
-                    alt={featured.title}
-                    className="absolute inset-0 object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
-                    onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.src = 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765185502/clclogo_p2v5bp.jpg';
-                    }}
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+    <section className="relative py-24 overflow-hidden bg-[#020202]">
+      <div className="container relative z-10 px-6 mx-auto">
+        {/* FEATURED ARTICLES */}
+        {featured && !isLoading && (
+          <div className="relative w-full max-w-6xl mx-auto rounded-3xl border border-white/10 bg-[#0a0a0a] p-4 lg:p-8 shadow-[0_20px_80px_rgba(0,0,0,0.8)]">
+            <Link 
+              href={`/academy/article/${featured.slug}`} 
+              className="relative block w-full overflow-hidden border cursor-pointer md:min-h-[500px] rounded-2xl border-white/5 group min-h-[250px]"
+            >
+              <img
+                src={featured.image || 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765185502/clclogo_p2v5bp.jpg'}
+                alt={featured.title}
+                className="absolute inset-0 object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765185502/clclogo_p2v5bp.jpg';
+                }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent"></div>
+              
+              <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center md:p-12">
+                <span className="bg-[#222] text-gray-200 text-[10px] font-bold px-2 py-1 rounded mb-4 uppercase tracking-wider backdrop-blur-md">
+                  {isFr ? 'ARTICLE' : 'ARTICLE'}
+                </span>
                 
-                <div className="absolute inset-0 flex flex-col items-start justify-end p-8 md:p-12">
-                    <span className="bg-[#222] text-gray-200 text-[10px] font-bold px-2 py-1 rounded mb-4 uppercase tracking-wider backdrop-blur-md">
-                        ARTICLE
-                    </span>
-                    
-                    <h2 className="max-w-2xl mb-6 text-3xl font-bold leading-tight text-white md:text-5xl drop-shadow-lg">
-                        {featured.title}
-                    </h2>
-                    
-                    <div className="flex items-center gap-4 mb-8 text-sm font-medium text-gray-300">
-                        <div className="flex items-center gap-2">
-                             <img
-                                src={featured.authorImage || 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765185502/clclogo_p2v5bp.jpg'}
-                                className="w-5 h-5 rounded-full"
-                                alt={featured.authorName || featured.author?.name || 'Coinlect'}
-                                onError={(e) => {
-                                    const target = e.target as HTMLImageElement;
-                                    target.src = 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765185502/clclogo_p2v5bp.jpg';
-                                }}
-                             />
-                             <span>{featured.authorName || featured.author?.name || 'Coinlect'}</span>
-                        </div>
-                        <span className="w-1 h-1 bg-gray-500 rounded-full"></span>
-                        <span>{featured.date}</span>
+                <h2 className="max-w-3xl mb-4 text-2xl font-bold leading-tight text-white md:text-4xl drop-shadow-lg">
+                  {featured.title}
+                </h2>
+                
+                {(featured.excerpt || featured.seoDescription) && (
+                  <p className="max-w-2xl mx-auto mb-6 text-sm text-gray-300 line-clamp-2 md:text-base">
+                    {featured.excerpt || featured.seoDescription}
+                  </p>
+                )}
+                
+                <div className="flex items-center justify-center gap-4 mb-8 text-sm font-medium text-gray-300">
+                  {featured.authorImage && (
+                    <div className="flex items-center gap-2">
+                      <img
+                        src={featured.authorImage}
+                        className="w-5 h-5 rounded-full"
+                        alt={featured.author?.name || 'Coinlect'}
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.src = 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765185502/clclogo_p2v5bp.jpg';
+                        }}
+                      />
+                      <span>{featured.author?.name || 'Coinlect'}</span>
                     </div>
-                    
-                    <button className="bg-white text-black px-6 py-2.5 rounded-full font-bold text-sm hover:bg-gray-200 transition-colors">
-                        Read Article
-                    </button>
-
-                    {/* Navigation Buttons */}
-                    <div className="absolute z-20 flex gap-3 bottom-12 right-12">
-                        <button
-                            onClick={(e) => { e.preventDefault(); prevSlide(); }}
-                            className="flex items-center justify-center w-10 h-10 text-white transition-colors border rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border-white/10"
-                            aria-label="Previous article"
-                            title="Previous article"
-                        >
-                            <ChevronLeft size={20} />
-                        </button>
-                        <button
-                            onClick={(e) => { e.preventDefault(); nextSlide(); }}
-                            className="flex items-center justify-center w-10 h-10 text-white transition-colors border rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md border-white/10"
-                            aria-label="Next article"
-                            title="Next article"
-                        >
-                            <ChevronRight size={20} />
-                        </button>
-                    </div>
+                  )}
+                  {featured.date && (
+                    <>
+                      {featured.authorImage && <span className="w-1 h-1 bg-gray-500 rounded-full"></span>}
+                      <span>{featured.date}</span>
+                    </>
+                  )}
                 </div>
+                
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    router.push(`/academy/article/${featured.slug}`);
+                  }}
+                  className="inline-block px-8 py-3 text-sm font-bold text-black transition-colors bg-white rounded-full hover:bg-gray-200"
+                >
+                  {isFr ? 'Lire l\'article' : 'Read Article'}
+                </button>
+              </div>
             </Link>
+
+            {/* Navigation buttons */}
+            {featuredArticles.length > 1 && (
+              <>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    prevSlide();
+                  }}
+                  className="absolute p-2 transition-colors -translate-y-1/2 border rounded-full left-4 top-1/2 bg-black/50 border-white/10 hover:bg-black/70"
+                  aria-label={isFr ? 'Article précédent' : 'Previous article'}
+                >
+                  <ChevronLeft className="w-5 h-5 text-white" />
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    nextSlide();
+                  }}
+                  className="absolute p-2 transition-colors -translate-y-1/2 border rounded-full right-4 top-1/2 bg-black/50 border-white/10 hover:bg-black/70"
+                  aria-label={isFr ? 'Article suivant' : 'Next article'}
+                >
+                  <ChevronRight className="w-5 h-5 text-white" />
+                </button>
+              </>
+            )}
           </div>
-       </div>
+        )}
+        
+        {/* Fallback if no featured articles */}
+        {!featured && !isLoading && (
+          <div className="relative w-full max-w-6xl mx-auto rounded-3xl border border-white/10 bg-[#0a0a0a] p-4 lg:p-8 shadow-[0_20px_80px_rgba(0,0,0,0.8)]">
+            <div className="flex items-center justify-center w-full overflow-hidden border aspect-video rounded-2xl bg-gradient-to-br from-zinc-900 to-black border-white/5">
+              <span className="font-bold tracking-widest uppercase text-zinc-800">Academy Interface Preview</span>
+            </div>
+          </div>
+        )}
+      </div>
     </section>
   );
 };
