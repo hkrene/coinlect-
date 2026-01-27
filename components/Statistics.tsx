@@ -51,7 +51,7 @@ export const Statistics = () => {
         
         {/* TOP NARRATIVE: RAW TYPOGRAPHY */}
         <div className="mb-20 lg:mb-32">
-          <h2 className="mb-8 text-2xl font-bold text-white uppercase lg:text-7xl">
+          <h2 className="mb-8 text-2xl font-bold text-white lg:text-5xl">
             L&apos;Éducation <span className="text-amber-500">sans frontières.</span> <br />
             Des chiffres qui parlent d&apos;eux-mêmes.
           </h2>

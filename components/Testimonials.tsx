@@ -18,24 +18,24 @@ interface TestimonialCardProps {
 }
 
 const TestimonialCard: React.FC<TestimonialCardProps> = ({ testimonial, index }) => (
-  <div className="flex-shrink-0 w-full max-w-sm p-6 transition-all duration-300 bg-white/[0.02] border border-white/5 rounded-xl hover:border-coinlect-accent/50 group">
-    <div className="flex items-center gap-4 mb-4">
+  <div className="flex-shrink-0 w-full max-w-sm p-6 md:p-4 md:max-w-xs transition-all duration-300 bg-white/[0.02] border border-white/5 rounded-xl hover:border-coinlect-accent/50 group">
+    <div className="flex items-center gap-4 mb-4 md:gap-3 md:mb-3">
       <img
         src={testimonial.avatar}
         alt={testimonial.name}
-        className="flex-shrink-0 object-cover w-12 h-12 border rounded-full border-white/10"
+        className="flex-shrink-0 object-cover w-12 h-12 border rounded-full md:w-10 md:h-10 border-white/10"
       />
       <div>
-        <h4 className="font-semibold text-white">{testimonial.name}</h4>
-        <p className="text-sm text-gray-400">{testimonial.role}</p>
+        <h4 className="font-semibold text-white md:text-sm">{testimonial.name}</h4>
+        <p className="text-sm text-gray-400 md:text-xs">{testimonial.role}</p>
       </div>
     </div>
-    <div className="flex gap-1 mb-4">
+    <div className="flex gap-1 mb-4 md:mb-3">
       {[...Array(5)].map((_, i) => (
-        <Star key={i} size={16} className="text-yellow-400 fill-yellow-400" />
+        <Star key={i} size={16} className="text-yellow-400 md:w-3 md:h-3 fill-yellow-400" />
       ))}
     </div>
-    <blockquote className="text-base leading-relaxed text-gray-300 font-body">
+    <blockquote className="text-base leading-relaxed text-gray-300 md:text-sm font-body">
       {testimonial.content}
     </blockquote>
   </div>
