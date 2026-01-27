@@ -1,13 +1,13 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Avatar } from '@/components/Avatar';
 import { ScrollReveal } from '@/components/ScrollReveal';
 import { ComponentsLayout } from '../../components-layout';
 import { AuthGuard } from '@/components/AuthGuard';
-import { User, Calendar, Lock, Camera, Save, Loader2, ArrowLeft } from 'lucide-react';
+import { User, Lock, Save, Loader2, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/Button';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
@@ -16,10 +16,8 @@ export default function EditProfilePage() {
   const { user, refreshUser } = useAuth();
   const { t } = useLanguage();
   const router = useRouter();
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [isSaving, setIsSaving] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
   const [formData, setFormData] = useState({
@@ -102,45 +100,6 @@ export default function EditProfilePage() {
     }
   };
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setIsUploading(true);
-    setMessage(null);
-
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('upload_preset', 'coinlect-uploads');
-
-      const res = await fetch('https://api.cloudinary.com/v1_1/drsd8adkq/image/upload', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        const avatarUrl = data.secure_url;
-
-        const updateRes = await fetch('/api/auth/update-profile', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ avatar: avatarUrl }),
-        });
-
-        if (updateRes.ok) {
-          await refreshUser();
-          setMessage({ type: 'success', text: t.profile.successUpdate });
-        }
-      }
-    } catch (err) {
-      setMessage({ type: 'error', text: t.profile.errorUpdate });
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
   return (
     <AuthGuard>
       <ComponentsLayout>
@@ -160,30 +119,13 @@ export default function EditProfilePage() {
 
               {/* Header Section */}
               <div className="mb-8 text-center">
-                <div className="relative flex justify-center mb-4 group">
-                  <div className="relative">
-                    <Avatar
-                      src={user.avatar}
-                      name={user.name}
-                      email={user.email}
-                      size="xl"
-                    />
-                    <button
-                      onClick={() => fileInputRef.current?.click()}
-                      disabled={isUploading}
-                      className="absolute bottom-0 right-0 p-2 text-black transition-colors rounded-full bg-coinlect-accent hover:bg-coinlect-accent/80 disabled:opacity-50"
-                    >
-                      {isUploading ? <Loader2 size={16} className="animate-spin" /> : <Camera size={16} />}
-                    </button>
-                    <input
-                      type="file"
-                      ref={fileInputRef}
-                      onChange={handleImageUpload}
-                      accept="image/*"
-                      className="hidden"
-                      aria-label={t.profile.uploadPhoto}
-                    />
-                  </div>
+                <div className="flex justify-center mb-4">
+                  <Avatar
+                    src={user.avatar}
+                    name={user.name}
+                    email={user.email}
+                    size="xl"
+                  />
                 </div>
                 <h1 className="mb-2 text-2xl font-bold sm:text-3xl md:text-4xl">
                   {t.profile.editProfile}
