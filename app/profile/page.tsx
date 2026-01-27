@@ -95,7 +95,7 @@ export default function ProfilePage() {
                   <div className="p-4 border rounded-lg bg-black/30 border-white/10">
                     <div className="flex items-center gap-3 mb-2">
                       <Calendar className="text-coinlect-accent" size={18} />
-                      <h3 className="text-sm font-semibold tracking-wider text-gray-400 uppercase">Date d'inscription</h3>
+                      <h3 className="text-sm font-semibold tracking-wider text-gray-400 uppercase">Date d&apos;inscription</h3>
                     </div>
                     <p className="text-white">{formatDate(user.createdAt)}</p>
                   </div>
@@ -109,7 +109,7 @@ export default function ProfilePage() {
                   className="flex-1"
                   onClick={() => router.push('/academy')}
                 >
-                  Voir l'Académie
+                  Voir l&apos;Académie
                 </Button>
                 {user.role === 'ADMIN' && (
                   <Button
