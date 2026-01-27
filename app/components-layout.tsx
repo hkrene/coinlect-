@@ -11,6 +11,14 @@ export function ComponentsLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isSpecialPage = pathname === '/privacy' || pathname === '/terms' || pathname === '/login' || pathname === '/register' || pathname === '/forgot-password';
   const isAdminPage = pathname === '/admin';
+  
+  // Pages that should not have footer
+  const isNoFooterPage = 
+    pathname === '/academy' ||
+    pathname === '/donate' ||
+    (pathname?.startsWith('/academy/article/')) ||
+    (pathname?.startsWith('/academy/') && pathname !== '/academy' && !pathname.startsWith('/academy/article/')) ||
+    (pathname?.startsWith('/deals/') && pathname !== '/deals');
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -34,8 +42,8 @@ export function ComponentsLayout({ children }: { children: React.ReactNode }) {
       <main className={`flex-grow ${isAdminPage ? 'pt-16' : ''}`}>
         {children}
       </main>
-      {!isSpecialPage && !isAdminPage && <Footer />}
-      {!isSpecialPage && !isAdminPage && <ChatAssistant />}
+      {!isSpecialPage && !isAdminPage && !isNoFooterPage && <Footer />}
+      {!isSpecialPage && !isAdminPage && !isNoFooterPage && <ChatAssistant />}
     </div>
   );
 }
