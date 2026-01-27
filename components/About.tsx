@@ -141,29 +141,6 @@ export const About: React.FC = () => {
                     </div>
                 </div>
             </Link>
-
-             {/* Sidebar List */}
-             {/* <div className="bg-[#111] rounded-xl p-8 border border-white/5 flex flex-col h-full">
-                <h3 className="mb-8 text-xs font-bold tracking-widest text-white uppercase">LATEST</h3>
-                
-                <div className="flex flex-col justify-between flex-1 gap-6">
-                    {latestArticles.map((article) => (
-                        <Link href={`/academy/article/${article.slug}`} key={article.id} className="block group">
-                            <h4 className="mb-2 text-base font-bold leading-snug text-white transition-colors group-hover:text-coinlect-accent line-clamp-2">
-                                {article.title}
-                            </h4>
-                            <div className="flex items-center gap-2 text-[10px] text-gray-500 font-medium">
-                                <span className="text-gray-400">{article.category || 'Trending'}</span>
-                                <span className="w-0.5 h-0.5 bg-gray-600 rounded-full"></span>
-                                <span>{article.date}</span>
-                                <span className="w-0.5 h-0.5 bg-gray-600 rounded-full"></span>
-                                <span>{article.readTime} read</span>
-                            </div>
-                        </Link>
-                    ))}
-                </div>
-             </div> */}
-
           </div>
        </div>
     </section>

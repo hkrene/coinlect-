@@ -5,6 +5,7 @@ import { Ticker } from '../components/Ticker';
 import { About } from '../components/About';
 import { Partners } from '../components/Partners';
 import { Features } from '../components/Features';
+import { Statistics } from '../components/Statistics';
 import { Testimonials } from '../components/Testimonials';
 import { FAQ } from '../components/FAQ';
 import { ScrollReveal } from '../components/ScrollReveal';
@@ -19,6 +20,7 @@ export const Home: React.FC = () => {
         <About />
       </ScrollReveal>
       <Partners />
+      <Statistics />
       <ScrollReveal>
         <Features />
       </ScrollReveal>
