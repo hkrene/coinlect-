@@ -389,6 +389,38 @@ export const translations = {
         title: "Rejoignez la",
         titleSuffix: "Révolution",
         subtitle: "Connectez-vous avec des milliers de traders, développeurs et passionnés. Partagez des idées, obtenez du soutien et façonnez l'avenir de la finance ensemble.",
+        page: {
+            titlePrefix: "Nos",
+            titleMain: "Communautés",
+            subtitle: "Connectez-vous avec des milliers de passionnés à travers nos différentes plateformes.",
+            categories: [
+                {
+                    name: "Canaux Officiels",
+                    items: [
+                        { name: "Twitter (X)", desc: "Actualités & News crypto." },
+                        { name: "LinkedIn", desc: "Réseau pro & carrières." },
+                        { name: "Telegram Community", desc: "Actualités & News crypto." },
+                        { name: "WhatsApp Channel", desc: "Directement dans votre poche." },
+                        { name: "Instagram", desc: "Contenu éducatif & Stories." },
+                        { name: "CoinMarketCap", desc: "Suivez nos articles sur CMC." }
+                    ]
+                },
+                {
+                    name: "Communauté & Chat",
+                    items: [
+                        { name: "Telegram Community", desc: "Le hub de discussion principal." },
+                        { name: "WhatsApp Groupe", desc: "Entraide mentors et étudiants." }
+                    ]
+                },
+                {
+                    name: "Vidéos & Tutoriels",
+                    items: [
+                        { name: "YouTube", desc: "Cours complets & analyses live." },
+                        { name: "TikTok", desc: "Analyses rapides & Trends." }
+                    ]
+                }
+            ]
+        },
         discord: { title: "Serveur Discord", desc: "Discutez en direct avec la communauté, rejoignez les salons vocaux et obtenez une aide instantanée.", cta: "Rejoindre Discord" },
         twitter: { title: "Twitter / X", desc: "Restez informé des dernières nouvelles, annonces et analyses de marché.", cta: "Nous Suivre" },
         github: { title: "Développeurs", desc: "Contribuez à nos dépôts open source et construisez sur notre API.", cta: "Voir GitHub" }
@@ -866,6 +898,38 @@ export const translations = {
         title: "Join the",
         titleSuffix: "Revolution",
         subtitle: "Connect with thousands of traders, developers, and enthusiasts. Share ideas, get support, and shape the future of finance together.",
+        page: {
+            titlePrefix: "Our",
+            titleMain: "Communities",
+            subtitle: "Connect with thousands of enthusiasts across our different platforms.",
+            categories: [
+                {
+                    name: "Official Channels",
+                    items: [
+                        { name: "Twitter (X)", desc: "Crypto news & updates." },
+                        { name: "LinkedIn", desc: "Professional network & careers." },
+                        { name: "Telegram Community", desc: "Crypto news & updates." },
+                        { name: "WhatsApp Channel", desc: "Right in your pocket." },
+                        { name: "Instagram", desc: "Educational content & stories." },
+                        { name: "CoinMarketCap", desc: "Follow our articles on CMC." }
+                    ]
+                },
+                {
+                    name: "Community & Chat",
+                    items: [
+                        { name: "Telegram Community", desc: "The main discussion hub." },
+                        { name: "WhatsApp Group", desc: "Mentors and students support." }
+                    ]
+                },
+                {
+                    name: "Videos & Tutorials",
+                    items: [
+                        { name: "YouTube", desc: "Complete courses & live analysis." },
+                        { name: "TikTok", desc: "Quick analysis & trends." }
+                    ]
+                }
+            ]
+        },
         discord: { title: "Discord Server", desc: "Chat live with the community, join voice channels, and get instant support.", cta: "Join Discord" },
         twitter: { title: "Twitter / X", desc: "Stay updated with the latest news, announcements, and market analysis.", cta: "Follow Us" },
         github: { title: "Developers", desc: "Contribute to our open source repositories and build on our API.", cta: "View GitHub" }
