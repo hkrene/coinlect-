@@ -2,8 +2,9 @@
 import React from 'react';
 import { Hero } from '../components/Hero';
 import { Ticker } from '../components/Ticker';
-import { About } from '../components/About';
 import { Partners } from '../components/Partners';
+import { FeaturedCourses } from '../components/FeaturedCourses';
+import { About } from '../components/About';
 import { Features } from '../components/Features';
 import { Statistics } from '../components/Statistics';
 import { Testimonials } from '../components/Testimonials';
@@ -16,10 +17,11 @@ export const Home: React.FC = () => {
     <>
       <Hero />
       <Ticker />
+      <Partners />
+      <FeaturedCourses />
       <ScrollReveal>
         <About />
       </ScrollReveal>
-      <Partners />
       <Statistics />
       <ScrollReveal>
         <Features />

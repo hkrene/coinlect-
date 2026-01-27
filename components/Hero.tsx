@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useCourses } from '../hooks/useCourses';
@@ -10,6 +11,7 @@ import { Play, ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
 export const Hero: React.FC = () => {
   const { t, language } = useLanguage();
   const { isAuthenticated } = useAuth();
+  const router = useRouter();
   const isFr = language === 'fr';
   const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -140,13 +142,16 @@ export const Hero: React.FC = () => {
                   )}
                 </div>
                 
-                <Link 
-                  href={`/academy/${featured.slug}`}
+                <button 
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    router.push(`/academy/${featured.slug}`);
+                  }}
                   className="inline-block px-8 py-3 text-sm font-bold text-black transition-colors bg-white rounded-full hover:bg-gray-200"
-                  onClick={(e) => e.stopPropagation()}
                 >
                   {isFr ? 'Voir le cours' : 'View Course'}
-                </Link>
+                </button>
               </div>
             </Link>
             {/* Fade out bottom to blend with next section */}
