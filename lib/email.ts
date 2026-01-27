@@ -10,8 +10,9 @@ function getResendClient() {
 }
 
 function getFromAddress() {
-  // Resend requires a verified sender domain for production. For dev, `onboarding@resend.dev` works.
-  return process.env.RESEND_FROM || 'Coinlect <onboarding@resend.dev>';
+  // Resend requires a verified sender domain for production.
+  // Using the verified domain: mail.coinlect.org
+  return process.env.RESEND_FROM || 'Coinlect <hello@mail.coinlect.org>';
 }
 
 function getAppBaseUrl() {
