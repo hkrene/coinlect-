@@ -145,7 +145,7 @@ export const About: React.FC = () => {
 
             <div className="flex items-center justify-center md:w-1/2">
               <img
-                src="https://res.cloudinary.com/drsd8adkq/image/upload/v1766400615/coinlect-fest_hreelt.jpg"
+                src="https://res.cloudinary.com/drsd8adkq/image/upload/v1765185502/clclogo_p2v5bp.jpg"
                 alt="CoinLect Academy"
                 className="w-2/3 h-auto"
                 onError={(e) => {
