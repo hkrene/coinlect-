@@ -10,6 +10,7 @@ interface User {
   avatar: string | null;
   role: 'ADMIN' | 'USER';
   createdAt?: string;
+  dateOfBirth?: string | null;
 }
 
 interface AuthContextType {
