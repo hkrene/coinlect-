@@ -156,6 +156,18 @@ export const translations = {
       titleSuffix: "affiliés & Ecosystem",
       desc: "Nous collaborons avec les leaders de l'industrie pour vous offrir le meilleur."
     },
+    statistics: {
+      title: "L'Éducation",
+      titleSuffix: "sans frontières.",
+      subtitle: "Des chiffres qui parlent d'eux-mêmes.",
+      description: "Coinlect Academy n'est pas qu'une plateforme. C'est l'épicentre de la croissance financière en Afrique francophone.",
+      stats: [
+        { value: 1000, suffix: '+', label: 'Apprenants' },
+        { value: 45, suffix: '+', label: 'Modules' },
+        { value: 98, suffix: '%', label: 'Satisfaction' },
+        { value: 10, suffix: 'M+', label: 'Target' },
+      ]
+    },
     testimonials: {
       title: "Ce que disent nos",
       titleSuffix: "utilisateurs",
@@ -226,6 +238,80 @@ export const translations = {
         title: "FORMEZ-VOUS SUR LA",
         titleSuffix: "BLOCKCHAIN ET LES CRYPTOS",
         subtitle: "Rejoignez une communauté mondiale et informez-vous gratuitement sur les cryptomonnaies et la blockchain !",
+        hero: {
+            titlePrefix: "Apprenez la",
+            titleMain: "Crypto",
+            titleMiddle: "et la",
+            titleHighlight: "Blockchain",
+            titleSuffix: "facilement",
+            subtitle: "Maîtrisez les fondamentaux de la Finance Décentralisée (DeFi), des smart contracts et de l'infrastructure Web3."
+        },
+        emptyStates: {
+            noCourses: "Aucun cours trouvé.",
+            noArticles: "Aucun article trouvé."
+        },
+        tradingTools: {
+            title: "Outils de Trading",
+            description: "Scanners de marché, explorateurs et plateformes d'analyse utilisés par les traders actifs.",
+            items: [
+                { title: "DexScreener", desc: "Graphiques en temps réel et historique de trading" },
+                { title: "DexTools", desc: "Le hub central pour les traders DeFi" },
+                { title: "BaseScan", desc: "Explorateur de blocs de l'écosystème Base" },
+                { title: "EtherScan", desc: "Explorateur de la blockchain Ethereum" },
+                { title: "BscScan", desc: "Explorateur de blocs pour la BNB Smart Chain" },
+                { title: "Solscan", desc: "Analyse et explorateur de l'écosystème Solana" },
+                { title: "Tonviewer", desc: "Explorateur de données pour le réseau TON" },
+                { title: "Tonscan", desc: "Explorateur de blockchain officiel de TON" },
+                { title: "CoinGecko", desc: "Données de marché et classement des cryptos" },
+                { title: "CoinMarketCap", desc: "Suivi des prix, capitalisation et volumes" },
+                { title: "SuiScan", desc: "Explorateur de blocs et d'objets pour Sui" },
+                { title: "RugCheck", desc: "Vérification de sécurité et détection de scam" },
+                { title: "LunarCrush", desc: "Analyse des réseaux sociaux et sentiments Web3" }
+            ]
+        },
+        ecosystems: {
+            titlePrefix: "Explorez les",
+            titleMain: "Protocoles",
+            titleMiddle: "et",
+            titleHighlight: "Écosystèmes",
+            titleSuffix: "Blockchain",
+            subtitle: "Maîtrisez le développement sur les réseaux les plus puissants avec nos guides techniques.",
+            items: [
+                {
+                    title: "Ethereum",
+                    desc: "Le standard des smart contracts. Apprenez à utiliser Hardhat et Solidity.",
+                    links: [
+                        { name: "Hardhat Guide", href: "https://hardhat.org/" },
+                        { name: "Solidity", href: "https://www.soliditylang.org/" }
+                    ]
+                },
+                {
+                    title: "Bitcoin",
+                    desc: "Explorez la couche de base et les solutions L2 comme Lightning et Stacks.",
+                    links: [{ name: "Lightning", href: "https://lightning.network/" }]
+                },
+                {
+                    title: "Base (L2)",
+                    desc: "L'écosystème L2 de Coinbase. Compatibilité EVM totale.",
+                    links: [{ name: "Base Docs", href: "https://www.base.org/" }]
+                },
+                {
+                    title: "TON Network",
+                    desc: "Adoption de masse via Telegram. Développez avec FunC et Tact.",
+                    links: [{ name: "TON SDK", href: "https://docs.ton.org/" }]
+                },
+                {
+                    title: "Sui Blockchain",
+                    desc: "Modèle objet via Move. Performance extrême pour le gaming.",
+                    links: [{ name: "Sui Move", href: "https://www.sui.io/" }]
+                },
+                {
+                    title: "Binance Smart Chain",
+                    desc: "La blockchain EVM pour la DeFi. Compatible tools Ethereum.",
+                    links: [{ name: "BSC Dev", href: "https://www.bnbchain.org/en" }]
+                }
+            ]
+        },
         searchPlaceholder: "Rechercher dans le glossaire...",
         filters: ["Tous", "Blockchain", "Trading", "DeFi", "NFT", "Sécurité", "Mining"],
         tabs: { courses: "Cours", articles: "Articles & Analyse" },
@@ -250,19 +336,6 @@ export const translations = {
             api: { title: "Doc API Coinlect", desc: "Intégrez les données de marché en temps réel et les fonctions de trading automatisées directement dans vos applications." },
             solidity: { title: "Masterclass Solidity", desc: "Apprenez à développer, tester et déployer des smart contracts sécurisés sur Ethereum et les chaînes EVM." },
             security: { title: "Sécurité Blockchain", desc: "Guide des meilleures pratiques pour auditer votre code et prévenir les vulnérables courantes (Reentrancy, Overflow)." }
-        },
-        tradingTools: {
-          title: "Outils de Trading",
-          dexscreener: { title: "Dexscreener", desc: "Analyse en temps réel des marchés décentralisés." },
-          dextools: { title: "Dextools", desc: "Données de trading DeFi et outils pour les DEX." },
-          basescan: { title: "Basescan", desc: "Explorateur de blocs pour la blockchain Base." },
-          etherscan: { title: "Etherscan", desc: "Explorateur de blocs pour Ethereum." },
-          tonscan: { title: "Tonscan", desc: "Explorateur de blocs pour The Open Network (TON)." },
-          bscscan: { title: "Bscscan", desc: "Explorateur de blocs pour Binance Smart Chain (BSC)." },
-          solscan: { title: "Solscan", desc: "Explorateur de blocs pour Solana." },
-          coingecko: { title: "CoinGecko", desc: "Données de prix, capitalisation boursière et volume pour les cryptomonnaies." },
-          coinmarketcap: { title: "CoinMarketCap", desc: "Classements de cryptomonnaies, graphiques et volumes d'échange." },
-          more: { title: "Plus d'Outils", desc: "Découvrez d'autres ressources et outils essentiels." }
         },
         article: {
             writtenBy: "Écrit par",
@@ -316,6 +389,38 @@ export const translations = {
         title: "Rejoignez la",
         titleSuffix: "Révolution",
         subtitle: "Connectez-vous avec des milliers de traders, développeurs et passionnés. Partagez des idées, obtenez du soutien et façonnez l'avenir de la finance ensemble.",
+        page: {
+            titlePrefix: "Nos",
+            titleMain: "Communautés",
+            subtitle: "Connectez-vous avec des milliers de passionnés à travers nos différentes plateformes.",
+            categories: [
+                {
+                    name: "Canaux Officiels",
+                    items: [
+                        { name: "Twitter (X)", desc: "Actualités & News crypto." },
+                        { name: "LinkedIn", desc: "Réseau pro & carrières." },
+                        { name: "Telegram Community", desc: "Actualités & News crypto." },
+                        { name: "WhatsApp Channel", desc: "Directement dans votre poche." },
+                        { name: "Instagram", desc: "Contenu éducatif & Stories." },
+                        { name: "CoinMarketCap", desc: "Suivez nos articles sur CMC." }
+                    ]
+                },
+                {
+                    name: "Communauté & Chat",
+                    items: [
+                        { name: "Telegram Community", desc: "Le hub de discussion principal." },
+                        { name: "WhatsApp Groupe", desc: "Entraide mentors et étudiants." }
+                    ]
+                },
+                {
+                    name: "Vidéos & Tutoriels",
+                    items: [
+                        { name: "YouTube", desc: "Cours complets & analyses live." },
+                        { name: "TikTok", desc: "Analyses rapides & Trends." }
+                    ]
+                }
+            ]
+        },
         discord: { title: "Serveur Discord", desc: "Discutez en direct avec la communauté, rejoignez les salons vocaux et obtenez une aide instantanée.", cta: "Rejoindre Discord" },
         twitter: { title: "Twitter / X", desc: "Restez informé des dernières nouvelles, annonces et analyses de marché.", cta: "Nous Suivre" },
         github: { title: "Développeurs", desc: "Contribuez à nos dépôts open source et construisez sur notre API.", cta: "Voir GitHub" }
@@ -560,6 +665,18 @@ export const translations = {
       titleSuffix: "Partners & Ecosystem",
       desc: "We collaborate with industry leaders to offer you the best."
     },
+    statistics: {
+      title: "Education",
+      titleSuffix: "without borders.",
+      subtitle: "Numbers that speak for themselves.",
+      description: "Coinlect Academy is more than just a platform. It's the epicenter of financial growth in Francophone Africa.",
+      stats: [
+        { value: 1000, suffix: '+', label: 'Learners' },
+        { value: 45, suffix: '+', label: 'Modules' },
+        { value: 98, suffix: '%', label: 'Satisfaction' },
+        { value: 10, suffix: 'M+', label: 'Target' },
+      ]
+    },
     testimonials: {
       title: "What our",
       titleSuffix: "users say",
@@ -630,6 +747,80 @@ export const translations = {
         title: "LEARN BLOCKCHAIN",
         titleSuffix: "AND CRYPTOS",
         subtitle: "Join a global community and learn about cryptocurrencies and blockchain for free!",
+        hero: {
+            titlePrefix: "Learn",
+            titleMain: "Crypto",
+            titleMiddle: "and",
+            titleHighlight: "Blockchain",
+            titleSuffix: "easily",
+            subtitle: "Master the fundamentals of Decentralized Finance (DeFi), smart contracts, and Web3 infrastructure."
+        },
+        emptyStates: {
+            noCourses: "No courses found.",
+            noArticles: "No articles found."
+        },
+        tradingTools: {
+            title: "Trading Tools",
+            description: "Market scanners, explorers, and analysis platforms used by active traders.",
+            items: [
+                { title: "DexScreener", desc: "Real-time charts and trading history" },
+                { title: "DexTools", desc: "The central hub for DeFi traders" },
+                { title: "BaseScan", desc: "Block explorer for the Base ecosystem" },
+                { title: "EtherScan", desc: "Ethereum blockchain explorer" },
+                { title: "BscScan", desc: "Block explorer for BNB Smart Chain" },
+                { title: "Solscan", desc: "Analysis and explorer for the Solana ecosystem" },
+                { title: "Tonviewer", desc: "Data explorer for the TON network" },
+                { title: "Tonscan", desc: "Official TON blockchain explorer" },
+                { title: "CoinGecko", desc: "Market data and crypto rankings" },
+                { title: "CoinMarketCap", desc: "Price tracking, market cap, and volumes" },
+                { title: "SuiScan", desc: "Block and object explorer for Sui" },
+                { title: "RugCheck", desc: "Security verification and scam detection" },
+                { title: "LunarCrush", desc: "Social media analysis and Web3 sentiment" }
+            ]
+        },
+        ecosystems: {
+            titlePrefix: "Explore",
+            titleMain: "Protocols",
+            titleMiddle: "and",
+            titleHighlight: "Blockchain",
+            titleSuffix: "Ecosystems",
+            subtitle: "Master development on the most powerful networks with our technical guides.",
+            items: [
+                {
+                    title: "Ethereum",
+                    desc: "The smart contract standard. Learn to use Hardhat and Solidity.",
+                    links: [
+                        { name: "Hardhat Guide", href: "https://hardhat.org/" },
+                        { name: "Solidity", href: "https://www.soliditylang.org/" }
+                    ]
+                },
+                {
+                    title: "Bitcoin",
+                    desc: "Explore the base layer and L2 solutions like Lightning and Stacks.",
+                    links: [{ name: "Lightning", href: "https://lightning.network/" }]
+                },
+                {
+                    title: "Base (L2)",
+                    desc: "Coinbase's L2 ecosystem. Full EVM compatibility.",
+                    links: [{ name: "Base Docs", href: "https://www.base.org/" }]
+                },
+                {
+                    title: "TON Network",
+                    desc: "Mass adoption via Telegram. Develop with FunC and Tact.",
+                    links: [{ name: "TON SDK", href: "https://docs.ton.org/" }]
+                },
+                {
+                    title: "Sui Blockchain",
+                    desc: "Object model via Move. Extreme performance for gaming.",
+                    links: [{ name: "Sui Move", href: "https://www.sui.io/" }]
+                },
+                {
+                    title: "Binance Smart Chain",
+                    desc: "The EVM blockchain for DeFi. Compatible with Ethereum tools.",
+                    links: [{ name: "BSC Dev", href: "https://www.bnbchain.org/en" }]
+                }
+            ]
+        },
         searchPlaceholder: "Search glossary...",
         filters: ["All", "Blockchain", "Trading", "DeFi", "NFT", "Security", "Mining"],
         tabs: { courses: "Courses", articles: "Articles & Analysis" },
@@ -654,19 +845,6 @@ export const translations = {
             api: { title: "Coinlect API Docs", desc: "Integrate real-time market data and automated trading features directly into your applications." },
             solidity: { title: "Solidity Masterclass", desc: "Learn to develop, test, and deploy secure smart contracts on Ethereum and EVM chains." },
             security: { title: "Blockchain Security", desc: "Guide to best practices for auditing your code and preventing common vulnerabilities (Reentrancy, Overflow)." }
-        },
-        tradingTools: {
-          title: "Trading Tools",
-          dexscreener: { title: "Dexscreener", desc: "Real-time decentralized market analysis." },
-          dextools: { title: "Dextools", desc: "DeFi trading data and tools for DEXs." },
-          basescan: { title: "Basescan", desc: "Block explorer for the Base blockchain." },
-          etherscan: { title: "Etherscan", desc: "Block explorer for Ethereum." },
-          tonscan: { title: "Tonscan", desc: "Block explorer for The Open Network (TON)." },
-          bscscan: { title: "Bscscan", desc: "Block explorer for Binance Smart Chain (BSC)." },
-          solscan: { title: "Solscan", desc: "Block explorer for Solana." },
-          coingecko: { title: "CoinGecko", desc: "Crypto prices, market cap, and exchange volumes." },
-          coinmarketcap: { title: "CoinMarketCap", desc: "Cryptocurrency rankings, charts, and trading volumes." },
-          more: { title: "More Tools", desc: "Discover other essential resources and tools." }
         },
         article: {
             writtenBy: "Written by",
@@ -720,6 +898,38 @@ export const translations = {
         title: "Join the",
         titleSuffix: "Revolution",
         subtitle: "Connect with thousands of traders, developers, and enthusiasts. Share ideas, get support, and shape the future of finance together.",
+        page: {
+            titlePrefix: "Our",
+            titleMain: "Communities",
+            subtitle: "Connect with thousands of enthusiasts across our different platforms.",
+            categories: [
+                {
+                    name: "Official Channels",
+                    items: [
+                        { name: "Twitter (X)", desc: "Crypto news & updates." },
+                        { name: "LinkedIn", desc: "Professional network & careers." },
+                        { name: "Telegram Community", desc: "Crypto news & updates." },
+                        { name: "WhatsApp Channel", desc: "Right in your pocket." },
+                        { name: "Instagram", desc: "Educational content & stories." },
+                        { name: "CoinMarketCap", desc: "Follow our articles on CMC." }
+                    ]
+                },
+                {
+                    name: "Community & Chat",
+                    items: [
+                        { name: "Telegram Community", desc: "The main discussion hub." },
+                        { name: "WhatsApp Group", desc: "Mentors and students support." }
+                    ]
+                },
+                {
+                    name: "Videos & Tutorials",
+                    items: [
+                        { name: "YouTube", desc: "Complete courses & live analysis." },
+                        { name: "TikTok", desc: "Quick analysis & trends." }
+                    ]
+                }
+            ]
+        },
         discord: { title: "Discord Server", desc: "Chat live with the community, join voice channels, and get instant support.", cta: "Join Discord" },
         twitter: { title: "Twitter / X", desc: "Stay updated with the latest news, announcements, and market analysis.", cta: "Follow Us" },
         github: { title: "Developers", desc: "Contribute to our open source repositories and build on our API.", cta: "View GitHub" }

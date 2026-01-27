@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useRef } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const CountUpNumber: React.FC<{ target: number; suffix?: string }> = ({ 
   target, 
@@ -38,12 +39,8 @@ const CountUpNumber: React.FC<{ target: number; suffix?: string }> = ({
 };
 
 export const Statistics = () => {
-  const stats = [
-    { value: 1000, suffix: '+', label: 'Apprenants' },
-    { value: 45, suffix: '+', label: 'Modules' },
-    { value: 98, suffix: '%', label: 'Satisfaction' },
-    { value: 10, suffix: 'M+', label: 'Target' },
-  ];
+  const { t } = useLanguage();
+  const stats = t.statistics.stats;
 
   return (
     <section className="px-6 py-20 bg-black lg:py-40 border-y border-white/10">
@@ -51,12 +48,12 @@ export const Statistics = () => {
         
         {/* TOP NARRATIVE: RAW TYPOGRAPHY */}
         <div className="mb-20 lg:mb-32">
-          <h2 className="mb-8 text-2xl font-bold text-white uppercase lg:text-7xl">
-            L&apos;Éducation <span className="text-amber-500">sans frontières.</span> <br />
-            Des chiffres qui parlent d&apos;eux-mêmes.
+          <h2 className="mb-8 text-2xl font-bold text-white lg:text-5xl">
+            {t.statistics.title} <span className="text-amber-500">{t.statistics.titleSuffix}</span> <br />
+            {t.statistics.subtitle}
           </h2>
           <p className="text-sm font-medium text-zinc-500 lg:text-xl">
-            Coinlect Academy n&apos;est pas qu&apos;une plateforme. C&apos;est l&apos;épicentre de la croissance financière en Afrique francophone.
+            {t.statistics.description}
           </p>
         </div>
 

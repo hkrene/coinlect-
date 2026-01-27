@@ -242,14 +242,14 @@ export const Academy: React.FC = () => {
             <ScrollReveal>
                 <div className="max-w-5xl mx-auto">
                     <h1 className="mb-8 text-4xl  font-bold leading-[1.1] tracking-tighter text-white md:text-6xl lg:text-6xl">
-                        <span className="text-[#a1a1aa]">Apprenez la</span>{' '}Crypto{' '}<span className="text-[#a1a1aa]">et la</span>{' '}<br className="hidden md:block" />
+                        <span className="text-[#a1a1aa]">{t.academy.hero.titlePrefix}</span>{' '}{t.academy.hero.titleMain}{' '}<span className="text-[#a1a1aa]">{t.academy.hero.titleMiddle}</span>{' '}<br className="hidden md:block" />
                         <span className="relative inline-block text-white">
                             <span className="absolute inset-x-0 top-1/2 h-[2px] w-[110%] -translate-x-[5%] bg-white -rotate-2 z-10" />
-                            Blockchain
-                        </span>{' '}<span className="text-[#a1a1aa]">facilement</span>
+                            {t.academy.hero.titleHighlight}
+                        </span>{' '}<span className="text-[#a1a1aa]">{t.academy.hero.titleSuffix}</span>
                     </h1>
                     <p className="max-w-3xl mx-auto text-sm leading-relaxed text-[#71717a] md:text-sm lg:text-sm">
-                        Maîtrisez les fondamentaux de la Finance Décentralisée (DeFi), des smart contracts et de l&apos;infrastructure Web3.
+                        {t.academy.hero.subtitle}
                     </p>
                 </div>
             </ScrollReveal>
@@ -283,9 +283,9 @@ export const Academy: React.FC = () => {
           {/* Tab Content */}
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
               {activeTab === 'courses' ? (
-                  getFilteredCourses().length > 0 ? getFilteredCourses().map((c, i) => <CourseCard key={c.id} course={c} delay={i * 100} />) : <div className="py-20 text-center text-gray-500 col-span-full">Aucun cours trouvé.</div>
+                  getFilteredCourses().length > 0 ? getFilteredCourses().map((c, i) => <CourseCard key={c.id} course={c} delay={i * 100} />) : <div className="py-20 text-center text-gray-500 col-span-full">{t.academy.emptyStates.noCourses}</div>
               ) : (
-                  getFilteredArticles().length > 0 ? getFilteredArticles().map((a, i) => <ArticleCard key={a.id} article={a} delay={i * 100} />) : <div className="py-20 text-center text-gray-500 col-span-full">Aucun article trouvé.</div>
+                  getFilteredArticles().length > 0 ? getFilteredArticles().map((a, i) => <ArticleCard key={a.id} article={a} delay={i * 100} />) : <div className="py-20 text-center text-gray-500 col-span-full">{t.academy.emptyStates.noArticles}</div>
               )}
           </div>
 
@@ -296,28 +296,30 @@ export const Academy: React.FC = () => {
         {t.academy.tradingTools.title}
       </h2>
       <p className="max-w-xl text-sm text-slate-400">
-        Scanners de marché, explorateurs et plateformes d&apos;analyse utilisés par les traders actifs.
+        {t.academy.tradingTools.description}
       </p>
   </header>
   <div className="flex gap-4 pb-4 overflow-x-auto scrollbar-hide">
-        {[
-          { title: "DexScreener", desc: "Graphiques en temps réel et historique de trading", link: "https://dexscreener.com/" },
-          { title: "DexTools", desc: "Le hub central pour les traders DeFi", link: "https://dextools.io/" },
-          { title: "BaseScan", desc: "Explorateur de blocs de l'écosystème Base", link: "https://basescan.org/" },
-          { title: "EtherScan", desc: "Explorateur de la blockchain Ethereum", link: "https://etherscan.io/" },
-          { title: "BscScan", desc: "Explorateur de blocs pour la BNB Smart Chain", link: "https://bscscan.com/" },
-          { title: "Solscan", desc: "Analyse et explorateur de l'écosystème Solana", link: "https://solscan.io/" },
-          { title: "Tonviewer", desc: "Explorateur de données pour le réseau TON", link: "https://tonviewer.com/" },
-          { title: "Tonscan", desc: "Explorateur de blockchain officiel de TON", link: "https://tonscan.org/" },
-          { title: "CoinGecko", desc: "Données de marché et classement des cryptos", link: "https://www.coingecko.com/" },
-          { title: "CoinMarketCap", desc: "Suivi des prix, capitalisation et volumes", link: "https://coinmarketcap.com/" },
-          { title: "SuiScan", desc: "Explorateur de blocs et d'objets pour Sui", link: "https://suiscan.xyz/" },
-          { title: "RugCheck", desc: "Vérification de sécurité et détection de scam", link: "https://rugcheck.xyz/" },
-          { title: "LunarCrush", desc: "Analyse des réseaux sociaux et sentiments Web3", link: "https://lunarcrush.com/" },
-        ].map((item, idx) => (
+        {t.academy.tradingTools.items.map((item, idx) => {
+          const links: { [key: string]: string } = {
+            "DexScreener": "https://dexscreener.com/",
+            "DexTools": "https://dextools.io/",
+            "BaseScan": "https://basescan.org/",
+            "EtherScan": "https://etherscan.io/",
+            "BscScan": "https://bscscan.com/",
+            "Solscan": "https://solscan.io/",
+            "Tonviewer": "https://tonviewer.com/",
+            "Tonscan": "https://tonscan.org/",
+            "CoinGecko": "https://www.coingecko.com/",
+            "CoinMarketCap": "https://coinmarketcap.com/",
+            "SuiScan": "https://suiscan.xyz/",
+            "RugCheck": "https://rugcheck.xyz/",
+            "LunarCrush": "https://lunarcrush.com/"
+          };
+          return (
             <a 
               key={idx} 
-              href={item.link} 
+              href={links[item.title] || "#"} 
               target="_blank" 
               rel="noopener noreferrer" 
               className="relative flex flex-col justify-between flex-shrink-0 w-64 p-5 overflow-hidden transition-all border rounded-none group md:w-80 border-white/10 bg-white/5 hover:border-coinlect-accent hover:bg-coinlect-accent/10"
@@ -332,7 +334,8 @@ export const Academy: React.FC = () => {
                     </p>
                 </div>
             </a>
-        ))}
+          );
+        })}
   </div>
 </ScrollReveal>
       </div>
@@ -359,47 +362,16 @@ export const Academy: React.FC = () => {
 
       {/* Grid sans bordure extérieure */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-        {[
-          { 
-            title: "Ethereum", 
-            logo: "https://cryptologos.cc/logos/ethereum-eth-logo.svg?v=024", 
-            desc: "Le standard des smart contracts. Apprenez à utiliser Hardhat et Solidity.", 
-            links: [
-              { name: "Hardhat Guide", href: "https://hardhat.org/" },
-              { name: "Solidity", href: "https://www.soliditylang.org/" }
-            ] 
-          },
-          { 
-            title: "Bitcoin", 
-            logo: "https://cryptologos.cc/logos/bitcoin-btc-logo.svg?v=024", 
-            desc: "Explorez la couche de base et les solutions L2 comme Lightning et Stacks.", 
-            links: [{ name: "Lightning", href: "https://lightning.network/" }] 
-          },
-          { 
-            title: "Base (L2)", 
-            logo: "https://cdn.brandfetch.io/id6XsSOVVS/w/400/h/400/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1757929784005", 
-            desc: "L'écosystème L2 de Coinbase. Compatibilité EVM totale.", 
-            links: [{ name: "Base Docs", href: "https://www.base.org/" }] 
-          },
-          { 
-            title: "TON Network", 
-            logo: "https://cryptologos.cc/logos/toncoin-ton-logo.svg?v=024", 
-            desc: "Adoption de masse via Telegram. Développez avec FunC et Tact.", 
-            links: [{ name: "TON SDK", href: "https://docs.ton.org/" }] 
-          },
-          { 
-            title: "Sui Blockchain", 
-            logo: "https://cryptologos.cc/logos/sui-sui-logo.svg?v=024", 
-            desc: "Modèle objet via Move. Performance extrême pour le gaming.", 
-            links: [{ name: "Sui Move", href: "https://www.sui.io/" }] 
-          },
-          { 
-            title: "Binance Smart Chain", 
-            logo: "https://cryptologos.cc/logos/bnb-bnb-logo.svg?v=024", 
-            desc: "La blockchain EVM pour la DeFi. Compatible tools Ethereum.", 
-            links: [{ name: "BSC Dev", href: "https://www.bnbchain.org/en" }] 
-          }
-        ].map((item, index) => (
+        {t.academy.ecosystems.items.map((item, index) => {
+          const logos: { [key: string]: string } = {
+            "Ethereum": "https://cryptologos.cc/logos/ethereum-eth-logo.svg?v=024",
+            "Bitcoin": "https://cryptologos.cc/logos/bitcoin-btc-logo.svg?v=024",
+            "Base (L2)": "https://cdn.brandfetch.io/id6XsSOVVS/w/400/h/400/theme/dark/icon.jpeg?c=1bxid64Mup7aczewSAYMX&t=1757929784005",
+            "TON Network": "https://cryptologos.cc/logos/toncoin-ton-logo.svg?v=024",
+            "Sui Blockchain": "https://cryptologos.cc/logos/sui-sui-logo.svg?v=024",
+            "Binance Smart Chain": "https://cryptologos.cc/logos/bnb-bnb-logo.svg?v=024"
+          };
+          return (
           <div 
             key={index} 
             className="relative flex flex-col items-start p-10 transition-all duration-300 bg-transparent group rounded-none border-white/10 border-b md:border-r hover:bg-white/[0.02]"
@@ -409,7 +381,7 @@ export const Academy: React.FC = () => {
             
             <div className="flex items-center mb-6">
               <img
-                src={item.logo}
+                src={logos[item.title] || 'https://via.placeholder.com/40x40/666/333?text=' + item.title.charAt(0)}
                 alt={item.title}
                 className="w-10 h-10 transition-all duration-500 grayscale brightness-[2] group-hover:grayscale-0 group-hover:brightness-100"
                 onError={(e) => {
@@ -439,7 +411,8 @@ export const Academy: React.FC = () => {
               ))}
             </div>
           </div>
-        ))}
+          );
+        })}
       </div>
     </ScrollReveal>
   </div>

@@ -2,10 +2,10 @@
 
 import React from 'react';
 import { ScrollReveal } from '../components/ScrollReveal';
-
+import { useLanguage } from '../contexts/LanguageContext';
 import { ArrowRight, MessageCircle, Share2, TrendingUp, Instagram } from 'lucide-react';
 
-// Icônes sociales personnalisées et Lucide
+// Icons matching Footer component
 const Icons = {
   YouTube: () => (
     <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
@@ -18,13 +18,13 @@ const Icons = {
     </svg>
   ),
   X: () => (
-    <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+    <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
       <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/>
     </svg>
   ),
   Telegram: () => (
     <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-      <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161c-.18 1.897-.962 6.502-1.359 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+      <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
     </svg>
   ),
   CMC: () => (
@@ -44,35 +44,64 @@ const Icons = {
   ),
 };
 
-const COMMUNITIES = [
-  {
-    category: "Canaux Officiels",
-    items: [
-      { name: 'Twitter (X)', desc: 'Actualités & News crypto.', icon: Icons.X, url: 'https://x.com/coinlect', color: 'text-white' },
-      { name: 'LinkedIn', desc: 'Réseau pro & carrières.', icon: Icons.LinkedIn, url: 'https://www.linkedin.com/company/coinlect-academie', color: 'text-blue-500' },
-      { name: 'Telegram Community', desc: 'Actualités & News crypto.', icon: Icons.Telegram, url: 'https://t.me/coinlect_academy', color: 'text-sky-400' },
-      { name: 'WhatsApp Channel', desc: 'Directement dans votre poche.', icon: Icons.WhatsApp, url: 'https://whatsapp.com/channel/0029Vaex60vDuMReflHWmH0S', color: 'text-green-500' },
-      { name: 'Instagram', desc: 'Contenu éducatif & Stories.', icon: () => <Instagram className="w-6 h-6" />, url: 'https://www.instagram.com/coinlectacademy', color: 'text-pink-500' },
-      { name: 'CoinMarketCap', desc: 'Suivez nos articles sur CMC.', icon: Icons.CMC, url: 'https://coinmarketcap.com/community/profile/coinlect_Academy', color: 'text-blue-400' }
-    ]
-  },
-  {
-    category: "Communauté & Chat",
-    items: [
-      { name: 'Telegram Community', desc: 'Le hub de discussion principal.', icon: Icons.Telegram, url: 'https://t.me/cryptacadem', color: 'text-sky-400' },
-      { name: 'WhatsApp Groupe', desc: 'Entraide mentors et étudiants.', icon: Icons.WhatsApp, url: '  https://chat.whatsapp.com/D7BRG2oBl8o6ES0FnoUJ2H', color: 'text-green-400' }
-    ]
-  },
-  {
-    category: "Vidéos & Tutoriels",
-    items: [
-      { name: 'YouTube', desc: 'Cours complets & analyses live.', icon: Icons.YouTube, url: 'https://www.youtube.com/@Coinlect', color: 'text-red-500' },
-      { name: 'TikTok', desc: 'Analyses rapides & Trends.', icon: Icons.TikTok, url: 'https://www.tiktok.com/@coinlect_academy', color: 'text-cyan-400' }
-    ]
+// URL, icon, and color mapping using canonical keys
+const COMMUNITY_CONFIG: { [key: string]: { url: string; icon: React.ComponentType<any>; color: string } } = {
+  'twitter': { url: 'https://x.com/coinlect', icon: Icons.X, color: 'text-white' },
+  'linkedin': { url: 'https://www.linkedin.com/company/coinlect-academie', icon: Icons.LinkedIn, color: 'text-blue-500' },
+  'telegram_official': { url: 'https://t.me/coinlect_academy', icon: Icons.Telegram, color: 'text-sky-400' },
+  'whatsapp_channel': { url: 'https://whatsapp.com/channel/0029Vaex60vDuMReflHWmH0S', icon: Icons.WhatsApp, color: 'text-green-500' },
+  'instagram': { url: 'https://www.instagram.com/coinlectacademy', icon: () => <Instagram className="w-6 h-6" />, color: 'text-pink-500' },
+  'coinmarketcap': { url: 'https://coinmarketcap.com/community/profile/coinlect_Academy', icon: Icons.CMC, color: 'text-blue-400' },
+  'telegram_community': { url: 'https://t.me/cryptacadem', icon: Icons.Telegram, color: 'text-sky-400' },
+  'whatsapp_group': { url: 'https://chat.whatsapp.com/D7BRG2oBl8o6ES0FnoUJ2H', icon: Icons.WhatsApp, color: 'text-green-400' },
+  'youtube': { url: 'https://www.youtube.com/@Coinlect', icon: Icons.YouTube, color: 'text-red-500' },
+  'tiktok': { url: 'https://www.tiktok.com/@coinlect_academy', icon: Icons.TikTok, color: 'text-cyan-400' }
+};
+
+// Helper function to get config by name (handles both language variants)
+const getCommunityConfig = (name: string) => {
+  const lowerName = name.toLowerCase();
+  
+  // Check for specific patterns first (before removing special characters)
+  if (/twitter.*x|^x\s*\(|\(.*x.*\)/i.test(name)) {
+    return COMMUNITY_CONFIG['twitter'];
   }
-];
+  if (/telegram.*community|community.*telegram/i.test(name)) {
+    return COMMUNITY_CONFIG['telegram_community'];
+  }
+  if (/telegram/i.test(name)) {
+    return COMMUNITY_CONFIG['telegram_official'];
+  }
+  if (/whatsapp.*channel|channel.*whatsapp/i.test(name)) {
+    return COMMUNITY_CONFIG['whatsapp_channel'];
+  }
+  if (/whatsapp.*group|whatsapp.*groupe|group.*whatsapp|groupe.*whatsapp/i.test(name)) {
+    return COMMUNITY_CONFIG['whatsapp_group'];
+  }
+  if (/coinmarketcap|cmc/i.test(name)) {
+    return COMMUNITY_CONFIG['coinmarketcap'];
+  }
+  if (/youtube/i.test(name)) {
+    return COMMUNITY_CONFIG['youtube'];
+  }
+  if (/tiktok/i.test(name)) {
+    return COMMUNITY_CONFIG['tiktok'];
+  }
+  if (/linkedin/i.test(name)) {
+    return COMMUNITY_CONFIG['linkedin'];
+  }
+  if (/instagram/i.test(name)) {
+    return COMMUNITY_CONFIG['instagram'];
+  }
+  
+  // Fallback
+  return COMMUNITY_CONFIG['twitter'] || { url: '#', icon: Icons.X, color: 'text-white' };
+};
 
 export const Community: React.FC = () => {
+  const { t } = useLanguage();
+  const communities = t.community.page.categories;
+
   return (
     <div className="min-h-screen pt-24 pb-20 bg-black">
       
@@ -84,14 +113,14 @@ export const Community: React.FC = () => {
           <ScrollReveal>
             <div className="text-center">
               <h1 className="mb-8 text-4xl font-bold leading-[1.1] tracking-tighter text-white md:text-6xl lg:text-6xl">
-                <span className="text-[#a1a1aa]">Nos</span>{' '}
+                <span className="text-[#a1a1aa]">{t.community.page.titlePrefix}</span>{' '}
                 <span className="relative inline-block text-white">
                   <span className="absolute inset-x-0 top-1/2 h-[2px] w-[110%] -translate-x-[5%] bg-white -rotate-2 z-10" />
-                  Communautés
+                  {t.community.page.titleMain}
                 </span>
               </h1>
               <p className="max-w-3xl mx-auto text-base leading-relaxed text-[#71717a] md:text-sm lg:text-sm font-medium">
-                Connectez-vous avec des milliers de passionnés à travers nos différentes plateformes.
+                {t.community.page.subtitle}
               </p>
             </div>
           </ScrollReveal>
@@ -99,33 +128,38 @@ export const Community: React.FC = () => {
       </section>
 
       <div className="container px-6 pb-24 mx-auto max-w-7xl">
-         {COMMUNITIES.map((section, sectionIndex) => (
+         {communities.map((section, sectionIndex) => (
            <div key={sectionIndex} className="mb-16">
              <ScrollReveal delay={sectionIndex * 100}>
                <h2 className="mb-8 text-xs font-black tracking-[0.3em] text-[#a1a1aa] uppercase border-l border-white/20 pl-4">
-                 {section.category}
+                 {section.name}
                </h2>
              </ScrollReveal>
              <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
-               {section.items.map((item, itemIndex) => (
-                 <ScrollReveal key={itemIndex} delay={(sectionIndex * 100) + (itemIndex * 50)}>
-                   <div
-                     className="flex items-center justify-between p-6 transition-all duration-500 border rounded-none cursor-pointer bg-[#0a0a0a] border-white/5 hover:border-white/20 group"
-                     onClick={() => window.open(item.url, '_blank', 'noopener,noreferrer')}
-                   >
-                     <div className="flex items-center gap-5">
-                       <div className={`transition-all duration-500 group-hover:scale-110 ${item.color}`}>
-                         <item.icon />
+               {section.items.map((item, itemIndex) => {
+                 const config = getCommunityConfig(item.name);
+                 const IconComponent = config.icon;
+                 
+                 return (
+                   <ScrollReveal key={itemIndex} delay={(sectionIndex * 100) + (itemIndex * 50)}>
+                     <div
+                       className="flex items-center justify-between p-6 transition-all duration-500 border rounded-none cursor-pointer bg-[#0a0a0a] border-white/5 hover:border-white/20 group"
+                       onClick={() => window.open(config.url, '_blank', 'noopener,noreferrer')}
+                     >
+                       <div className="flex items-center gap-5">
+                         <div className={`transition-all duration-500 group-hover:scale-110 ${config.color}`}>
+                           <IconComponent />
+                         </div>
+                         <div className="flex flex-col">
+                           <span className="text-[15px] font-bold text-white tracking-tight">{item.name}</span>
+                           <span className="text-[11px] text-[#71717a] font-medium uppercase tracking-tight">{item.desc}</span>
+                         </div>
                        </div>
-                       <div className="flex flex-col">
-                         <span className="text-[15px] font-bold text-white tracking-tight">{item.name}</span>
-                         <span className="text-[11px] text-[#71717a] font-medium uppercase tracking-tight">{item.desc}</span>
-                       </div>
+                       <ArrowRight size={18} className="text-[#333] group-hover:text-white transition-all translate-x-0 group-hover:translate-x-1" />
                      </div>
-                     <ArrowRight size={18} className="text-[#333] group-hover:text-white transition-all translate-x-0 group-hover:translate-x-1" />
-                   </div>
-                 </ScrollReveal>
-               ))}
+                   </ScrollReveal>
+                 );
+               })}
             </div>
           </div>
         ))}

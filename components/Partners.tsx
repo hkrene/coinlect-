@@ -82,7 +82,7 @@ export const Partners: React.FC = () => {
        <div className="container relative z-10 px-4 mx-auto sm:px-6">
         <ScrollReveal>
             <div className="mb-12 text-center">
-            <h2 className="mb-4 text-3xl font-bold">
+            <h2 className="mb-4 text-2xl font-bold lg:text-3xl">
                 {t.partners.title} <span className="text-coinlect-accent">{t.partners.titleSuffix}</span>
             </h2>
             <p className="max-w-xl mx-auto text-sm text-gray-500">

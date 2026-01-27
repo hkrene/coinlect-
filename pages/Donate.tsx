@@ -12,13 +12,13 @@ export const Donate: React.FC = () => {
     const wallets = [
         { 
             name: "Bitcoin (BTC)", 
-            address: "bc1qa7mzzd4u8vgycyczjypm5pam0rdjntvlqsnjvc", 
+            address: "bc1qfrd783asqv8jkqm65ynju565v3vc5ygdvtt7qy", 
             network: "Bitcoin Network",
             color: "text-orange-500" 
         },
         { 
             name: "Ethereum (ETH)", 
-            address: "0xF9D4b07342D1A8edB6290cc938B7d35a1F284C83", 
+            address: "0x072c88972753655208bf481122bA962F549Ae1E1", 
             network: "Ethereum Network",
             color: "text-blue-500" 
         },

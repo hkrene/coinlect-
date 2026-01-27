@@ -68,12 +68,12 @@ export const Deals: React.FC = () => {
       <div className="container px-6 py-12 mx-auto">
         {/* Filtres Catégories */}
         <ScrollReveal>
-          <div className="flex w-full gap-2 pb-2 mb-16 overflow-x-auto md:w-auto md:pb-0 scrollbar-hide">
+          <div className="flex w-full gap-2 pb-2 mb-8 overflow-x-auto md:mb-16 md:w-auto md:pb-0 scrollbar-hide">
             {canonicalCategories.map((catKey, index) => (
               <button
                 key={catKey}
                 onClick={() => setActiveCategory(catKey)}
-                className={`whitespace-nowrap px-6 py-2 rounded-full text-xs font-bold border transition-all ${
+                className={`whitespace-nowrap px-4 py-1.5 md:px-6 md:py-2 rounded-full text-[10px] md:text-xs font-bold border transition-all ${
                   activeCategory === catKey 
                     ? 'bg-white text-black border-white' 
                     : 'bg-transparent border-white/10 text-gray-400 hover:border-white/30 hover:text-white'
@@ -87,14 +87,14 @@ export const Deals: React.FC = () => {
         </ScrollReveal>
 
         {/* Liste des Offres */}
-        <div className="flex flex-col gap-8 mb-20">
+        <div className="flex flex-col gap-4 mb-20 md:gap-8">
             {filteredDeals.length > 0 ? (
                 filteredDeals.map((deal, idx) => (
                     <ScrollReveal key={deal.id} delay={idx * 50}>
                         <Link href={`/deals/${deal.id}`} className="block h-full">
-                          <div className="relative flex flex-col md:flex-row h-full overflow-hidden transition-all duration-300 border rounded-2xl bg-[#0a0a0a] border-white/10 hover:border-white/30 group cursor-pointer">
+                          <div className="relative flex flex-col md:flex-row h-full overflow-hidden transition-all duration-300 border rounded-xl md:rounded-2xl bg-[#0a0a0a] border-white/10 hover:border-white/30 group cursor-pointer">
                             
-                            <div className="relative w-full md:w-[380px] h-56 md:h-auto overflow-hidden bg-black flex items-center justify-center border-b md:border-b-0 md:border-r border-white/10 md:rounded-l-2xl rounded-t-2xl md:rounded-tr-none">
+                            <div className="relative w-full md:w-[380px] h-40 md:h-auto overflow-hidden bg-black flex items-center justify-center border-b md:border-b-0 md:border-r border-white/10 md:rounded-l-2xl rounded-t-xl md:rounded-tr-none">
                                 <img
                                   src={deal.image}
                                   alt={deal.title}
@@ -105,33 +105,33 @@ export const Deals: React.FC = () => {
                                   }}
                                 />
                                 {deal.exclusive && (
-                                    <div className="absolute top-0 left-0 bg-white text-black text-[10px] font-black uppercase tracking-widest px-3 py-1.5 z-20 flex items-center gap-1 shadow-2xl rounded-br-lg">{t.deals.exclusive}
+                                    <div className="absolute top-0 left-0 bg-white text-black text-[8px] md:text-[10px] font-black uppercase tracking-widest px-2 py-1 md:px-3 md:py-1.5 z-20 flex items-center gap-1 shadow-2xl rounded-br-md md:rounded-br-lg">{t.deals.exclusive}
                                     </div>
                                 )}
                             </div>
 
-                            <div className="flex flex-col flex-grow p-8 bg-transparent md:rounded-r-2xl rounded-b-2xl md:rounded-bl-none">
-                                <div className="flex flex-col mb-4">
-                                    <span className="text-[10px] font-bold text-coinlect-accent uppercase tracking-[0.2em] mb-3">{deal.category}</span>
-                                    <h3 className="text-2xl font-bold tracking-tight text-white md:text-3xl">{deal.title} {deal.discount && ` — ${deal.discount}`}</h3>
+                            <div className="flex flex-col flex-grow p-4 bg-transparent md:p-8 md:rounded-r-2xl rounded-b-xl md:rounded-bl-none">
+                                <div className="flex flex-col mb-3 md:mb-4">
+                                    <span className="text-[9px] md:text-[10px] font-bold text-coinlect-accent uppercase tracking-[0.2em] mb-2 md:mb-3">{deal.category}</span>
+                                    <h3 className="text-lg font-bold tracking-tight text-white md:text-2xl lg:text-3xl">{deal.title} {deal.discount && <span className="text-sm md:text-base lg:text-lg">— {deal.discount}</span>}</h3>
                                 </div>
-                                <p className="mb-6 text-sm leading-relaxed text-[#71717a] max-w-2xl font-medium">{deal.details || deal.description}</p>
+                                <p className="mb-4 md:mb-6 text-xs md:text-sm leading-relaxed text-[#71717a] max-w-2xl font-medium line-clamp-2 md:line-clamp-none">{deal.details || deal.description}</p>
                                 
-                                <div className="flex items-center gap-6 mt-auto wrap">
+                                <div className="flex flex-col items-stretch gap-3 mt-auto sm:flex-row sm:items-center md:gap-6">
                                     <button
                                         onClick={(e) => {
                                           e.preventDefault();
                                           e.stopPropagation();
                                           window.open(deal.link, '_blank');
                                         }}
-                                        className="px-10 py-4 text-xs font-bold tracking-widest text-black uppercase transition-all bg-white rounded-md hover:bg-coinlect-accent"
+                                        className="px-6 py-2.5 md:px-10 md:py-4 text-[10px] md:text-xs font-bold tracking-widest text-black uppercase transition-all bg-white rounded-md hover:bg-coinlect-accent w-full sm:w-auto text-center"
                                     >
                                         {t.deals.claim}
                                     </button>
                                     {deal.code && (
-                                        <div className="flex items-center gap-3 text-xs font-bold tracking-widest text-gray-500 uppercase">
+                                        <div className="flex items-center gap-2 md:gap-3 text-[10px] md:text-xs font-bold tracking-widest text-gray-500 uppercase">
                                             <span>{t.deals.coupon} :</span>
-                                            <span className="px-4 py-2 text-white border border-dashed rounded-md bg-white/5 border-white/10">{deal.code}</span>
+                                            <span className="px-3 py-1.5 md:px-4 md:py-2 text-white border border-dashed rounded-md bg-white/5 border-white/10 text-[10px] md:text-xs">{deal.code}</span>
                                         </div>
                                     )}
                                 </div>
