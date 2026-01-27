@@ -52,11 +52,11 @@ export const Statistics = () => {
         {/* TOP NARRATIVE: RAW TYPOGRAPHY */}
         <div className="mb-20 lg:mb-32">
           <h2 className="mb-8 text-2xl font-bold text-white uppercase lg:text-7xl">
-            L'Éducation <span className="text-amber-500">sans frontières.</span> <br />
-            Des chiffres qui parlent d'eux-mêmes.
+            L&apos;Éducation <span className="text-amber-500">sans frontières.</span> <br />
+            Des chiffres qui parlent d&apos;eux-mêmes.
           </h2>
           <p className="text-sm font-medium text-zinc-500 lg:text-xl">
-            Coinlect Academy n'est pas qu'une plateforme. C'est l'épicentre de la croissance financière en Afrique francophone.
+            Coinlect Academy n&apos;est pas qu&apos;une plateforme. C&apos;est l&apos;épicentre de la croissance financière en Afrique francophone.
           </p>
         </div>
 
