@@ -5,7 +5,7 @@ import { ScrollReveal } from '../components/ScrollReveal';
 import { useLanguage } from '../contexts/LanguageContext';
 import { ArrowRight, MessageCircle, Share2, TrendingUp, Instagram } from 'lucide-react';
 
-// Icônes sociales personnalisées et Lucide
+// Icons matching Footer component
 const Icons = {
   YouTube: () => (
     <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
@@ -18,13 +18,13 @@ const Icons = {
     </svg>
   ),
   X: () => (
-    <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+    <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
       <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/>
     </svg>
   ),
   Telegram: () => (
     <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-      <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161c-.18 1.897-.962 6.502-1.359 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+      <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
     </svg>
   ),
   CMC: () => (
@@ -60,21 +60,42 @@ const COMMUNITY_CONFIG: { [key: string]: { url: string; icon: React.ComponentTyp
 
 // Helper function to get config by name (handles both language variants)
 const getCommunityConfig = (name: string) => {
-  const key = name.toLowerCase()
-    .replace(/[^a-z0-9]/g, '_')
-    .replace(/twitter.*x/i, 'twitter')
-    .replace(/telegram.*community/i, 'telegram_community')
-    .replace(/telegram/i, 'telegram_official')
-    .replace(/whatsapp.*channel/i, 'whatsapp_channel')
-    .replace(/whatsapp.*group/i, 'whatsapp_group')
-    .replace(/whatsapp.*groupe/i, 'whatsapp_group')
-    .replace(/coinmarketcap|cmc/i, 'coinmarketcap')
-    .replace(/youtube/i, 'youtube')
-    .replace(/tiktok/i, 'tiktok')
-    .replace(/linkedin/i, 'linkedin')
-    .replace(/instagram/i, 'instagram');
+  const lowerName = name.toLowerCase();
   
-  return COMMUNITY_CONFIG[key] || { url: '#', icon: Icons.Telegram, color: 'text-sky-400' };
+  // Check for specific patterns first (before removing special characters)
+  if (/twitter.*x|^x\s*\(|\(.*x.*\)/i.test(name)) {
+    return COMMUNITY_CONFIG['twitter'];
+  }
+  if (/telegram.*community|community.*telegram/i.test(name)) {
+    return COMMUNITY_CONFIG['telegram_community'];
+  }
+  if (/telegram/i.test(name)) {
+    return COMMUNITY_CONFIG['telegram_official'];
+  }
+  if (/whatsapp.*channel|channel.*whatsapp/i.test(name)) {
+    return COMMUNITY_CONFIG['whatsapp_channel'];
+  }
+  if (/whatsapp.*group|whatsapp.*groupe|group.*whatsapp|groupe.*whatsapp/i.test(name)) {
+    return COMMUNITY_CONFIG['whatsapp_group'];
+  }
+  if (/coinmarketcap|cmc/i.test(name)) {
+    return COMMUNITY_CONFIG['coinmarketcap'];
+  }
+  if (/youtube/i.test(name)) {
+    return COMMUNITY_CONFIG['youtube'];
+  }
+  if (/tiktok/i.test(name)) {
+    return COMMUNITY_CONFIG['tiktok'];
+  }
+  if (/linkedin/i.test(name)) {
+    return COMMUNITY_CONFIG['linkedin'];
+  }
+  if (/instagram/i.test(name)) {
+    return COMMUNITY_CONFIG['instagram'];
+  }
+  
+  // Fallback
+  return COMMUNITY_CONFIG['twitter'] || { url: '#', icon: Icons.X, color: 'text-white' };
 };
 
 export const Community: React.FC = () => {
