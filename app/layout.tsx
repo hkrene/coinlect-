@@ -3,6 +3,7 @@ import './globals.css';
 import { Providers } from './providers';
 import { Orbitron, Jura } from 'next/font/google';
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { GoogleAnalytics } from './components/GoogleAnalytics';
 
 const orbitron = Orbitron({
   subsets: ['latin'],
@@ -34,6 +35,7 @@ export default function RootLayout({
   return (
     <html lang="fr" className={`${orbitron.variable} ${jura.variable} scroll-smooth`}>
       <body className={`bg-black text-white`} suppressHydrationWarning={true}>
+        <GoogleAnalytics />
         <Providers>
           {children}
         </Providers>
