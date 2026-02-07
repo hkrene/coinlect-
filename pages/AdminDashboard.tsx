@@ -60,6 +60,12 @@ export const AdminDashboard: React.FC = () => {
     return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
   };
 
+  const ACTIVE_THRESHOLD_MS = 30 * 60 * 1000;
+  const isUserActiveOnPlatform = (lastActivityAt?: string | null): boolean => {
+    if (!lastActivityAt) return false;
+    return Date.now() - new Date(lastActivityAt).getTime() < ACTIVE_THRESHOLD_MS;
+  };
+
   // Image upload function for markdown editor
   const uploadImage = async (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -200,29 +206,6 @@ export const AdminDashboard: React.FC = () => {
     } catch (error) {
       console.error('Error fetching users:', error);
       return [];
-    }
-  };
-
-  const handleToggleUserActive = async (userId: string) => {
-    try {
-      const targetUser = users.find((u) => u.id === userId);
-      const newActive = !(targetUser?.isActive ?? true);
-      const response = await fetch(`/api/users/${userId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ isActive: newActive }),
-      });
-      if (!response.ok) {
-        const error = await response.json();
-        alert(error.error || 'Échec de la mise à jour du statut');
-        return;
-      }
-      const updated = await fetchUsers();
-      setUsers(updated);
-    } catch (error) {
-      console.error('Error toggling user active:', error);
-      alert('Erreur lors de la mise à jour du statut.');
     }
   };
 
@@ -1001,13 +984,12 @@ export const AdminDashboard: React.FC = () => {
                         <span className={`px-2 py-1 text-xs rounded-full ${u.role === 'ADMIN' ? 'bg-coinlect-accent/20 text-coinlect-accent' : 'bg-gray-500/20 text-gray-400'}`}>{u.role === 'ADMIN' ? 'Admin' : 'Utilisateur'}</span>
                       </td>
                       <td className="px-4 py-3">
-                        <button
-                          onClick={() => handleToggleUserActive(u.id)}
-                          className={`px-2 py-1 text-xs rounded-full transition-colors ${u.isActive !== false ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30' : 'bg-red-500/20 text-red-400 hover:bg-red-500/30'}`}
-                          aria-label={u.isActive !== false ? 'Désactiver' : 'Activer'}
+                        <span
+                          className={`inline-block px-2 py-1 text-xs rounded-full ${isUserActiveOnPlatform(u.lastActivityAt) ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}
+                          title={u.lastActivityAt ? `Dernière activité: ${formatRelativeDate(u.lastActivityAt)}` : 'Jamais connecté'}
                         >
-                          {u.isActive !== false ? 'Actif' : 'Inactif'}
-                        </button>
+                          {isUserActiveOnPlatform(u.lastActivityAt) ? 'Actif' : 'Inactif'}
+                        </span>
                       </td>
                       <td className="px-4 py-3 text-gray-400 text-sm">{new Date(u.createdAt).toLocaleDateString('fr-FR')}</td>
                       <td className="px-4 py-3 text-gray-400 text-sm">{u.updatedAt ? formatRelativeDate(u.updatedAt) : '—'}</td>

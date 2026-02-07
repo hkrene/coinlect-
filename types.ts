@@ -7,7 +7,6 @@ export interface User {
   name?: string;
   avatar?: string | null;
   role: 'ADMIN' | 'USER';
-  isActive?: boolean;
   createdAt: string;
   updatedAt: string;
   lastActivityAt?: string;
