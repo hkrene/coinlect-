@@ -11,6 +11,7 @@ import { Course, Article, Event, User, Deal } from '../types';
 import { PublishStatus } from '@prisma/client';
 import { Button } from '../components/Button';
 import { Trash2, Plus, BookOpen, FileText, LayoutDashboard, X, Check, Calendar, Star, Menu } from 'lucide-react';
+import { Avatar } from '../components/Avatar';
 import { useLanguage } from '../contexts/LanguageContext';
 import MDEditor from '@uiw/react-md-editor';
 
@@ -45,6 +46,18 @@ export const AdminDashboard: React.FC = () => {
   const getVimeoVideoId = (url: string): string => {
     const match = url.match(/vimeo\.com\/(\d+)/);
     return match ? match[1] : '';
+  };
+
+  const formatRelativeDate = (dateStr: string): string => {
+    const d = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now.getTime() - d.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    if (diffDays === 0) return "Aujourd'hui";
+    if (diffDays === 1) return 'Hier';
+    if (diffDays < 7) return `Il y a ${diffDays} jours`;
+    if (diffDays < 30) return `Il y a ${Math.floor(diffDays / 7)} semaines`;
+    return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' });
   };
 
   // Image upload function for markdown editor
@@ -187,6 +200,29 @@ export const AdminDashboard: React.FC = () => {
     } catch (error) {
       console.error('Error fetching users:', error);
       return [];
+    }
+  };
+
+  const handleToggleUserActive = async (userId: string) => {
+    try {
+      const targetUser = users.find((u) => u.id === userId);
+      const newActive = !(targetUser?.isActive ?? true);
+      const response = await fetch(`/api/users/${userId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ isActive: newActive }),
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        alert(error.error || 'Échec de la mise à jour du statut');
+        return;
+      }
+      const updated = await fetchUsers();
+      setUsers(updated);
+    } catch (error) {
+      console.error('Error toggling user active:', error);
+      alert('Erreur lors de la mise à jour du statut.');
     }
   };
 
@@ -683,67 +719,79 @@ export const AdminDashboard: React.FC = () => {
                 <Plus size={16} className="mr-2" /> Créer un Cours
               </Button>
             </div>
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-              {courses.map(c => (
-                <div key={c.id} className="bg-[#111] p-4 rounded-xl border border-white/10 group">
-                  <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-                    <div className="flex items-center flex-1 min-w-0 gap-4">
-                      <img src={c.image || 'https://via.placeholder.com/80x48/333/666?text=No+Image'} className="flex-shrink-0 object-cover w-20 h-12 rounded shadow" alt="" onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.src = 'https://via.placeholder.com/80x48/333/666?text=No+Image';
-                      }} />
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-bold text-white transition-colors group-hover:text-coinlect-accent line-clamp-2">{c.title}</h4>
-                        <p className="mt-1 text-xs tracking-widest text-gray-500 uppercase">{c.category} • {c.level}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center flex-shrink-0 gap-2">
-                      <button
-                        onClick={() => {
-                          setEditingItem(c);
-                          setModalType('course');
-                          setCourseForm({
-                            title: c.title || '',
-                            slug: c.slug || '',
-                            description: c.description || '',
-                            seoTitle: c.seoTitle || '',
-                            seoDescription: c.seoDescription || '',
-                            status: c.status || 'DRAFT',
-                            publishedAt: c.publishedAt || undefined,
-                            createdAt: c.createdAt || '',
-                            updatedAt: c.updatedAt || '',
-                            authorId: c.authorId || undefined,
-                            author: c.author || undefined,
-                            about: c.about || '',
-                            level: c.level || 'Débutant',
-                            duration: c.duration || '35m',
-                            category: c.category || 'Blockchain',
-                            image: c.image || '',
-                            syllabus: c.syllabus || [],
-                            courseType: c.courseType || 'academy',
-                            videoLink: c.videoLink || ''
-                          });
-                          setIsModalOpen(true);
-                        }}
-                        className="p-2 text-blue-500 transition-colors rounded-lg hover:text-blue-400 hover:bg-blue-500/10"
-                        aria-label="Edit course"
-                      >
-                        <FileText size={18} />
-                      </button>
-                      <button
-                        onClick={() => {
-                          setDeleteTarget({ type: 'course', item: c });
-                          setDeleteDialogOpen(true);
-                        }}
-                        className="p-2 text-red-500 transition-colors rounded-lg hover:text-red-400 hover:bg-red-500/10"
-                        aria-label="Delete course"
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
+            <div className="overflow-x-auto rounded-xl border border-white/10">
+              <table className="w-full text-left">
+                <thead className="bg-[#0a0a0a] text-xs uppercase text-gray-400">
+                  <tr>
+                    <th className="px-4 py-3">Image</th>
+                    <th className="px-4 py-3">Titre</th>
+                    <th className="px-4 py-3">Catégorie / Niveau</th>
+                    <th className="px-4 py-3">Statut</th>
+                    <th className="px-4 py-3">Date création</th>
+                    <th className="px-4 py-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {courses.map(c => (
+                    <tr key={c.id} className="bg-[#111] hover:bg-white/5 transition-colors">
+                      <td className="px-4 py-3">
+                        <img src={c.image || 'https://via.placeholder.com/48x32/333/666?text=—'} className="object-cover w-12 h-8 rounded" alt="" onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/48x32/333/666?text=—'; }} />
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="font-medium text-white line-clamp-1">{c.title}</span>
+                      </td>
+                      <td className="px-4 py-3 text-gray-400 text-sm">{c.category || '—'} • {c.level || '—'}</td>
+                      <td className="px-4 py-3">
+                        <span className={`px-2 py-1 text-xs rounded-full ${c.status === 'PUBLISHED' ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}>{c.status}</span>
+                      </td>
+                      <td className="px-4 py-3 text-gray-400 text-sm">{new Date(c.createdAt).toLocaleDateString('fr-FR')}</td>
+                      <td className="px-4 py-3 text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          <button
+                            onClick={() => {
+                              setEditingItem(c);
+                              setModalType('course');
+                              setCourseForm({
+                                title: c.title || '',
+                                slug: c.slug || '',
+                                description: c.description || '',
+                                seoTitle: c.seoTitle || '',
+                                seoDescription: c.seoDescription || '',
+                                status: c.status || 'DRAFT',
+                                publishedAt: c.publishedAt || undefined,
+                                createdAt: c.createdAt || '',
+                                updatedAt: c.updatedAt || '',
+                                authorId: c.authorId || undefined,
+                                author: c.author || undefined,
+                                about: c.about || '',
+                                level: c.level || 'Débutant',
+                                duration: c.duration || '35m',
+                                category: c.category || 'Blockchain',
+                                image: c.image || '',
+                                syllabus: c.syllabus || [],
+                                courseType: c.courseType || 'academy',
+                                videoLink: c.videoLink || ''
+                              });
+                              setIsModalOpen(true);
+                            }}
+                            className="p-2 text-blue-500 rounded-lg hover:bg-blue-500/10"
+                            aria-label="Modifier"
+                          >
+                            <FileText size={16} />
+                          </button>
+                          <button
+                            onClick={() => { setDeleteTarget({ type: 'course', item: c }); setDeleteDialogOpen(true); }}
+                            className="p-2 text-red-500 rounded-lg hover:bg-red-500/10"
+                            aria-label="Supprimer"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         )}
@@ -756,78 +804,93 @@ export const AdminDashboard: React.FC = () => {
                 <Plus size={16} className="mr-2" /> Publier un Article
               </Button>
             </div>
-            <div className="grid gap-4">
-              {articles.map(a => (
-                <div key={a.id} className="bg-[#111] p-4 rounded-xl border border-white/10 group">
-                  <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-                    <div className="flex items-center flex-1 min-w-0 gap-4">
-                      <div className="relative flex-shrink-0">
-                        <img src={a.image || 'https://via.placeholder.com/80x48/333/666?text=No+Image'} className="object-cover w-20 h-12 rounded shadow" alt="" onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.src = 'https://via.placeholder.com/80x48/333/666?text=No+Image';
-                        }} />
-                        {a.featured && <Star className="absolute -top-2 -left-2 text-coinlect-accent" size={16} fill="currentColor" />}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-bold text-white line-clamp-2">{a.title}</h4>
-                        <p className="mt-1 text-xs text-gray-500 uppercase">{a.category} • {a.date}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center flex-shrink-0 gap-2">
-                    <button
-                      onClick={async () => {
-                        try {
-                          const updatedArticles = await articleService.getAll();
-                          const article = updatedArticles.find(art => art.id === a.id);
-                          if (article) {
-                            const newFeaturedStatus = !article.featured;
-                            await articleService.update(a.id, { featured: newFeaturedStatus });
-                            setRefreshTrigger(t => t+1);
-                            if (typeof window !== 'undefined') {
-                              window.dispatchEvent(new CustomEvent('contentUpdated'));
-                            }
-                          }
-                        } catch (error) {
-                          console.error('Error updating article:', error);
-                          alert('Error updating article. Please try again.');
-                        }
-                      }} 
-                      className={`p-2 transition-colors ${a.featured ? 'text-coinlect-accent hover:text-yellow-500' : 'text-gray-500 hover:text-coinlect-accent'}`}
-                      aria-label={a.featured ? "Retirer de la page d'accueil" : "Mettre en vedette"}
-                      title={a.featured ? "Retirer de la page d'accueil" : "Mettre en vedette"}
-                    >
-                      <Star size={18} fill={a.featured ? "currentColor" : "none"} />
-                    </button>
-                    <button onClick={() => {
-                      setDeleteTarget({ type: 'article', item: a });
-                      setDeleteDialogOpen(true);
-                    }} className="p-2 text-red-500 transition-colors hover:text-red-400" aria-label="Delete article"><Trash2 size={18} /></button>
-                    <button onClick={() => {
-                      setEditingItem(a);
-                      setModalType('article');
-                      setArticleForm({
-                        title: a.title || '',
-                        slug: a.slug || '',
-                        excerpt: a.excerpt || '',
-                        content: a.content || '',
-                        tags: a.tags || [],
-                        seoTitle: a.seoTitle || '',
-                        seoDescription: a.seoDescription || '',
-                        status: a.status || 'DRAFT',
-                        image: a.image || '',
-                        authorImage: a.authorImage || '',
-                        keyTakeaways: (a as any).keyTakeaways || '',
-                        authorName: (a as any).authorName || '',
-                        featured: a.featured || false,
-                        readTime: (a as any).readTime || '5 min',
-                        date: a.createdAt ? new Date(a.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]
-                      });
-                      setIsModalOpen(true);
-                    }} className="p-2 text-blue-500 hover:text-blue-400" aria-label="Edit article"><FileText size={18} /></button>
-                  </div>
-                </div>
-              </div>
-            ))}
+            <div className="overflow-x-auto rounded-xl border border-white/10">
+              <table className="w-full text-left">
+                <thead className="bg-[#0a0a0a] text-xs uppercase text-gray-400">
+                  <tr>
+                    <th className="px-4 py-3">Image</th>
+                    <th className="px-4 py-3">Titre</th>
+                    <th className="px-4 py-3">Statut</th>
+                    <th className="px-4 py-3">Date création</th>
+                    <th className="px-4 py-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {articles.map(a => (
+                    <tr key={a.id} className="bg-[#111] hover:bg-white/5 transition-colors">
+                      <td className="px-4 py-3">
+                        <div className="relative">
+                          <img src={a.image || 'https://via.placeholder.com/48x32/333/666?text=—'} className="object-cover w-12 h-8 rounded" alt="" onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/48x32/333/666?text=—'; }} />
+                          {a.featured && <Star className="absolute -top-1 -left-1 text-coinlect-accent" size={12} fill="currentColor" />}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="font-medium text-white line-clamp-1">{a.title}</span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className={`px-2 py-1 text-xs rounded-full ${a.status === 'PUBLISHED' ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}>{a.status}</span>
+                      </td>
+                      <td className="px-4 py-3 text-gray-400 text-sm">{new Date(a.createdAt).toLocaleDateString('fr-FR')}</td>
+                      <td className="px-4 py-3 text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          <button
+                            onClick={async () => {
+                              try {
+                                const updatedArticles = await articleService.getAll();
+                                const article = updatedArticles.find(art => art.id === a.id);
+                                if (article) {
+                                  const newFeaturedStatus = !article.featured;
+                                  await articleService.update(a.id, { featured: newFeaturedStatus });
+                                  setRefreshTrigger(t => t + 1);
+                                  if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('contentUpdated'));
+                                }
+                              } catch (error) {
+                                console.error('Error updating article:', error);
+                                alert('Erreur lors de la mise à jour.');
+                              }
+                            }}
+                            className={`p-2 rounded-lg ${a.featured ? 'text-coinlect-accent' : 'text-gray-500'} hover:bg-white/5`}
+                            aria-label={a.featured ? "Retirer de la vedette" : "Mettre en vedette"}
+                          >
+                            <Star size={16} fill={a.featured ? 'currentColor' : 'none'} />
+                          </button>
+                          <button
+                            onClick={() => {
+                              setEditingItem(a);
+                              setModalType('article');
+                              setArticleForm({
+                                title: a.title || '',
+                                slug: a.slug || '',
+                                excerpt: a.excerpt || '',
+                                content: a.content || '',
+                                tags: a.tags || [],
+                                seoTitle: a.seoTitle || '',
+                                seoDescription: a.seoDescription || '',
+                                status: a.status || 'DRAFT',
+                                image: a.image || '',
+                                authorImage: a.authorImage || '',
+                                keyTakeaways: (a as any).keyTakeaways || '',
+                                authorName: (a as any).authorName || '',
+                                featured: a.featured || false,
+                                readTime: (a as any).readTime || '5 min',
+                                date: a.createdAt ? new Date(a.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]
+                              });
+                              setIsModalOpen(true);
+                            }}
+                            className="p-2 text-blue-500 rounded-lg hover:bg-blue-500/10"
+                            aria-label="Modifier"
+                          >
+                            <FileText size={16} />
+                          </button>
+                          <button onClick={() => { setDeleteTarget({ type: 'article', item: a }); setDeleteDialogOpen(true); }} className="p-2 text-red-500 rounded-lg hover:bg-red-500/10" aria-label="Supprimer">
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         )}
@@ -840,92 +903,147 @@ export const AdminDashboard: React.FC = () => {
                 <Plus size={16} className="mr-2" /> Créer un Événement
               </Button>
             </div>
-            <div className="grid gap-4">
-              {events.map(e => (
-                <div key={e.id} className="bg-[#111] p-4 rounded-xl border border-white/10 group">
-                  <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex flex-wrap gap-1 mb-2">
-                        {(e.eventTypes || []).map((t, idx) => (
-                          <span key={idx} className="px-2 py-1 text-[10px] font-bold text-gray-400 uppercase bg-white/5 rounded">{t}</span>
-                        ))}
-                      </div>
-                      <h4 className="font-bold text-white line-clamp-2">{e.title}</h4>
-                      <p className="mt-1 text-xs text-gray-500">{e.date} • {e.location}</p>
-                    </div>
-                    <div className="flex items-center flex-shrink-0 gap-2">
-                    <button onClick={() => {
-                      setEditingItem(e);
-                      setModalType('event');
-                      setEventForm({
-                        title: e.title || '',
-                        slug: e.slug || '',
-                        date: e.date || '',
-                        location: e.location || '',
-                        description: e.description || '',
-                        banner: e.banner || '',
-                        bannerImage: e.bannerImage || '',
-                        eventTypes: e.eventTypes || [],
-                        seoTitle: e.seoTitle || '',
-                        seoDescription: e.seoDescription || '',
-                        status: e.status || 'DRAFT',
-                        url: e.url || '',
-                      });
-                      setIsModalOpen(true);
-                    }} className="p-2 text-blue-500 hover:text-blue-400" aria-label="Edit event"><FileText size={18} /></button>
-                    <button onClick={() => {
-                      setDeleteTarget({ type: 'event', item: e });
-                      setDeleteDialogOpen(true);
-                    }} className="p-2 text-red-500 transition-colors hover:text-red-400" aria-label="Delete event"><Trash2 size={18} /></button>
-                  </div>
-                </div>
-              </div>
-            ))}
+            <div className="overflow-x-auto rounded-xl border border-white/10">
+              <table className="w-full text-left">
+                <thead className="bg-[#0a0a0a] text-xs uppercase text-gray-400">
+                  <tr>
+                    <th className="px-4 py-3">Titre</th>
+                    <th className="px-4 py-3">Date / Lieu</th>
+                    <th className="px-4 py-3">Types</th>
+                    <th className="px-4 py-3">Statut</th>
+                    <th className="px-4 py-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {events.map(e => (
+                    <tr key={e.id} className="bg-[#111] hover:bg-white/5 transition-colors">
+                      <td className="px-4 py-3">
+                        <span className="font-medium text-white line-clamp-2">{e.title}</span>
+                      </td>
+                      <td className="px-4 py-3 text-gray-400 text-sm">{e.date} • {e.location}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex flex-wrap gap-1">
+                          {(e.eventTypes || []).slice(0, 3).map((t, idx) => (
+                            <span key={idx} className="px-2 py-0.5 text-[10px] font-medium text-gray-400 uppercase bg-white/5 rounded">{t}</span>
+                          ))}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className={`px-2 py-1 text-xs rounded-full ${e.status === 'PUBLISHED' ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}>{e.status}</span>
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          <button
+                            onClick={() => {
+                              setEditingItem(e);
+                              setModalType('event');
+                              setEventForm({
+                                title: e.title || '',
+                                slug: e.slug || '',
+                                date: e.date || '',
+                                location: e.location || '',
+                                description: e.description || '',
+                                banner: e.banner || '',
+                                bannerImage: e.bannerImage || '',
+                                eventTypes: e.eventTypes || [],
+                                seoTitle: e.seoTitle || '',
+                                seoDescription: e.seoDescription || '',
+                                status: e.status || 'DRAFT',
+                                url: e.url || '',
+                              });
+                              setIsModalOpen(true);
+                            }}
+                            className="p-2 text-blue-500 rounded-lg hover:bg-blue-500/10"
+                            aria-label="Modifier"
+                          >
+                            <FileText size={16} />
+                          </button>
+                          <button onClick={() => { setDeleteTarget({ type: 'event', item: e }); setDeleteDialogOpen(true); }} className="p-2 text-red-500 rounded-lg hover:bg-red-500/10" aria-label="Supprimer">
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         )}
 
         {activeTab === 'users' && (
           <div className="space-y-4 md:space-y-6 animate-in fade-in">
-            <h1 className="text-2xl font-bold md:text-3xl">Gestion des Utilisateurs</h1>
-            <div className="grid gap-4">
-              {users.map(u => (
-                <div key={u.id} className="bg-[#111] p-4 rounded-xl border border-white/10 group">
-                  <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-                    <div className="flex-1">
-                      <h4 className="font-bold text-white">{u.name || 'No name'}</h4>
-                      <p className="text-sm text-gray-400">{u.email}</p>
-                      <p className="mt-1 text-xs text-gray-500">
-                        Rôle: <span className={`font-semibold ${u.role === 'ADMIN' ? 'text-coinlect-accent' : 'text-gray-400'}`}>{u.role === 'ADMIN' ? 'Admin' : 'Utilisateur'}</span>
-                      </p>
-                    </div>
-                    <div className="flex flex-col flex-shrink-0 gap-2 sm:flex-row">
-                    {u.role === 'USER' && (
-                      <Button
-                        onClick={() => handleRoleChange(u.id, 'promote')}
-                        variant="outline"
-                        size="sm"
-                        className="text-xs"
-                      >
-                        <Star size={14} className="mr-1" />
-                        Promouvoir Admin
-                      </Button>
-                    )}
-                    {u.role === 'ADMIN' && u.id !== user?.id && (
-                      <Button
-                        onClick={() => handleRoleChange(u.id, 'demote')}
-                        variant="outline"
-                        size="sm"
-                        className="text-xs text-red-400 border-red-400 hover:bg-red-400 hover:text-black"
-                      >
-                        <X size={14} className="mr-1" />
-                        Rétrograder
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            ))}
+            <h1 className="text-2xl font-bold md:text-3xl">Gestion des Utilisateurs ({users.length})</h1>
+            <div className="overflow-x-auto rounded-xl border border-white/10">
+              <table className="w-full text-left">
+                <thead className="bg-[#0a0a0a] text-xs uppercase text-gray-400">
+                  <tr>
+                    <th className="px-4 py-3">Utilisateur</th>
+                    <th className="px-4 py-3">Email</th>
+                    <th className="px-4 py-3">Rôle</th>
+                    <th className="px-4 py-3">Statut</th>
+                    <th className="px-4 py-3">Date création</th>
+                    <th className="px-4 py-3">Dernière MAJ</th>
+                    <th className="px-4 py-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {users.map(u => (
+                    <tr key={u.id} className="bg-[#111] hover:bg-white/5 transition-colors">
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-3">
+                          <Avatar src={u.avatar} name={u.name} email={u.email} size="sm" />
+                          <span className="font-medium text-white">{u.name || '—'}</span>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-gray-400 text-sm">{u.email}</td>
+                      <td className="px-4 py-3">
+                        <span className={`px-2 py-1 text-xs rounded-full ${u.role === 'ADMIN' ? 'bg-coinlect-accent/20 text-coinlect-accent' : 'bg-gray-500/20 text-gray-400'}`}>{u.role === 'ADMIN' ? 'Admin' : 'Utilisateur'}</span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <button
+                          onClick={() => handleToggleUserActive(u.id)}
+                          className={`px-2 py-1 text-xs rounded-full transition-colors ${u.isActive !== false ? 'bg-green-500/20 text-green-400 hover:bg-green-500/30' : 'bg-red-500/20 text-red-400 hover:bg-red-500/30'}`}
+                          aria-label={u.isActive !== false ? 'Désactiver' : 'Activer'}
+                        >
+                          {u.isActive !== false ? 'Actif' : 'Inactif'}
+                        </button>
+                      </td>
+                      <td className="px-4 py-3 text-gray-400 text-sm">{new Date(u.createdAt).toLocaleDateString('fr-FR')}</td>
+                      <td className="px-4 py-3 text-gray-400 text-sm">{u.updatedAt ? formatRelativeDate(u.updatedAt) : '—'}</td>
+                      <td className="px-4 py-3 text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          {u.role === 'USER' && (
+                            <button
+                              onClick={() => handleRoleChange(u.id, 'promote')}
+                              className="px-2 py-1 text-xs rounded-lg border border-white/20 text-coinlect-accent hover:bg-coinlect-accent/10"
+                            >
+                              Promouvoir
+                            </button>
+                          )}
+                          {u.role === 'ADMIN' && u.id !== user?.id && (
+                            <button
+                              onClick={() => handleRoleChange(u.id, 'demote')}
+                              className="px-2 py-1 text-xs rounded-lg border border-red-400/50 text-red-400 hover:bg-red-400/10"
+                            >
+                              Rétrograder
+                            </button>
+                          )}
+                          {u.id !== user?.id && (
+                            <button
+                              onClick={() => { setDeleteTarget({ type: 'user', item: u }); setDeleteDialogOpen(true); }}
+                              className="p-2 text-red-500 rounded-lg hover:bg-red-500/10"
+                              aria-label="Supprimer"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         )}
@@ -938,57 +1056,79 @@ export const AdminDashboard: React.FC = () => {
                 <Plus size={16} className="mr-2" /> Créer un Deal
               </Button>
             </div>
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-              {deals.map(d => (
-                <div key={d.id} className="bg-[#111] p-4 rounded-xl border border-white/10 group">
-                  <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-                    <div className="flex items-center flex-1 min-w-0 gap-4">
-                      <img
-                        src={d.image || 'https://via.placeholder.com/60x40'}
-                        className="flex-shrink-0 object-cover w-20 h-12 rounded shadow"
-                        alt="Deal image"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.src = 'https://via.placeholder.com/60x40/333/666?text=No+Image';
-                        }}
-                      />
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-bold text-white transition-colors group-hover:text-coinlect-accent line-clamp-2">{d.title}</h4>
-                        <p className="mt-1 text-xs tracking-widest text-gray-500 uppercase">{d.category} • {d.discount}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center flex-shrink-0 gap-2">
-                    {d.featured && <Star className="text-coinlect-accent" size={18} fill="currentColor" />}
-                    {d.verified && <Check className="text-green-500" size={18} />}
-                    <button onClick={() => {
-                      setEditingItem(d);
-                      setModalType('deal');
-                      setDealForm({
-                        title: d.title || '',
-                        description: d.description || '',
-                        details: d.details || '',
-                        category: d.category || '',
-                        link: d.link || '',
-                        image: d.image || '',
-                        discount: d.discount || '',
-                        code: d.code || '',
-                        exclusive: d.exclusive || false,
-                        verified: d.verified || false,
-                        featured: d.featured || false,
-                        createdAt: d.createdAt || '',
-                        updatedAt: d.updatedAt || '',
-                        status: (d as any).status || 'DRAFT'
-                      });
-                      setIsModalOpen(true);
-                    }} className="p-2 text-blue-500 hover:text-blue-400" aria-label="Edit deal"><FileText size={18} /></button>
-                    <button onClick={() => {
-                      setDeleteTarget({ type: 'deal', item: d });
-                      setDeleteDialogOpen(true);
-                    }} className="p-2 text-red-500 hover:text-red-400" aria-label="Delete deal"><Trash2 size={18} /></button>
-                  </div>
-                </div>
-              </div>
-            ))}
+            <div className="overflow-x-auto rounded-xl border border-white/10">
+              <table className="w-full text-left">
+                <thead className="bg-[#0a0a0a] text-xs uppercase text-gray-400">
+                  <tr>
+                    <th className="px-4 py-3">Image</th>
+                    <th className="px-4 py-3">Titre</th>
+                    <th className="px-4 py-3">Catégorie / Réduction</th>
+                    <th className="px-4 py-3">Badges</th>
+                    <th className="px-4 py-3">Date création</th>
+                    <th className="px-4 py-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5">
+                  {deals.map(d => (
+                    <tr key={d.id} className="bg-[#111] hover:bg-white/5 transition-colors">
+                      <td className="px-4 py-3">
+                        <img
+                          src={d.image || 'https://via.placeholder.com/48x32/333/666?text=—'}
+                          className="object-cover w-12 h-8 rounded"
+                          alt=""
+                          onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/48x32/333/666?text=—'; }}
+                        />
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="font-medium text-white line-clamp-2">{d.title}</span>
+                      </td>
+                      <td className="px-4 py-3 text-gray-400 text-sm">{d.category} • {d.discount || '—'}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-1">
+                          {d.featured && <Star className="text-coinlect-accent" size={14} fill="currentColor" />}
+                          {d.verified && <Check className="text-green-500" size={14} />}
+                          {d.exclusive && <span className="text-[10px] font-bold text-yellow-500">EXC</span>}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-gray-400 text-sm">{new Date(d.createdAt).toLocaleDateString('fr-FR')}</td>
+                      <td className="px-4 py-3 text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          <button
+                            onClick={() => {
+                              setEditingItem(d);
+                              setModalType('deal');
+                              setDealForm({
+                                title: d.title || '',
+                                description: d.description || '',
+                                details: d.details || '',
+                                category: d.category || '',
+                                link: d.link || '',
+                                image: d.image || '',
+                                discount: d.discount || '',
+                                code: d.code || '',
+                                exclusive: d.exclusive || false,
+                                verified: d.verified || false,
+                                featured: d.featured || false,
+                                createdAt: d.createdAt || '',
+                                updatedAt: d.updatedAt || '',
+                                status: (d as any).status || 'DRAFT'
+                              });
+                              setIsModalOpen(true);
+                            }}
+                            className="p-2 text-blue-500 rounded-lg hover:bg-blue-500/10"
+                            aria-label="Modifier"
+                          >
+                            <FileText size={16} />
+                          </button>
+                          <button onClick={() => { setDeleteTarget({ type: 'deal', item: d }); setDeleteDialogOpen(true); }} className="p-2 text-red-500 rounded-lg hover:bg-red-500/10" aria-label="Supprimer">
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         )}
@@ -1559,10 +1699,13 @@ export const AdminDashboard: React.FC = () => {
                 deleteTarget.type === 'course' ? 'ce cours' :
                 deleteTarget.type === 'article' ? 'cet article' :
                 deleteTarget.type === 'event' ? 'cet événement' :
+                deleteTarget.type === 'user' ? 'cet utilisateur' :
                 'cette offre'
               } ?
               <br />
-              <span className="font-semibold text-white">{deleteTarget.item.title}</span>
+              <span className="font-semibold text-white">
+                {deleteTarget.type === 'user' ? (deleteTarget.item.name || deleteTarget.item.email) : deleteTarget.item.title}
+              </span>
               <br />
               <span className="text-sm text-red-400">Cette action est irréversible.</span>
             </p>
@@ -1587,6 +1730,7 @@ export const AdminDashboard: React.FC = () => {
                       deleteTarget.type === 'course' ? `/api/courses/${encodeURIComponent(deleteTarget.item.slug)}` :
                       deleteTarget.type === 'article' ? `/api/articles/${encodeURIComponent(deleteTarget.item.slug)}` :
                       deleteTarget.type === 'event' ? `/api/events/${encodeURIComponent(deleteTarget.item.slug)}` :
+                      deleteTarget.type === 'user' ? `/api/users/${deleteTarget.item.id}` :
                       `/api/deals/${deleteTarget.item.id}`;
 
                     const response = await fetch(endpoint, {
@@ -1596,10 +1740,15 @@ export const AdminDashboard: React.FC = () => {
 
                     if (response.ok) {
                       setRefreshTrigger(t => t + 1);
+                      if (deleteTarget.type === 'user') {
+                        const updated = await fetchUsers();
+                        setUsers(updated);
+                      }
                       setDeleteDialogOpen(false);
                       setDeleteTarget(null);
                     } else {
-                      alert('Erreur lors de la suppression');
+                      const err = await response.json().catch(() => ({}));
+                      alert(err.error || 'Erreur lors de la suppression');
                     }
                   } catch (error) {
                     console.error('Error deleting item:', error);
