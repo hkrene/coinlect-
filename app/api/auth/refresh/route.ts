@@ -22,11 +22,11 @@ export async function POST(req: NextRequest) {
     const accessToken = await signAccessToken({ sub: payload.sub, role: payload.role });
     const newRefresh = await signRefreshToken({ sub: payload.sub, role: payload.role });
 
-    // rotate token
+    const now = new Date();
     await prisma.$transaction([
       prisma.refreshToken.update({
         where: { token: refreshToken },
-        data: { revokedAt: new Date() },
+        data: { revokedAt: now },
       }),
       prisma.refreshToken.create({
         data: {
@@ -34,6 +34,10 @@ export async function POST(req: NextRequest) {
           token: newRefresh,
           expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
         },
+      }),
+      prisma.user.update({
+        where: { id: payload.sub },
+        data: { lastActivityAt: now },
       }),
     ]);
 

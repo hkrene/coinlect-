@@ -35,6 +35,7 @@ model User {
   avatar         String?         // Profile picture URL
   dateOfBirth    DateTime?
   role           UserRole        @default(USER)
+  isActive       Boolean         @default(true)
   provider       String?         // local | google
   googleId       String?         @unique
   createdAt      DateTime        @default(now())
