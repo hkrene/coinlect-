@@ -137,6 +137,7 @@ model Event {
   seoDescription String?
   status         PublishStatus @default(DRAFT)
   publishedAt    DateTime?
+  url            String?       // External event source URL
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 

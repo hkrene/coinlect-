@@ -59,6 +59,7 @@ export const PATCH = requireAdminSlug(async (req: NextRequest, user, params: Pro
         seoDescription: data.seoDescription,
         status: data.status ?? PublishStatus.DRAFT,
         publishedAt: data.status === PublishStatus.PUBLISHED && existingEvent.status !== PublishStatus.PUBLISHED ? new Date() : existingEvent.publishedAt,
+        url: data.url,
       },
     });
 

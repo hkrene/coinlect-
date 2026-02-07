@@ -38,6 +38,7 @@ export const POST = requireAdmin(async (req: NextRequest, user) => {
         seoDescription: data.seoDescription,
         status: data.status ?? PublishStatus.DRAFT,
         publishedAt: data.status === PublishStatus.PUBLISHED ? new Date() : null,
+        url: data.url,
         authorId: user.id,
       },
     });
