@@ -130,6 +130,20 @@ export const translations = {
         section9: { title: "9. Contactez-nous", content: "Des questions ou besoin d'aide ? Contactez-nous à coinlectacademy@gmail.com" },
         closing: "Merci de faire partie de Coinlect. Construisons le Web3 de la bonne manière."
     },
+    donatePage: {
+      title: "Aidez-nous à faire grandir l'",
+      titleSuffix: "écosystème",
+      subtitle: "Coinlect s'engage à offrir une éducation et des outils gratuits à la communauté crypto africaine. Vos dons nous aident à maintenir les serveurs, créer du contenu de qualité et développer de nouvelles fonctionnalités.",
+      internationalTitle: "Don international",
+      internationalDesc: "Carte, Mobile Money ou Crypto via MbiyoPay",
+      donateMbiyoPay: "Faire un don via MbiyoPay",
+      network: "Réseau",
+      copyAddress: "Copier l'adresse",
+      localTitle: "Dons locaux (RDC)",
+      otherWaysTitle: "Autres façons de nous soutenir",
+      followX: "Suivez-nous sur X",
+      subscribeYoutube: "Abonnez-vous sur YouTube",
+    },
     about: {
       title: "C'est",
       subtitle: "Tout ce dont vous avez besoin pour comprendre le Web3.",
@@ -637,6 +651,20 @@ export const translations = {
         section8: { title: "8. Changes to These Terms", content: "Web3 moves fast—and so do these terms. Important changes will be communicated, but it is your responsibility to stay informed." },
         section9: { title: "9. Contact Us", content: "Questions or need help? Contact us at coinlectacademy@gmail.com" },
         closing: "Thank you for being part of Coinlect. Let's build Web3 the right way."
+    },
+    donatePage: {
+      title: "Help Us Grow the ",
+      titleSuffix: "Ecosystem",
+      subtitle: "Coinlect is committed to providing free education and tools for the African crypto community. Your donations help us maintain servers, create high-quality content, and develop new features.",
+      internationalTitle: "International Donation",
+      internationalDesc: "Card, Mobile Money, or Crypto via MbiyoPay",
+      donateMbiyoPay: "Donate via MbiyoPay",
+      network: "Network",
+      copyAddress: "Copy Address",
+      localTitle: "Local Donations (DRC)",
+      otherWaysTitle: "Other Ways to Support",
+      followX: "Follow us on X",
+      subscribeYoutube: "Subscribe on YouTube",
     },
     about: {
       title: "It's",
