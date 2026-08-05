@@ -5,376 +5,360 @@ import { ScrollReveal } from '../components/ScrollReveal';
 import { Button } from '../components/Button';
 import { AdBanner } from '../components/AdBanner';
 import {
-    Copy,
-    Check,
-    Wallet,
-    ExternalLink,
-    Globe2,
-    Users,
-    Code2
+  Copy,
+  Check,
+  Wallet,
+  ExternalLink,
+  Globe2,
+  Smartphone,
+  Heart,
+  BookOpen,
+  Users,
+  Code2,
+  QrCode,
+  Share2
 } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 
 export const Donate: React.FC = () => {
-    const { t } = useLanguage();
-    const [copied, setCopied] = useState<string | null>(null);
+  const { t } = useLanguage();
+  const [copied, setCopied] = useState<string | null>(null);
+  const [activeQr, setActiveQr] = useState<string | null>(null);
 
-    const wallets = [
-        { name: "Bitcoin (BTC)", address: "bc1qfrd783asqv8jkqm65ynju565v3vc5ygdvtt7qy", network: "Bitcoin Network", color: "text-orange-500" },
-        { name: "Ethereum (ETH)", address: "0x072c88972753655208bf481122bA962F549Ae1E1", network: "Ethereum Network", color: "text-blue-500" },
-        { name: "USDT (TRC20)", address: "TBFfsCJ689cyZ3eUTgEpGLiqEyuqJen6iF", network: "Tron Network", color: "text-green-500" }
-    ];
+  const wallets = [
+    {
+      name: "Bitcoin (BTC)",
+      address: "bc1qfrd783asqv8jkqm65ynju565v3vc5ygdvtt7qy",
+      network: "Bitcoin Network",
+      color: "from-amber-500/20 to-orange-500/10 text-orange-400 border-amber-500/30"
+    },
+    {
+      name: "Ethereum (ETH)",
+      address: "0x072c88972753655208bf481122bA962F549Ae1E1",
+      network: "Ethereum Network (ERC20)",
+      color: "from-blue-500/20 to-indigo-500/10 text-blue-400 border-blue-500/30"
+    },
+    {
+      name: "USDT (TRC20)",
+      address: "TBFfsCJ689cyZ3eUTgEpGLiqEyuqJen6iF",
+      network: "Tron Network (TRC20)",
+      color: "from-emerald-500/20 to-teal-500/10 text-emerald-400 border-emerald-500/30"
+    }
+  ];
 
-    const mobileMoney = [
-        { name: "Airtel Money (Airtel)", number: "+243971379450" },
-        { name: "M-Pesa (Vodacom)", number: "+243837266193" }
-    ];
+  const mobileMoney = [
+    {
+      name: "Airtel Money",
+      provider: "Airtel DRC",
+      number: "+243971379450"
+    }
+  ];
 
-    const handleCopy = (text: string) => {
-        navigator.clipboard.writeText(text);
-        setCopied(text);
-        setTimeout(() => setCopied(null), 2000);
-    };
+  const impactPoints = [
+    {
+      icon: BookOpen,
+      title: "Crypto Education",
+      desc: "Free courses and localized content for Web3 beginners."
+    },
+    {
+      icon: Users,
+      title: "Community Events",
+      desc: "Workshops, bootcamps, and local meetups across the Francophone region."
+    },
+    {
+      icon: Code2,
+      title: "Developer Tools",
+      desc: "Open-source resources enabling developers to build real-world Web3 apps."
+    }
+  ];
 
-    return (
-        <div className="min-h-screen bg-[#050509] text-white pt-20 sm:pt-24 md:pt-32 pb-16 md:pb-24">
-            {/* HERO */}
-            <section className="relative overflow-hidden">
-                <div className="absolute inset-0">
-                    <img
-                        src="https://images.unsplash.com/photo-1649972904349-6e44c42644a9?auto=format&fit=crop&w=1600&q=80"
-                        alt="Community learning about blockchain"
-                        className="object-cover w-full h-full opacity-25"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-br from-black via-black/85 to-[#050509]" />
+  const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopied(text);
+    setTimeout(() => setCopied(null), 2000);
+  };
+
+  return (
+    <div className="min-h-screen bg-[#050509] text-white pt-24 md:pt-32 pb-16 md:pb-24 selection:bg-[#FF6B00]/30 selection:text-white">
+      {/* BACKGROUND DECORATIONS */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#FF6B00]/10 blur-[150px] rounded-full" />
+        <div className="absolute bottom-1/3 right-10 w-[400px] h-[400px] bg-blue-600/10 blur-[120px] rounded-full" />
+      </div>
+
+      {/* HERO SECTION */}
+      <section className="relative mb-16 overflow-hidden md:mb-24">
+        <div className="container relative max-w-6xl px-4 mx-auto sm:px-6 lg:px-8">
+          <div className="max-w-3xl mx-auto space-y-6 text-center">
+            {/* <ScrollReveal>
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-amber-500/30 bg-amber-500/10 text-amber-400 text-xs font-medium tracking-wide uppercase">
+                <Heart className="w-3.5 h-3.5 fill-amber-400/20" />
+                Community-Powered Web3 Education
+              </div>
+            </ScrollReveal> */}
+
+            <ScrollReveal delay={100}>
+              <h1 className="text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl md:text-6xl">
+                {t.donatePage.title}{' '}
+                <span className="bg-gradient-to-r from-[#FF6B00] via-orange-400 to-amber-400 bg-clip-text text-transparent">
+                  {t.donatePage.titleSuffix}
+                </span>
+              </h1>
+            </ScrollReveal>
+
+            <ScrollReveal delay={200}>
+              <p className="max-w-2xl mx-auto text-base leading-relaxed text-gray-400 sm:text-lg">
+                {t.donatePage.subtitle}
+              </p>
+            </ScrollReveal>
+
+            <ScrollReveal delay={300}>
+              <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
+                <Button
+                  variant="primary"
+                  className="px-8 py-3.5 text-sm font-semibold bg-[#FF6B00] hover:bg-[#ff8530] transition-all duration-200 shadow-[0_10px_30px_rgba(255,107,0,0.3)] hover:shadow-[0_15px_40px_rgba(255,107,0,0.45)]"
+                  onClick={() => {
+                    const el = document.getElementById('donation-grid');
+                    el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                  }}
+                >
+                  Explore Donation Options
+                </Button>
+                <Button
+                  variant="outline"
+                  className="px-8 py-3.5 text-sm font-semibold border-white/10 hover:border-[#FF6B00] bg-white/[0.02] hover:bg-white/[0.05] transition-all duration-200"
+                  onClick={() =>
+                    window.open(
+                      'https://dashboard.mbiyo.africa/pay/create-session/2bb14d4a-664d-4c51-86a6-620cca13578c',
+                      '_blank'
+                    )
+                  }
+                >
+                  Instant Card / Mobile Pay <ExternalLink className="w-4 h-4 ml-2" />
+                </Button>
+              </div>
+            </ScrollReveal>
+          </div>
+
+          {/* IMPACT CARDS */}
+          <div className="grid grid-cols-1 gap-6 mt-16 md:grid-cols-3">
+            {impactPoints.map((item, idx) => (
+              <ScrollReveal key={idx} delay={100 * (idx + 1)}>
+                <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/10 backdrop-blur-md hover:border-white/20 transition-all">
+                  <div className="w-12 h-12 rounded-xl bg-[#FF6B00]/10 border border-[#FF6B00]/20 flex items-center justify-center text-[#FF6B00] mb-4">
+                    <item.icon className="w-6 h-6" />
+                  </div>
+                  <h3 className="mb-2 text-lg font-semibold text-white">{item.title}</h3>
+                  <p className="text-sm leading-relaxed text-gray-400">{item.desc}</p>
                 </div>
-
-                <div className="relative container max-w-6xl px-4 mx-auto sm:px-6 lg:px-8">
-                    <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
-                        <ScrollReveal>
-                            <div className="pt-4 pb-10 lg:py-16">
-                                <p className="inline-flex items-center gap-2 px-3 py-1 mb-4 text-xs font-semibold tracking-wide text-amber-400 uppercase rounded-full bg-amber-500/10 border border-amber-500/40">
-                                    Community-powered Web3 education
-                                </p>
-                                <h1 className="mb-4 text-3xl font-bold leading-tight sm:text-4xl md:text-5xl">
-                                    {t.donatePage.title}
-                                    <span className="text-[#FF6B00]">{t.donatePage.titleSuffix}</span>
-                                </h1>
-                                <p className="max-w-xl mb-8 text-sm leading-relaxed text-gray-300 sm:text-base md:text-lg">
-                                    {t.donatePage.subtitle}
-                                </p>
-
-                                <div className="flex flex-col gap-3 sm:flex-row">
-                                    <Button
-                                        variant="primary"
-                                        className="flex items-center justify-center gap-2 px-8 py-3 text-sm font-semibold bg-[#FF6B00] hover:bg-[#ff8530] shadow-[0_18px_60px_rgba(255,107,0,0.45)]"
-                                        onClick={() => {
-                                            const el = document.getElementById('donation-grid');
-                                            el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                                        }}
-                                    >
-                                        Donate Now
-                                    </Button>
-                                    <Button
-                                        variant="outline"
-                                        className="flex items-center justify-center gap-2 px-8 py-3 text-sm font-semibold border-white/20 hover:border-[#FF6B00] hover:text-[#FF6B00]"
-                                        onClick={() =>
-                                            window.open(
-                                                'https://dashboard.mbiyo.africa/pay/create-session/2bb14d4a-664d-4c51-86a6-620cca13578c',
-                                                '_blank'
-                                            )
-                                        }
-                                    >
-                                        Donate via MbiyoPay
-                                    </Button>
-                                </div>
-                            </div>
-                        </ScrollReveal>
-
-                        <ScrollReveal delay={150}>
-                            <div className="relative">
-                                <div className="absolute -inset-1 rounded-3xl bg-gradient-to-br from-[#FF6B00] via-amber-500 to-transparent opacity-40 blur-xl" />
-                                <div className="relative p-6 rounded-3xl bg-white/5 border border-white/10 backdrop-blur-xl">
-                                    <div className="flex items-center justify-between mb-6">
-                                        <div>
-                                            <p className="text-xs font-semibold tracking-wide text-gray-400 uppercase">
-                                                Impact snapshot
-                                            </p>
-                                            <p className="mt-1 text-sm text-gray-300">
-                                                Every donation powers education, tools & community.
-                                            </p>
-                                        </div>
-                                        <div className="flex items-center justify-center w-10 h-10 rounded-full bg-[#FF6B00]/20 text-[#FF6B00]">
-                                            <Wallet className="w-5 h-5" />
-                                        </div>
-                                    </div>
-
-                                    <div className="grid grid-cols-3 gap-3 mb-6 text-center">
-                                        <div className="px-3 py-3 rounded-2xl bg-black/40 border border-white/5">
-                                            <p className="text-xs font-medium text-gray-400 uppercase">Learners</p>
-                                            <p className="mt-1 text-xl font-semibold">1k+</p>
-                                        </div>
-                                        <div className="px-3 py-3 rounded-2xl bg-black/40 border border-white/5">
-                                            <p className="text-xs font-medium text-gray-400 uppercase">Events</p>
-                                            <p className="mt-1 text-xl font-semibold">45+</p>
-                                        </div>
-                                        <div className="px-3 py-3 rounded-2xl bg-black/40 border border-white/5">
-                                            <p className="text-xs font-medium text-gray-400 uppercase">Countries</p>
-                                            <p className="mt-1 text-xl font-semibold">10+</p>
-                                        </div>
-                                    </div>
-
-                                    <div className="relative overflow-hidden rounded-2xl">
-                                        <img
-                                            src="https://images.unsplash.com/photo-1522202195461-41a0320e77b0?auto=format&fit=crop&w=1200&q=80"
-                                            alt="CoinLect community workshop"
-                                            className="object-cover w-full h-40 sm:h-48"
-                                        />
-                                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-                                        <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
-                                            <div>
-                                                <p className="text-xs font-medium text-gray-300 uppercase">Latest initiative</p>
-                                                <p className="text-sm font-semibold">Web3 bootcamps across Francophone Africa</p>
-                                            </div>
-                                            <span className="px-3 py-1 text-xs font-semibold rounded-full bg-[#FF6B00] text-black">
-                                                You fund this
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </ScrollReveal>
-                    </div>
-                </div>
-            </section>
-
-            {/* IMPACT CARDS */}
-            <section className="mt-10 border-t border-white/5 bg-black/40">
-                <div className="container max-w-6xl px-4 py-10 mx-auto sm:px-6 lg:px-8">
-                    <ScrollReveal>
-                        <div className="grid gap-5 md:grid-cols-3">
-                            <div className="p-5 rounded-2xl bg-[#090909] border border-white/10 hover:border-[#FF6B00]/60 transition-colors">
-                                <div className="flex items-center justify-between mb-4">
-                                    <h3 className="text-sm font-semibold tracking-wide uppercase text-gray-300">
-                                        Web3 Education
-                                    </h3>
-                                    <span className="flex items-center justify-center w-8 h-8 rounded-full bg-[#FF6B00]/15 text-[#FF6B00]">
-                                        <Globe2 className="w-4 h-4" />
-                                    </span>
-                                </div>
-                                <p className="text-sm text-gray-400">
-                                    Fund high-quality courses and workshops that help the next generation understand
-                                    blockchain, DeFi and on-chain finance in French.
-                                </p>
-                            </div>
-
-                            <div className="p-5 rounded-2xl bg-[#090909] border border-white/10 hover:border-[#FF6B00]/60 transition-colors">
-                                <div className="flex items-center justify-between mb-4">
-                                    <h3 className="text-sm font-semibold tracking-wide uppercase text-gray-300">
-                                        Dev Tooling
-                                    </h3>
-                                    <span className="flex items-center justify-center w-8 h-8 rounded-full bg-[#FF6B00]/15 text-[#FF6B00]">
-                                        <Code2 className="w-4 h-4" />
-                                    </span>
-                                </div>
-                                <p className="text-sm text-gray-400">
-                                    Support the creation of open resources, starter kits and API tooling to help African
-                                    developers build on Bitcoin, Ethereum and modern L2s.
-                                </p>
-                            </div>
-
-                            <div className="p-5 rounded-2xl bg-[#090909] border border-white/10 hover:border-[#FF6B00]/60 transition-colors">
-                                <div className="flex items-center justify-between mb-4">
-                                    <h3 className="text-sm font-semibold tracking-wide uppercase text-gray-300">
-                                        Community Events
-                                    </h3>
-                                    <span className="flex items-center justify-center w-8 h-8 rounded-full bg-[#FF6B00]/15 text-[#FF6B00]">
-                                        <Users className="w-4 h-4" />
-                                    </span>
-                                </div>
-                                <p className="text-sm text-gray-400">
-                                    Enable meetups, bootcamps and hackathons that connect traders, builders and learners
-                                    across the continent.
-                                </p>
-                            </div>
-                        </div>
-                    </ScrollReveal>
-                </div>
-            </section>
-
-            {/* DONATION GRID */}
-            <section id="donation-grid" className="mt-10">
-                <div className="container max-w-6xl px-4 mx-auto sm:px-6 lg:px-8">
-                    <ScrollReveal>
-                        <div className="grid gap-6 lg:grid-cols-3">
-                            {/* Crypto wallets */}
-                            <div className="p-5 rounded-2xl bg-black/70 border border-white/10">
-                                <div className="flex items-center justify-between mb-4">
-                                    <div>
-                                        <h3 className="text-sm font-semibold tracking-wide uppercase text-gray-200">
-                                            Crypto wallets
-                                        </h3>
-                                        <p className="text-xs text-gray-400">
-                                            Donate directly in BTC, ETH or USDT (TRC20).
-                                        </p>
-                                    </div>
-                                    <span className="flex items-center justify-center w-9 h-9 rounded-full bg-[#FF6B00]/15 text-[#FF6B00]">
-                                        <Wallet className="w-4 h-4" />
-                                    </span>
-                                </div>
-                                <div className="space-y-3">
-                                    {wallets.map((wallet, idx) => (
-                                        <div
-                                            key={idx}
-                                            className="p-3 rounded-xl bg-[#0F0F0F] border border-white/10 hover:border-[#FF6B00]/50 transition-colors"
-                                        >
-                                            <div className="flex items-center justify-between gap-3 mb-2">
-                                                <div className="flex items-center gap-2">
-                                                    <span
-                                                        className={`flex items-center justify-center w-7 h-7 rounded-full bg-white/5 ${wallet.color}`}
-                                                    >
-                                                        <Wallet className="w-3 h-3" />
-                                                    </span>
-                                                    <div>
-                                                        <p className="text-xs font-semibold text-white">
-                                                            {wallet.name}
-                                                        </p>
-                                                        <p className="text-[10px] text-gray-500">
-                                                            {t.donatePage.network}: {wallet.network}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div className="flex items-center gap-2">
-                                                <div className="flex-1 px-2 py-2 text-[10px] text-gray-200 truncate rounded-lg bg-black/60 border border-white/10 select-all">
-                                                    {wallet.address}
-                                                </div>
-                                                <button
-                                                    onClick={() => handleCopy(wallet.address)}
-                                                    className="flex-shrink-0 p-2 text-white rounded-lg bg-white/10 hover:bg-white/20"
-                                                    title={t.donatePage.copyAddress}
-                                                    aria-label={t.donatePage.copyAddress}
-                                                >
-                                                    {copied === wallet.address ? (
-                                                        <Check className="w-3 h-3 text-emerald-400" />
-                                                    ) : (
-                                                        <Copy className="w-3 h-3" />
-                                                    )}
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* Local RDC (Airtel / M-Pesa) */}
-                            <div className="p-5 rounded-2xl bg-black/70 border border-white/10">
-                                <div className="flex items-center justify-between mb-4">
-                                    <div>
-                                        <h3 className="text-sm font-semibold tracking-wide uppercase text-gray-200">
-                                            {t.donatePage.localTitle}
-                                        </h3>
-                                        <p className="text-xs text-gray-400">
-                                            Use Airtel Money or M-Pesa to donate locally in DRC.
-                                        </p>
-                                    </div>
-                                    <span className="flex items-center justify-center w-9 h-9 rounded-full bg-[#FF6B00]/15 text-[#FF6B00]">
-                                        <Users className="w-4 h-4" />
-                                    </span>
-                                </div>
-                                <div className="space-y-3">
-                                    {mobileMoney.map((item, idx) => (
-                                        <div
-                                            key={idx}
-                                            className="flex items-center justify-between gap-3 p-3 rounded-xl bg-[#101010] border border-white/10 hover:border-[#FF6B00]/50 transition-colors"
-                                        >
-                                            <div>
-                                                <p className="text-[10px] font-semibold tracking-wide uppercase text-gray-400">
-                                                    {item.name}
-                                                </p>
-                                                <p className="text-sm font-semibold text-white">{item.number}</p>
-                                            </div>
-                                            <button
-                                                onClick={() => handleCopy(item.number)}
-                                                className="p-2 text-gray-200 rounded-lg bg-white/10 hover:bg-white/20"
-                                            >
-                                                {copied === item.number ? (
-                                                    <Check className="w-4 h-4 text-emerald-400" />
-                                                ) : (
-                                                    <Copy className="w-4 h-4" />
-                                                )}
-                                            </button>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-
-                            {/* MbiyoPay + Other ways */}
-                            <div className="flex flex-col gap-4">
-                                <div className="flex-1 p-5 rounded-2xl bg-black/70 border border-white/10">
-                                    <div className="flex items-center justify-between mb-4">
-                                        <div>
-                                            <h3 className="text-sm font-semibold tracking-wide uppercase text-gray-200">
-                                                {t.donatePage.internationalTitle}
-                                            </h3>
-                                            <p className="text-xs text-gray-400">
-                                                {t.donatePage.internationalDesc}
-                                            </p>
-                                        </div>
-                                        <span className="flex items-center justify-center w-9 h-9 rounded-full bg-[#FF6B00]/15 text-[#FF6B00]">
-                                            <Globe2 className="w-4 h-4" />
-                                        </span>
-                                    </div>
-                                    <Button
-                                        variant="primary"
-                                        className="flex items-center justify-center w-full gap-2 px-4 py-3 text-sm font-semibold bg-[#FF6B00] hover:bg-[#ff8530]"
-                                        onClick={() =>
-                                            window.open(
-                                                'https://dashboard.mbiyo.africa/pay/create-session/2bb14d4a-664d-4c51-86a6-620cca13578c',
-                                                '_blank'
-                                            )
-                                        }
-                                    >
-                                        {t.donatePage.donateMbiyoPay}
-                                        <ExternalLink size={16} />
-                                    </Button>
-                                </div>
-
-                                <div className="p-5 rounded-2xl bg-gradient-to-r from-[#FF6B00]/20 via-black to-transparent border border-[#FF6B00]/40">
-                                    <h3 className="mb-3 text-sm font-semibold tracking-wide uppercase text-gray-100">
-                                        {t.donatePage.otherWaysTitle}
-                                    </h3>
-                                    <p className="mb-4 text-sm text-gray-200">
-                                        Share CoinLect with your network and help us reach more learners.
-                                    </p>
-                                    <div className="flex flex-col gap-3 sm:flex-row">
-                                        <Button
-                                            variant="outline"
-                                            className="w-full text-xs sm:text-sm border-white/40 hover:border-white"
-                                            onClick={() => window.open('https://twitter.com/coinlect', '_blank')}
-                                        >
-                                            {t.donatePage.followX}
-                                        </Button>
-                                        <Button
-                                            variant="outline"
-                                            className="w-full text-xs sm:text-sm border-white/40 hover:border-white"
-                                            onClick={() => window.open('https://youtube.com/@coinlect', '_blank')}
-                                        >
-                                            {t.donatePage.subscribeYoutube}
-                                        </Button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </ScrollReveal>
-                </div>
-            </section>
-
-            <div className="container max-w-6xl px-4 mx-auto mt-12 sm:px-6 sm:mt-16 lg:px-8">
-                <AdBanner />
-            </div>
+              </ScrollReveal>
+            ))}
+          </div>
         </div>
-    );
+      </section>
+
+      {/* DONATION OPTIONS SECTION */}
+      <section id="donation-grid" className="relative scroll-mt-28">
+        <div className="container max-w-6xl px-4 mx-auto sm:px-6 lg:px-8">
+          <ScrollReveal>
+            <div className="mb-12 text-center">
+              <h2 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                Choose How You Want to Give
+              </h2>
+              <p className="mt-2 text-sm text-gray-400">
+                Direct crypto transfers, local mobile payments, or international cards.
+              </p>
+            </div>
+          </ScrollReveal>
+
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+            {/* LEFT COLUMN: CRYPTO WALLETS */}
+            <div className="space-y-4 lg:col-span-7">
+              <ScrollReveal>
+                <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/10 backdrop-blur-md">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="p-2.5 rounded-xl bg-orange-500/10 text-orange-400 border border-orange-500/20">
+                      <Wallet className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-white">Cryptocurrency</h3>
+                      <p className="text-xs text-gray-400">Direct wallet-to-wallet transfer</p>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    {wallets.map((wallet, idx) => (
+                      <div
+                        key={idx}
+                        className="p-4 rounded-xl bg-white/[0.02] border border-white/5 hover:border-white/10 transition-all"
+                      >
+                        <div className="flex items-center justify-between gap-4 mb-2">
+                          <div className="flex items-center gap-2">
+                            <span className={`px-2.5 py-0.5 text-xs font-semibold rounded-md border bg-gradient-to-r ${wallet.color}`}>
+                              {wallet.name}
+                            </span>
+                            <span className="text-xs text-gray-500">{wallet.network}</span>
+                          </div>
+                          
+                          <button
+                            onClick={() => setActiveQr(activeQr === wallet.address ? null : wallet.address)}
+                            className="flex items-center gap-1 text-xs text-gray-400 transition-colors hover:text-white"
+                          >
+                            <QrCode className="w-3.5 h-3.5" />
+                            {activeQr === wallet.address ? 'Hide QR' : 'QR Code'}
+                          </button>
+                        </div>
+
+                        {/* Address Bar */}
+                        <div className="flex items-center justify-between gap-2 p-2.5 rounded-lg bg-black/40 border border-white/5 font-mono text-xs">
+                          <span className="text-gray-300 truncate select-all">{wallet.address}</span>
+                          <button
+                            onClick={() => handleCopy(wallet.address)}
+                            className="p-1.5 rounded-md bg-white/10 hover:bg-white/20 transition-colors shrink-0 text-gray-200 hover:text-white"
+                            aria-label={t.donatePage.copyAddress}
+                          >
+                            {copied === wallet.address ? (
+                              <Check className="w-4 h-4 text-emerald-400" />
+                            ) : (
+                              <Copy className="w-4 h-4" />
+                            )}
+                          </button>
+                        </div>
+
+                        {/* Optional QR Code Dropdown */}
+                        {activeQr === wallet.address && (
+                          <div className="flex flex-col items-center justify-center pt-4 mt-4 border-t border-white/5">
+                            <div className="p-3 bg-white shadow-lg rounded-xl">
+                              <img
+                                src={`https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=${wallet.address}`}
+                                alt={`${wallet.name} QR Code`}
+                                className="w-32 h-32"
+                              />
+                            </div>
+                            <p className="mt-2 text-[11px] text-gray-400">Scan with your wallet app</p>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </ScrollReveal>
+            </div>
+
+            {/* RIGHT COLUMN: LOCAL & INTERNATIONAL */}
+            <div className="space-y-6 lg:col-span-5">
+              {/* Mobile Money */}
+              <ScrollReveal delay={100}>
+                <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/10 backdrop-blur-md">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="p-2.5 rounded-xl bg-red-500/10 text-red-400 border border-red-500/20">
+                      <Smartphone className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-white">{t.donatePage.localTitle}</h3>
+                      <p className="text-xs text-gray-400">Direct mobile transfers in DRC</p>
+                    </div>
+                  </div>
+
+                  {mobileMoney.map((item, idx) => (
+                    <div key={idx} className="p-4 rounded-xl bg-white/[0.02] border border-white/5">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-semibold text-white">{item.name}</span>
+                        <span className="text-xs text-gray-400">{item.provider}</span>
+                      </div>
+                      <div className="flex items-center justify-between gap-2 p-2.5 rounded-lg bg-black/40 border border-white/5 font-mono text-xs">
+                        <span className="font-semibold text-gray-300">{item.number}</span>
+                        <button
+                          onClick={() => handleCopy(item.number)}
+                          className="p-1.5 rounded-md bg-white/10 hover:bg-white/20 transition-colors shrink-0 text-gray-200 hover:text-white"
+                          aria-label={t.donatePage.copyAddress}
+                        >
+                          {copied === item.number ? (
+                            <Check className="w-4 h-4 text-emerald-400" />
+                          ) : (
+                            <Copy className="w-4 h-4" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </ScrollReveal>
+
+              {/* International & MbiyoPay */}
+              <ScrollReveal delay={150}>
+                <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/10 backdrop-blur-md space-y-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                      <Globe2 className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-white">{t.donatePage.internationalTitle}</h3>
+                      <p className="text-xs text-gray-400">Credit cards, Debit & online checkout</p>
+                    </div>
+                  </div>
+
+                  <p className="text-xs leading-relaxed text-gray-400">
+                    {t.donatePage.internationalDesc}
+                  </p>
+
+                  <Button
+                    variant="primary"
+                    className="w-full flex items-center justify-center gap-2 py-3 text-sm font-semibold bg-[#FF6B00] hover:bg-[#ff8530] transition-colors"
+                    onClick={() =>
+                      window.open(
+                        'https://dashboard.mbiyo.africa/pay/create-session/2bb14d4a-664d-4c51-86a6-620cca13578c',
+                        '_blank'
+                      )
+                    }
+                  >
+                    {t.donatePage.donateMbiyoPay}
+                    <ExternalLink className="w-4 h-4" />
+                  </Button>
+                </div>
+              </ScrollReveal>
+
+              {/* Spread the Word */}
+              <ScrollReveal delay={200}>
+                <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/10 backdrop-blur-md space-y-4">
+                  <div className="flex items-center gap-2">
+                    <Share2 className="w-4 h-4 text-[#FF6B00]" />
+                    <h4 className="text-sm font-semibold text-white">
+                      {t.donatePage.otherWaysTitle}
+                    </h4>
+                  </div>
+                  <p className="text-xs leading-relaxed text-gray-400">
+                    Can't donate right now? Share CoinLect with your network to support community growth.
+                  </p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <Button
+                      variant="outline"
+                      className="w-full text-xs py-2.5 border-white/10 hover:border-white/30 bg-white/[0.02]"
+                      onClick={() => window.open('https://twitter.com/coinlect', '_blank')}
+                    >
+                      {t.donatePage.followX}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="w-full text-xs py-2.5 border-white/10 hover:border-white/30 bg-white/[0.02]"
+                      onClick={() => window.open('https://youtube.com/@coinlect', '_blank')}
+                    >
+                      {t.donatePage.subscribeYoutube}
+                    </Button>
+                  </div>
+                </div>
+              </ScrollReveal>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* BANNER SECTION */}
+      <div className="container max-w-6xl px-4 mx-auto mt-16 sm:px-6 lg:px-8">
+        <AdBanner />
+      </div>
+    </div>
+  );
 };
 
 export default Donate;
