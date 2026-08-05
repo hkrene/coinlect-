@@ -328,7 +328,7 @@ export const Donate: React.FC = () => {
                     </h4>
                   </div>
                   <p className="text-xs leading-relaxed text-gray-400">
-                    Can't donate right now? Share CoinLect with your network to support community growth.
+                    Can&apos;t donate right now? Share CoinLect with your network to support community growth.
                   </p>
                   <div className="grid grid-cols-2 gap-3">
                     <Button
