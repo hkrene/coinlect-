@@ -39,6 +39,8 @@ export const translations = {
       cardTrendsDesc: "Suivez les tendances crypto et trading en Afrique.",
       cardEvents: "Événements",
       cardEventsDesc: "Trouvez les événements blockchain et meetups au Sénégal, Côte d’Ivoire, Togo.",
+      seoTitle: "Plateforme de formation crypto pour l'Afrique Francophone",
+      seoParagraph: "Formation crypto au Sénégal, en Côte d'Ivoire, au Bénin, au Togo, au Gabon, au Congo et au Burkina Faso. Coinlect propose des cours crypto, des ressources Web3 et une communauté active pour les apprenants francophones.",
       seoSection1: "Coinlect propose des formations crypto Web3 conçues pour le Sénégal, la Côte d'Ivoire, le Bénin, le Togo, le Gabon, le Congo et le Burkina Faso.",
       seoSection2: "Coinlect démocratise la formation crypto et le Web3 pour toute l'Afrique Francophone, avec des contenus adaptés aux besoins des pays francophones.",
       seoSection3: "Vous avez des questions sur la formation crypto, le Web3 ou l'accompagnement au Sénégal, en Côte d'Ivoire et dans les pays francophones ?",
@@ -615,6 +617,7 @@ export const translations = {
     aboutPage: {
       title: "Our Mission",
       subtitle: "We are democratizing crypto education for better financial inclusion in Francophone Africa.",
+      seoContent: "Crypto training in Senegal, Côte d'Ivoire, Benin, Togo, Gabon, Congo, Burkina Faso. Coinlect offers crypto courses, Web3 resources, and an active community for French-speaking learners.",
       vision: {
         title: "An Inclusive Revolution",
         desc: "At CoinLect Academy, we believe that access to knowledge is the first step towards financial autonomy. The digital revolution led by Web3 must not leave anyone behind. We work to ensure young African talents become key players in this transformation."
@@ -807,7 +810,8 @@ export const translations = {
             { q: "How to start with Coinlect?", a: "Start by creating a free account, explore our courses in the Academy, and join our community on Telegram." },
             { q: "Is Coinlect free?", a: "Yes, the majority of our educational content is available for free to foster financial inclusion." },
             { q: "How to secure my crypto?", a: "We recommend using hardware wallets like Ledger or Trezor for long-term storage." },
-            { q: "Do you offer financial advice?", a: "No, Coinlect is an educational platform. Always do your own research before investing." }
+            { q: "Do you offer financial advice?", a: "No, Coinlect is an educational platform. Always do your own research before investing." },
+            { q: "Francophone Africa crypto education platform", a: "Crypto training in Senegal, Côte d'Ivoire, Benin, Togo, Gabon, Congo, Burkina Faso. Coinlect offers crypto courses, Web3 resources, and an active community for French-speaking learners." }
         ]
     },
     academy: {
@@ -1012,6 +1016,8 @@ export const translations = {
       title: "Exclusive",
       titleSuffix: "Deals",
       subtitle: "We negotiated the best deals for you. Save on trading fees, secure your crypto, and optimize your taxes.",
+      heroDescription: "Best crypto deals and Web3 training offers for Francophone Africa. Save on trading fees and learn crypto from Dakar, Abidjan, Cotonou, Lomé, Libreville, Brazzaville, Kinshasa, and Ouagadougou.",
+      heroHeading: "Crypto deals for Francophone students and investors",
       searchPlaceholder: "Search for a deal...",
       filters: ["All", "Exchange", "Wallet", "Tax", "Trading Tool", "Security"],
       claim: "Claim Offer",
