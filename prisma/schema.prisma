@@ -25,6 +25,21 @@ enum FeaturedType {
   ARTICLE
 }
 
+enum DonationMethod {
+  BTC
+  ETH
+  USDT_TRC20
+  MOBILE_MONEY
+  MBIYOPAY
+  LIGHTNING
+}
+
+enum DonationStatus {
+  PENDING
+  CONFIRMED
+  FAILED
+}
+
 
 // Models
 model User {
@@ -236,4 +251,30 @@ model PasswordResetToken {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, expiresAt])
+}
+
+model Donation {
+  id                   String          @id @default(uuid())
+  method               DonationMethod
+  status               DonationStatus  @default(PENDING)
+
+  // Amounts
+  amountSats           Int?            // For Lightning donations in sats
+  amountFiat           Float?          // Optional approximate fiat value
+  currency             String?         // e.g. "USD", "EUR", "CDF", "SATS"
+
+  // Lightning-specific fields
+  lightningInvoice     String?         // Bolt11 invoice string
+  lightningPaymentHash String?        @unique
+
+  // Optional metadata
+  reference            String?         // TX hash, external reference or payment id
+  donorName            String?
+  donorEmail           String?
+  metadata             Json?
+
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
+
+  @@index([method, status])
 }

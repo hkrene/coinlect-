@@ -77,13 +77,10 @@ export function LoginForm() {
     <ComponentsLayout>
       <div className="container flex flex-col items-center justify-center min-h-screen px-4 py-8 mx-auto sm:px-6 md:pt-32 md:pb-20">
         <ScrollReveal className="w-full max-w-md">
-          <div className="relative p-6 overflow-hidden border glass-card sm:p-8 rounded-2xl border-white/10">
-            <div className="absolute top-0 right-0 w-24 h-24 sm:w-32 sm:h-32 bg-coinlect-accent/10 rounded-full blur-[50px] pointer-events-none"></div>
-
+          <div className="p-6 sm:p-8">
             <div className="mb-6 text-center sm:mb-8">
               <h1 className="mb-2 text-xl font-bold sm:text-2xl md:text-3xl">Welcome Back</h1>
               <p className="text-xs text-gray-500 sm:text-sm">Enter your credentials to access your account</p>
-              
             </div>
 
             {error && (
@@ -98,7 +95,7 @@ export function LoginForm() {
                 <input 
                   type="email" 
                   required
-                  className="w-full px-3 py-3 text-sm text-white transition-colors border rounded-lg sm:px-4 sm:py-3 sm:text-base bg-black/50 border-white/10 focus:outline-none focus:border-coinlect-accent focus:ring-1 focus:ring-coinlect-accent/50" 
+                  className="w-full px-3 py-3 text-sm text-white transition-colors border rounded-lg sm:px-4 sm:py-3 sm:text-base bg-white/5 border-white/20 focus:outline-none focus:border-coinlect-accent focus:ring-1 focus:ring-coinlect-accent/60" 
                   placeholder="you@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -110,7 +107,7 @@ export function LoginForm() {
                 <input 
                     type={showPassword ? 'text' : 'password'} 
                   required
-                    className="w-full px-3 py-3 pr-10 text-sm text-white transition-colors border rounded-lg sm:px-4 sm:py-3 sm:text-base bg-black/50 border-white/10 focus:outline-none focus:border-coinlect-accent focus:ring-1 focus:ring-coinlect-accent/50" 
+                    className="w-full px-3 py-3 pr-10 text-sm text-white transition-colors border rounded-lg sm:px-4 sm:py-3 sm:text-base bg-white/5 border-white/20 focus:outline-none focus:border-coinlect-accent focus:ring-1 focus:ring-coinlect-accent/60" 
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}

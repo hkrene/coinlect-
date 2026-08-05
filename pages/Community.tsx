@@ -122,12 +122,16 @@ export const Community: React.FC = () => {
               <p className="max-w-3xl mx-auto text-base leading-relaxed text-[#71717a] md:text-sm lg:text-sm font-medium">
                 {t.community.page.subtitle}
               </p>
+              <p className="max-w-3xl mx-auto mt-6 text-base font-medium leading-relaxed text-gray-300 md:text-sm lg:text-sm">
+                {t.community.page.seoDescription}
+              </p>
             </div>
           </ScrollReveal>
         </div>
       </section>
 
       <div className="container px-6 pb-24 mx-auto max-w-7xl">
+        {/* Intro paragraph removed per request */}
          {communities.map((section, sectionIndex) => (
            <div key={sectionIndex} className="mb-16">
              <ScrollReveal delay={sectionIndex * 100}>

@@ -95,12 +95,17 @@ export const Events: React.FC = () => {
       <div className="container px-6 mx-auto max-w-7xl">
         <div className="mb-8">
           <div className="flex flex-col gap-6 mb-6 md:flex-row md:items-center md:justify-between">
-            <h1 className="text-4xl font-extrabold text-white md:text-5xl">UPCOMING EVENTS</h1>
+            <div>
+              <h1 className="text-4xl font-extrabold text-white md:text-5xl">{t.events.title} {t.events.titleSuffix}</h1>
+              <p className="max-w-3xl mt-4 text-sm leading-relaxed text-gray-300 md:text-left">
+                {t.events.subtitle}
+              </p>
+            </div>
             <div className="relative w-full max-w-md">
               <Search className="absolute text-gray-400 transform -translate-y-1/2 left-4 top-1/2" size={20} />
               <input
                 type="text"
-                placeholder="Search events..."
+                placeholder={t.events.searchPlaceholder}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full py-3 pl-12 pr-4 text-white placeholder-gray-500 transition-colors border rounded-lg bg-black/50 border-white/10 focus:outline-none focus:border-coinlect-accent"
@@ -108,7 +113,7 @@ export const Events: React.FC = () => {
             </div>
           </div>
 
-          <div className="flex w-full gap-2 pb-2 mb-12 overflow-x-auto md:pb-0 scrollbar-hide">
+          <div className="flex w-full gap-2 pb-2 mb-4 overflow-x-auto md:pb-0 scrollbar-hide">
             {canonicalFilters.map((filterKey, index) => (
               <button
                 key={filterKey}
@@ -122,6 +127,11 @@ export const Events: React.FC = () => {
                 {displayFilters[index] || filterKey}
               </button>
             ))}
+          </div>
+          <div className="flex flex-wrap gap-2 mb-10">
+            <span className="px-3 py-1 text-xs font-semibold uppercase rounded-full bg-white/10 text-gray-200">Blockchain Sénégal</span>
+            <span className="px-3 py-1 text-xs font-semibold uppercase rounded-full bg-white/10 text-gray-200">Meetup Web3 Abidjan</span>
+            <span className="px-3 py-1 text-xs font-semibold uppercase rounded-full bg-white/10 text-gray-200">Hackathon crypto Ouagadougou</span>
           </div>
         </div>
 

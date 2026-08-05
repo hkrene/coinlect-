@@ -58,8 +58,9 @@ export const Deals: React.FC = () => {
                 </span>
               </h1>
               <p className="max-w-3xl mx-auto text-sm leading-relaxed text-[#71717a] md:text-sm lg:text-sm">
-                {t.deals.subtitle}
+                {t.deals.heroDescription}
               </p>
+              <h2 className="mt-8 text-xl font-bold text-white sm:text-3xl">{t.deals.heroHeading}</h2>
             </div>
           </ScrollReveal>
         </div>

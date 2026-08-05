@@ -30,6 +30,22 @@ export const translations = {
       ctaDonation: "Rejoindre sur Telegram",
       ctaStart: "Commencer"
     },
+    home: {
+      cardAcademy: "Académie crypto",
+      cardAcademyDesc: "Découvrez notre académie crypto Sénégal et Afrique Francophone.",
+      cardCommunity: "Communauté",
+      cardCommunityDesc: "Rejoignez la communauté crypto francophone.",
+      cardTrends: "Tendances",
+      cardTrendsDesc: "Suivez les tendances crypto et trading en Afrique.",
+      cardEvents: "Événements",
+      cardEventsDesc: "Trouvez les événements blockchain et meetups au Sénégal, Côte d’Ivoire, Togo.",
+      seoTitle: "Plateforme de formation crypto pour l'Afrique Francophone",
+      seoParagraph: "Formation crypto au Sénégal, en Côte d'Ivoire, au Bénin, au Togo, au Gabon, au Congo et au Burkina Faso. Coinlect propose des cours crypto, des ressources Web3 et une communauté active pour les apprenants francophones.",
+      seoSection1: "Coinlect propose des formations crypto Web3 conçues pour le Sénégal, la Côte d'Ivoire, le Bénin, le Togo, le Gabon, le Congo et le Burkina Faso.",
+      seoSection2: "Coinlect démocratise la formation crypto et le Web3 pour toute l'Afrique Francophone, avec des contenus adaptés aux besoins des pays francophones.",
+      seoSection3: "Vous avez des questions sur la formation crypto, le Web3 ou l'accompagnement au Sénégal, en Côte d'Ivoire et dans les pays francophones ?",
+      statsLine: "Nos chiffres illustrent l'impact de la formation crypto, de l'éducation Web3 et des communautés francophones d'Afrique."
+    },
     footer: {
       ready: "Prêt à démarrer votre voyage financier ?",
       join: "Rejoignez Coinlect aujourd'hui et prenez le contrôle de votre avenir.",
@@ -53,6 +69,7 @@ export const translations = {
     aboutPage: {
       title: "Notre Mission",
       subtitle: "Nous démocratisons l’éducation crypto pour une meilleure inclusion financière en Afrique francophone.",
+      seoContent: "Formation crypto Sénégal, Côte d'Ivoire, Bénin, Togo, Gabon, Congo, Burkina Faso. Coinlect propose des formations crypto, des ressources Web3 et une communauté active pour les apprenants francophones.",
       vision: {
         title: "Une révolution inclusive",
         desc: "Chez CoinLect Academy, nous croyons que l’accès à la connaissance est la première étape vers l’autonomie financière. La révolution numérique portée par le Web3 ne doit laisser personne de côté. Nous œuvrons pour que les jeunes talents africains deviennent des acteurs incontournables de cette transformation."
@@ -245,6 +262,7 @@ export const translations = {
             { q: "Est-ce que Coinlect est gratuit ?", a: "Oui, la majorité de notre contenu éducatif est accessible gratuitement pour favoriser l'inclusion financière." },
             { q: "Comment sécuriser mes cryptos ?", a: "Nous recommandons l'utilisation de portefeuilles matériels (hardware wallets) comme Ledger ou Trezor pour le stockage à long terme." },
             { q: "Proposez-vous des conseils financiers ?", a: "Non, Coinlect est une plateforme éducative. Faites toujours vos propres recherches avant d'investir." }
+        ,{ q: "Plateforme d'éducation crypto en Afrique Francophone", a: "Formation crypto Sénégal, Côte d'Ivoire, Bénin, Togo, Gabon, Congo, Burkina Faso. Coinlect propose des formations crypto, des ressources Web3 et une communauté active pour les apprenants francophones." }
         ]
     },
     academy: {
@@ -258,7 +276,11 @@ export const translations = {
             titleMiddle: "et la",
             titleHighlight: "Blockchain",
             titleSuffix: "facilement",
-            subtitle: "Maîtrisez les fondamentaux de la Finance Décentralisée (DeFi), des smart contracts et de l'infrastructure Web3."
+            subtitle: "Maîtrisez les fondamentaux de la Finance Décentralisée (DeFi), des smart contracts et de l'infrastructure Web3.",
+            seoDescription: "Coinlect Academy propose des formations crypto pratiques pour le Sénégal, la Côte d'Ivoire, le Bénin, le Togo, le Gabon, le Congo et le Burkina Faso. Formation crypto en ligne pour l'Afrique Francophone. Cours blockchain, trading et DeFi pour les débutants et les professionnels.",
+            heroHeading: "Formation crypto en ligne pour l'Afrique Francophone",
+            heroSubtext: "Cours blockchain, trading et DeFi pour les débutants et les professionnels.",
+            whyChoose: "Meilleure académie crypto en Afrique. Formation Web3 accessible depuis Dakar, Abidjan, Cotonou, Lomé, Ouagadougou, Brazzaville, Kinshasa."
         },
         emptyStates: {
             noCourses: "Aucun cours trouvé.",
@@ -383,6 +405,7 @@ export const translations = {
     trends: {
         title: "Marché",
         subtitle: "Données en temps réel fournies par l'API CoinGecko.",
+        heroText: "Tendances crypto et trading en Afrique Francophone. Analyse marché crypto pour le Sénégal, la Côte d'Ivoire, le Bénin, le Togo, le Gabon, le Congo et le Burkina Faso. Suivez les mouvements crypto, les actualités DeFi et les tendances trading qui intéressent les francophones d'Afrique.",
         live: "Marché en Direct",
         offline: "Données Hors Ligne",
         lastUpdate: "Dernière mise à jour",
@@ -407,6 +430,7 @@ export const translations = {
             titlePrefix: "Nos",
             titleMain: "Communautés",
             subtitle: "Connectez-vous avec des milliers de passionnés à travers nos différentes plateformes.",
+            seoDescription: "Rejoignez des passionnés de crypto au Sénégal, en Côte d'Ivoire, au Bénin, au Togo, au Gabon, au Congo et au Burkina Faso.",
             categories: [
                 {
                     name: "Canaux Officiels",
@@ -443,6 +467,8 @@ export const translations = {
       title: "Offres",
       titleSuffix: "Exclusives",
       subtitle: "Nous avons négocié les meilleures offres pour vous. Économisez sur les frais de trading, sécurisez vos cryptos et optimisez votre fiscalité.",
+      heroDescription: "Meilleurs deals crypto et offres de formation Web3 pour l'Afrique Francophone. Économisez sur les frais de trading et apprenez la crypto depuis Dakar, Abidjan, Cotonou, Lomé, Libreville, Brazzaville, Kinshasa et Ouagadougou.",
+      heroHeading: "Offres crypto pour les étudiants et investisseurs francophones",
       searchPlaceholder: "Rechercher une offre...",
       filters: ["Tous", "Échange", "Portefeuille", "Fiscalité", "Outil Trading", "Sécurité"],
       claim: "Profiter de l'offre",
@@ -552,6 +578,22 @@ export const translations = {
       ctaDonation: "Join our Telegram",
       ctaStart: "Get Started"
     },
+    home: {
+      seoTitle: "Crypto education platform for Francophone Africa",
+      seoParagraph: "Crypto training in Senegal, Côte d'Ivoire, Benin, Togo, Gabon, Congo, Burkina Faso. Coinlect offers crypto courses, Web3 resources, and an active community for French-speaking learners.",
+      cardAcademy: "Crypto Academy",
+      cardAcademyDesc: "Discover our crypto academy for Senegal and Francophone Africa.",
+      cardCommunity: "Community",
+      cardCommunityDesc: "Join the Francophone crypto community.",
+      cardTrends: "Trends",
+      cardTrendsDesc: "Track crypto and trading trends in Africa.",
+      cardEvents: "Events",
+      cardEventsDesc: "Find blockchain events and meetups in Senegal, Côte d'Ivoire, and Togo.",
+      seoSection1: "Coinlect offers Web3 crypto training designed for Senegal, Côte d'Ivoire, Benin, Togo, Gabon, Congo, and Burkina Faso.",
+      seoSection2: "Coinlect democratizes crypto and Web3 education for all Francophone Africa, with content adapted to French-speaking markets.",
+      seoSection3: "Have questions about crypto training, Web3, or support in Senegal, Côte d'Ivoire, and Francophone countries?",
+      statsLine: "Our numbers show the impact of crypto education, Web3 learning, and Francophone African communities."
+    },
     footer: {
       ready: "Ready to start your financial journey?",
       join: "Join Coinlect today and take control of your future.",
@@ -575,6 +617,7 @@ export const translations = {
     aboutPage: {
       title: "Our Mission",
       subtitle: "We are democratizing crypto education for better financial inclusion in Francophone Africa.",
+      seoContent: "Crypto training in Senegal, Côte d'Ivoire, Benin, Togo, Gabon, Congo, Burkina Faso. Coinlect offers crypto courses, Web3 resources, and an active community for French-speaking learners.",
       vision: {
         title: "An Inclusive Revolution",
         desc: "At CoinLect Academy, we believe that access to knowledge is the first step towards financial autonomy. The digital revolution led by Web3 must not leave anyone behind. We work to ensure young African talents become key players in this transformation."
@@ -767,7 +810,8 @@ export const translations = {
             { q: "How to start with Coinlect?", a: "Start by creating a free account, explore our courses in the Academy, and join our community on Telegram." },
             { q: "Is Coinlect free?", a: "Yes, the majority of our educational content is available for free to foster financial inclusion." },
             { q: "How to secure my crypto?", a: "We recommend using hardware wallets like Ledger or Trezor for long-term storage." },
-            { q: "Do you offer financial advice?", a: "No, Coinlect is an educational platform. Always do your own research before investing." }
+            { q: "Do you offer financial advice?", a: "No, Coinlect is an educational platform. Always do your own research before investing." },
+            { q: "Francophone Africa crypto education platform", a: "Crypto training in Senegal, Côte d'Ivoire, Benin, Togo, Gabon, Congo, Burkina Faso. Coinlect offers crypto courses, Web3 resources, and an active community for French-speaking learners." }
         ]
     },
     academy: {
@@ -781,7 +825,11 @@ export const translations = {
             titleMiddle: "and",
             titleHighlight: "Blockchain",
             titleSuffix: "easily",
-            subtitle: "Master the fundamentals of Decentralized Finance (DeFi), smart contracts, and Web3 infrastructure."
+            subtitle: "Master the fundamentals of Decentralized Finance (DeFi), smart contracts, and Web3 infrastructure.",
+            seoDescription: "Coinlect Academy offers practical crypto training for Senegal, Côte d'Ivoire, Benin, Togo, Gabon, Congo, and Burkina Faso.",
+            heroHeading: "Online crypto training for Francophone Africa",
+            heroSubtext: "Blockchain, trading, and DeFi courses for beginners and professionals.",
+            whyChoose: "Top crypto academy in Africa. Web3 training accessible from Dakar, Abidjan, Cotonou, Lomé, Ouagadougou, Brazzaville, and Kinshasa."
         },
         emptyStates: {
             noCourses: "No courses found.",
@@ -906,6 +954,7 @@ export const translations = {
     trends: {
         title: "Market",
         subtitle: "Real-time data provided by CoinGecko API.",
+        heroText: "Crypto and trading trends for Francophone Africa. Market analysis for Senegal, Côte d'Ivoire, Benin, Togo, Gabon, Congo, and Burkina Faso. Follow crypto movements, DeFi news, and trading trends that matter to African French-speaking users.",
         live: "Live Market",
         offline: "Offline Data",
         lastUpdate: "Last updated",
@@ -930,6 +979,7 @@ export const translations = {
             titlePrefix: "Our",
             titleMain: "Communities",
             subtitle: "Connect with thousands of enthusiasts across our different platforms.",
+            seoDescription: "Join crypto enthusiasts in Senegal, Côte d'Ivoire, Benin, Togo, Gabon, Congo, and Burkina Faso.",
             categories: [
                 {
                     name: "Official Channels",
@@ -966,6 +1016,8 @@ export const translations = {
       title: "Exclusive",
       titleSuffix: "Deals",
       subtitle: "We negotiated the best deals for you. Save on trading fees, secure your crypto, and optimize your taxes.",
+      heroDescription: "Best crypto deals and Web3 training offers for Francophone Africa. Save on trading fees and learn crypto from Dakar, Abidjan, Cotonou, Lomé, Libreville, Brazzaville, Kinshasa, and Ouagadougou.",
+      heroHeading: "Crypto deals for Francophone students and investors",
       searchPlaceholder: "Search for a deal...",
       filters: ["All", "Exchange", "Wallet", "Tax", "Trading Tool", "Security"],
       claim: "Claim Offer",

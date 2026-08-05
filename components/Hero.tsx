@@ -80,18 +80,19 @@ export const Hero: React.FC = () => {
         </p>
         
         {/* CTAs */}
-        <div className="flex flex-col items-center justify-center gap-4 mb-24 sm:flex-row">
+        <div className="flex flex-row items-center justify-center gap-3 mb-24">
           <Link href="https://t.me/coinlect_academy">
-            <button className="flex items-center gap-3 px-8 py-4 font-semibold text-white transition-all border rounded-full bg-white/5 border-white/10 hover:bg-white/10">
+            <button className="flex items-center gap-3 px-6 py-3 font-semibold text-white transition-all border rounded-full bg-white/5 border-white/10 hover:bg-white/10">
               <div className="p-1 text-black bg-white rounded-full">
                 <Play className="w-3 h-3 fill-current" />
               </div>
-              {t.hero.ctaDonation}
+              <span className="hidden sm:inline">{t.hero.ctaDonation}</span>
+              <span className="inline sm:hidden">telegran</span>
             </button>
           </Link>
           
           <Link href={isAuthenticated ? "/academy" : "/register"}>
-            <button className="px-10 py-4 rounded-full bg-amber-500 text-black font-black hover:bg-white transition-all shadow-[0_0_40px_rgba(245,158,11,0.2)]">
+            <button className="px-6 py-3 rounded-full bg-amber-500 text-black font-black hover:bg-white transition-all shadow-[0_0_24px_rgba(245,158,11,0.15)]">
               {t.hero.ctaStart}
             </button>
           </Link>

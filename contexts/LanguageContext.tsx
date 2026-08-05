@@ -5,10 +5,12 @@ import { translations } from '../translations';
 
 type Language = 'fr' | 'en';
 
+type Translations = typeof translations[keyof typeof translations];
+
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: typeof translations.fr;
+  t: Translations;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
