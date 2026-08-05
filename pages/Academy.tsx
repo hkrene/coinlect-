@@ -249,7 +249,7 @@ export const Academy: React.FC = () => {
                         </span>{' '}<span className="text-[#a1a1aa]">{t.academy.hero.titleSuffix}</span>
                     </h1>
                     <p className="max-w-3xl mx-auto text-sm leading-relaxed text-[#71717a] md:text-sm lg:text-sm">
-                        {t.academy.hero.subtitle}
+                        {t.academy.hero.seoDescription}
                     </p>
                 </div>
             </ScrollReveal>

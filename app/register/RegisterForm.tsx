@@ -76,8 +76,7 @@ export function RegisterForm() {
     <ComponentsLayout>
       <div className="container flex flex-col items-center justify-center min-h-screen px-4 py-8 mx-auto sm:px-6 md:pt-32 md:pb-20">
         <ScrollReveal className="w-full max-w-md">
-          <div className="relative p-6 overflow-hidden border glass-card sm:p-8 rounded-2xl border-white/10">
-            <div className="absolute top-0 left-0 w-24 h-24 sm:w-32 sm:h-32 bg-blue-500/10 rounded-full blur-[50px] pointer-events-none"></div>
+          <div className="p-6 sm:p-8">
 
             <div className="mb-6 text-center sm:mb-8">
               <h1 className="mb-2 text-xl font-bold sm:text-2xl md:text-3xl">Create Account</h1>
@@ -94,37 +93,37 @@ export function RegisterForm() {
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <label className="block mb-2 text-xs font-medium text-gray-400 sm:text-sm">First Name</label>
-                  <input 
-                    id="firstName" 
-                    type="text" 
-                    required 
-                    onChange={handleChange} 
-                    className="w-full px-3 py-3 text-sm text-white transition-colors border rounded-lg sm:px-4 sm:text-base bg-black/50 border-white/10 focus:outline-none focus:border-coinlect-accent focus:ring-1 focus:ring-coinlect-accent/50" 
-                    placeholder="John"
-                  />
+                    <input 
+                      id="firstName" 
+                      type="text" 
+                      required 
+                      onChange={handleChange} 
+                      className="w-full px-3 py-3 text-sm text-white transition-colors border rounded-lg sm:px-4 sm:text-base bg-white/5 border-white/20 focus:outline-none focus:border-coinlect-accent focus:ring-1 focus:ring-coinlect-accent/60" 
+                      placeholder="John"
+                    />
                 </div>
                 <div>
                   <label className="block mb-2 text-xs font-medium text-gray-400 sm:text-sm">Last Name</label>
-                  <input 
-                    id="lastName" 
-                    type="text" 
-                    required 
-                    onChange={handleChange} 
-                    className="w-full px-3 py-3 text-sm text-white transition-colors border rounded-lg sm:px-4 sm:text-base bg-black/50 border-white/10 focus:outline-none focus:border-coinlect-accent focus:ring-1 focus:ring-coinlect-accent/50" 
-                    placeholder="Doe"
-                  />
+                    <input 
+                      id="lastName" 
+                      type="text" 
+                      required 
+                      onChange={handleChange} 
+                      className="w-full px-3 py-3 text-sm text-white transition-colors border rounded-lg sm:px-4 sm:text-base bg-white/5 border-white/20 focus:outline-none focus:border-coinlect-accent focus:ring-1 focus:ring-coinlect-accent/60" 
+                      placeholder="Doe"
+                    />
                 </div>
               </div>
               <div>
                 <label className="block mb-2 text-xs font-medium text-gray-400 sm:text-sm">Email Address</label>
-                <input 
-                  id="email" 
-                  type="email" 
-                  required 
-                  onChange={handleChange} 
-                  className="w-full px-3 py-3 text-sm text-white transition-colors border rounded-lg sm:px-4 sm:text-base bg-black/50 border-white/10 focus:outline-none focus:border-coinlect-accent focus:ring-1 focus:ring-coinlect-accent/50" 
-                  placeholder="you@example.com" 
-                />
+                  <input 
+                    id="email" 
+                    type="email" 
+                    required 
+                    onChange={handleChange} 
+                    className="w-full px-3 py-3 text-sm text-white transition-colors border rounded-lg sm:px-4 sm:text-base bg-white/5 border-white/20 focus:outline-none focus:border-coinlect-accent focus:ring-1 focus:ring-coinlect-accent/60" 
+                    placeholder="you@example.com" 
+                  />
               </div>
               <div>
                 <label className="block mb-2 text-xs font-medium text-gray-400 sm:text-sm">Password</label>
@@ -134,7 +133,7 @@ export function RegisterForm() {
                     type={showPassword ? 'text' : 'password'} 
                     required 
                     onChange={handleChange} 
-                    className="w-full px-3 py-3 pr-10 text-sm text-white transition-colors border rounded-lg sm:px-4 sm:text-base bg-black/50 border-white/10 focus:outline-none focus:border-coinlect-accent focus:ring-1 focus:ring-coinlect-accent/50" 
+                      className="w-full px-3 py-3 pr-10 text-sm text-white transition-colors border rounded-lg sm:px-4 sm:text-base bg-white/5 border-white/20 focus:outline-none focus:border-coinlect-accent focus:ring-1 focus:ring-coinlect-accent/60" 
                     placeholder="••••••••" 
                   />
                   <button 
@@ -151,7 +150,7 @@ export function RegisterForm() {
                 By clicking Sign Up, you agree to our <a href="/terms" className="font-medium underline text-coinlect-accent">Terms</a> and <a href="/privacy" className="font-medium underline text-coinlect-accent">Privacy Policy</a>.
               </div>
 
-              <Button className="justify-center w-full py-3 text-sm font-semibold sm:py-4 sm:text-base" disabled={isLoading}>
+              <Button size="sm" className="justify-center w-full py-3 text-sm font-semibold rounded-lg shadow-none" disabled={isLoading}>
                 {isLoading ? 'Creating Account...' : 'Sign Up'}
               </Button>
             </form>

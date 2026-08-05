@@ -55,12 +55,10 @@ export default function ProfilePage() {
       <ComponentsLayout>
         <div className="container flex flex-col items-center justify-center min-h-screen px-4 py-8 mx-auto sm:px-6 md:pt-32 md:pb-20">
           <ScrollReveal className="w-full max-w-2xl">
-            <div className="relative p-6 overflow-hidden border glass-card sm:p-8 rounded-2xl border-white/10">
-              <div className="absolute top-0 right-0 w-24 h-24 sm:w-32 sm:h-32 bg-coinlect-accent/10 rounded-full blur-[50px] pointer-events-none"></div>
-
+            <div className="p-6 sm:p-8">
               {/* Header Section */}
               <div className="mb-8 text-center">
-                <div className="relative flex justify-center mb-4 group">
+                <div className="flex justify-center mb-4">
                   <Avatar
                     src={user.avatar}
                     name={user.name}
@@ -81,14 +79,14 @@ export default function ProfilePage() {
                   {t.profile.personalInfo}
                 </h2>
                 <div className="space-y-4">
-                  <div className="flex items-center gap-3 p-4 border rounded-lg bg-black/30 border-white/10">
+                  <div className="flex items-start gap-3 pb-4 border-b border-white/10">
                     <User className="text-coinlect-accent" size={18} />
                     <div className="flex-1">
                       <h3 className="text-xs font-semibold tracking-wider text-gray-400 uppercase">{t.profile.name}</h3>
                       <p className="text-sm text-white">{user.name || 'N/A'}</p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 p-4 border rounded-lg bg-black/30 border-white/10">
+                  <div className="flex items-start gap-3 pb-4 border-b border-white/10">
                     <Mail className="text-coinlect-accent" size={18} />
                     <div className="flex-1">
                       <h3 className="text-xs font-semibold tracking-wider text-gray-400 uppercase">{t.profile.email}</h3>
@@ -96,7 +94,7 @@ export default function ProfilePage() {
                     </div>
                   </div>
                   {user.dateOfBirth && (
-                    <div className="flex items-center gap-3 p-4 border rounded-lg bg-black/30 border-white/10">
+                    <div className="flex items-start gap-3 pb-4 border-b border-white/10">
                       <Calendar className="text-coinlect-accent" size={18} />
                       <div className="flex-1">
                         <h3 className="text-xs font-semibold tracking-wider text-gray-400 uppercase">{t.profile.dateOfBirth}</h3>
@@ -104,7 +102,7 @@ export default function ProfilePage() {
                       </div>
                     </div>
                   )}
-                  <div className="flex items-center gap-3 p-4 border rounded-lg bg-black/30 border-white/10">
+                  <div className="flex items-start gap-3 pt-4">
                     <Calendar className="text-coinlect-accent" size={18} />
                     <div className="flex-1">
                       <h3 className="text-xs font-semibold tracking-wider text-gray-400 uppercase">{t.profile.dateJoined}</h3>
@@ -115,34 +113,42 @@ export default function ProfilePage() {
               </div>
 
               {/* Actions */}
-              <div className="flex flex-col gap-3 mt-8 sm:flex-row">
-                <Link href="/profile/edit" className="flex-1">
-                  <Button variant="outline" className="w-full">
-                    <Edit size={16} className="mr-2" />
+              <div className="grid gap-3 mt-6 sm:grid-cols-2">
+                <Link href="/profile/edit" className="w-full">
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    className="w-full py-3 text-sm font-semibold shadow-none rounded-xl hover:bg-yellow-400"
+                  >
+                    <Edit size={14} className="mr-2" />
                     {t.profile.editProfile}
                   </Button>
                 </Link>
                 <Button
-                  variant="outline"
-                  className="flex-1"
+                  variant="ghost"
+                  size="sm"
+                  className="w-full py-3 text-white border rounded-xl border-white/10 hover:bg-white/10"
                   onClick={() => router.push('/academy')}
                 >
                   {t.profile.viewAcademy}
                 </Button>
                 {user.role === 'ADMIN' && (
                   <Button
-                    variant="outline"
-                    className="flex-1"
+                    variant="ghost"
+                    size="sm"
+                    className="w-full py-3 text-white border rounded-xl border-white/10 hover:bg-white/10"
                     onClick={() => router.push('/admin')}
                   >
                     {t.profile.adminPanel}
                   </Button>
                 )}
                 <Button
-                  className="flex-1 text-white bg-red-600 hover:bg-red-700"
+                  variant="primary"
+                  size="sm"
+                  className="w-full py-3 text-white bg-red-600 shadow-none rounded-xl hover:bg-red-700"
                   onClick={handleLogout}
                 >
-                  <LogOut size={16} className="mr-2" />
+                  <LogOut size={14} className="mr-2" />
                   {t.profile.logout}
                 </Button>
               </div>

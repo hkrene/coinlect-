@@ -14,6 +14,7 @@ export function ComponentsLayout({ children }: { children: React.ReactNode }) {
   
   // Pages that should not have footer
   const isNoFooterPage = 
+    pathname === '/profile' ||
     pathname === '/academy' ||
     pathname === '/donate' ||
     (pathname?.startsWith('/academy/article/')) ||

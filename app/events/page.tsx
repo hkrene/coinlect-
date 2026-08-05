@@ -1,5 +1,3 @@
-'use client';
-
 import type { Metadata } from 'next';
 import { Events } from '@/pages/Events';
 import { ComponentsLayout } from '../components-layout';
