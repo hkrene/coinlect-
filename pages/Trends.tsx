@@ -188,8 +188,8 @@ export const Trends: React.FC = () => {
             <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
                 <div>
                     <h1 className="mb-4 text-4xl font-bold text-center md:text-left">Marché <span className="text-coinlect-accent">Crypto</span></h1>
-                                        <p className="max-w-3xl mt-3 text-xs leading-relaxed text-gray-300 text-center md:text-sm md:text-left">
-                                            Tendances crypto et trading en Afrique Francophone. Analyse marché crypto pour le Sénégal, la Côte d'Ivoire, le Bénin, le Togo, le Gabon, le Congo et le Burkina Faso. Suivez les mouvements crypto, les actualités DeFi et les tendances trading qui intéressent les francophones d'Afrique.
+                                        <p className="max-w-3xl mt-3 text-xs leading-relaxed text-center text-gray-300 md:text-sm md:text-left">
+                                            Tendances crypto et trading en Afrique Francophone. Analyse marché crypto pour le Sénégal, la Côte d&apos;Ivoire, le Bénin, le Togo, le Gabon, le Congo et le Burkina Faso. Suivez les mouvements crypto, les actualités DeFi et les tendances trading qui intéressent les francophones d&apos;Afrique.
                                         </p>
                 </div>
                 <div className="flex items-center gap-4">
