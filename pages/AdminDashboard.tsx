@@ -25,6 +25,8 @@ export const AdminDashboard: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [deals, setDeals] = useState<Deal[]>([]);
   const [users, setUsers] = useState<User[]>([]);
+  const [totalUsers, setTotalUsers] = useState(0);
+  const [usersError, setUsersError] = useState<string | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -186,9 +188,14 @@ export const AdminDashboard: React.FC = () => {
         setArticles(articlesData);
         setEvents(eventsData);
         setUsers(usersData);
+        setTotalUsers(usersData.length);
+        setUsersError(null);
         setDeals(dealsData);
       } catch (error) {
         console.error('Error loading admin data:', error);
+        setUsers([]);
+        setTotalUsers(0);
+        setUsersError(error instanceof Error ? error.message : 'Failed to fetch users');
       }
     };
 
@@ -200,12 +207,21 @@ export const AdminDashboard: React.FC = () => {
       const response = await fetch('/api/users', {
         credentials: 'include',
       });
-      if (!response.ok) throw new Error('Failed to fetch users');
-      const data = await response.json();
+
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(data?.error || 'Failed to fetch users');
+      }
+
+      if (!Array.isArray(data.users)) {
+        throw new Error('Unexpected response from users API');
+      }
+
+      setTotalUsers(Number.isFinite(data.totalUsers) ? Number(data.totalUsers) : data.users.length);
       return data.users;
     } catch (error) {
       console.error('Error fetching users:', error);
-      return [];
+      throw error;
     }
   };
 
@@ -642,7 +658,7 @@ export const AdminDashboard: React.FC = () => {
                   { label: 'Articles', val: articles.length, icon: <FileText />, color: 'text-purple-500' },
                   { label: 'Événements', val: events.length, icon: <Calendar />, color: 'text-green-500' },
                   { label: 'Deals', val: deals.length, icon: <Star />, color: 'text-yellow-500' },
-                  { label: 'Utilisateurs', val: users.length, icon: <Star />, color: 'text-blue-500' }
+                  { label: 'Utilisateurs', val: totalUsers || users.length, icon: <Star />, color: 'text-blue-500' }
                 ].map((card, i) => (
                   <div key={i} className="bg-[#111] p-6 rounded-xl border border-white/10 flex items-center justify-between">
                     <div>
@@ -702,7 +718,7 @@ export const AdminDashboard: React.FC = () => {
                 <Plus size={16} className="mr-2" /> Créer un Cours
               </Button>
             </div>
-            <div className="overflow-x-auto rounded-xl border border-white/10">
+            <div className="overflow-x-auto border rounded-xl border-white/10">
               <table className="w-full text-left">
                 <thead className="bg-[#0a0a0a] text-xs uppercase text-gray-400">
                   <tr>
@@ -723,11 +739,11 @@ export const AdminDashboard: React.FC = () => {
                       <td className="px-4 py-3">
                         <span className="font-medium text-white line-clamp-1">{c.title}</span>
                       </td>
-                      <td className="px-4 py-3 text-gray-400 text-sm">{c.category || '—'} • {c.level || '—'}</td>
+                      <td className="px-4 py-3 text-sm text-gray-400">{c.category || '—'} • {c.level || '—'}</td>
                       <td className="px-4 py-3">
                         <span className={`px-2 py-1 text-xs rounded-full ${c.status === 'PUBLISHED' ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}>{c.status}</span>
                       </td>
-                      <td className="px-4 py-3 text-gray-400 text-sm">{new Date(c.createdAt).toLocaleDateString('fr-FR')}</td>
+                      <td className="px-4 py-3 text-sm text-gray-400">{new Date(c.createdAt).toLocaleDateString('fr-FR')}</td>
                       <td className="px-4 py-3 text-right">
                         <div className="flex items-center justify-end gap-1">
                           <button
@@ -787,7 +803,7 @@ export const AdminDashboard: React.FC = () => {
                 <Plus size={16} className="mr-2" /> Publier un Article
               </Button>
             </div>
-            <div className="overflow-x-auto rounded-xl border border-white/10">
+            <div className="overflow-x-auto border rounded-xl border-white/10">
               <table className="w-full text-left">
                 <thead className="bg-[#0a0a0a] text-xs uppercase text-gray-400">
                   <tr>
@@ -813,7 +829,7 @@ export const AdminDashboard: React.FC = () => {
                       <td className="px-4 py-3">
                         <span className={`px-2 py-1 text-xs rounded-full ${a.status === 'PUBLISHED' ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}>{a.status}</span>
                       </td>
-                      <td className="px-4 py-3 text-gray-400 text-sm">{new Date(a.createdAt).toLocaleDateString('fr-FR')}</td>
+                      <td className="px-4 py-3 text-sm text-gray-400">{new Date(a.createdAt).toLocaleDateString('fr-FR')}</td>
                       <td className="px-4 py-3 text-right">
                         <div className="flex items-center justify-end gap-1">
                           <button
@@ -886,7 +902,7 @@ export const AdminDashboard: React.FC = () => {
                 <Plus size={16} className="mr-2" /> Créer un Événement
               </Button>
             </div>
-            <div className="overflow-x-auto rounded-xl border border-white/10">
+            <div className="overflow-x-auto border rounded-xl border-white/10">
               <table className="w-full text-left">
                 <thead className="bg-[#0a0a0a] text-xs uppercase text-gray-400">
                   <tr>
@@ -903,7 +919,7 @@ export const AdminDashboard: React.FC = () => {
                       <td className="px-4 py-3">
                         <span className="font-medium text-white line-clamp-2">{e.title}</span>
                       </td>
-                      <td className="px-4 py-3 text-gray-400 text-sm">{e.date} • {e.location}</td>
+                      <td className="px-4 py-3 text-sm text-gray-400">{e.date} • {e.location}</td>
                       <td className="px-4 py-3">
                         <div className="flex flex-wrap gap-1">
                           {(e.eventTypes || []).slice(0, 3).map((t, idx) => (
@@ -956,8 +972,15 @@ export const AdminDashboard: React.FC = () => {
 
         {activeTab === 'users' && (
           <div className="space-y-4 md:space-y-6 animate-in fade-in">
-            <h1 className="text-2xl font-bold md:text-3xl">Gestion des Utilisateurs ({users.length})</h1>
-            <div className="overflow-x-auto rounded-xl border border-white/10">
+            <div className="flex items-center justify-between gap-4">
+              <h1 className="text-2xl font-bold md:text-3xl">Gestion des Utilisateurs ({totalUsers || users.length})</h1>
+            </div>
+            {usersError && (
+              <div className="p-3 text-sm text-red-200 border rounded-lg border-red-500/30 bg-red-500/10">
+                Impossible de charger la liste des utilisateurs. Vérifiez que l&apos;utilisateur admin a bien le rôle ADMIN et que le cookie de session est valide. Détail: {usersError}
+              </div>
+            )}
+            <div className="overflow-x-auto border rounded-xl border-white/10">
               <table className="w-full text-left">
                 <thead className="bg-[#0a0a0a] text-xs uppercase text-gray-400">
                   <tr>
@@ -979,7 +1002,7 @@ export const AdminDashboard: React.FC = () => {
                           <span className="font-medium text-white">{u.name || '—'}</span>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-gray-400 text-sm">{u.email}</td>
+                      <td className="px-4 py-3 text-sm text-gray-400">{u.email}</td>
                       <td className="px-4 py-3">
                         <span className={`px-2 py-1 text-xs rounded-full ${u.role === 'ADMIN' ? 'bg-coinlect-accent/20 text-coinlect-accent' : 'bg-gray-500/20 text-gray-400'}`}>{u.role === 'ADMIN' ? 'Admin' : 'Utilisateur'}</span>
                       </td>
@@ -991,14 +1014,14 @@ export const AdminDashboard: React.FC = () => {
                           {isUserActiveOnPlatform(u.lastActivityAt) ? 'Actif' : 'Inactif'}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-gray-400 text-sm">{new Date(u.createdAt).toLocaleDateString('fr-FR')}</td>
-                      <td className="px-4 py-3 text-gray-400 text-sm">{u.updatedAt ? formatRelativeDate(u.updatedAt) : '—'}</td>
+                      <td className="px-4 py-3 text-sm text-gray-400">{new Date(u.createdAt).toLocaleDateString('fr-FR')}</td>
+                      <td className="px-4 py-3 text-sm text-gray-400">{u.updatedAt ? formatRelativeDate(u.updatedAt) : '—'}</td>
                       <td className="px-4 py-3 text-right">
                         <div className="flex items-center justify-end gap-1">
                           {u.role === 'USER' && (
                             <button
                               onClick={() => handleRoleChange(u.id, 'promote')}
-                              className="px-2 py-1 text-xs rounded-lg border border-white/20 text-coinlect-accent hover:bg-coinlect-accent/10"
+                              className="px-2 py-1 text-xs border rounded-lg border-white/20 text-coinlect-accent hover:bg-coinlect-accent/10"
                             >
                               Promouvoir
                             </button>
@@ -1006,7 +1029,7 @@ export const AdminDashboard: React.FC = () => {
                           {u.role === 'ADMIN' && u.id !== user?.id && (
                             <button
                               onClick={() => handleRoleChange(u.id, 'demote')}
-                              className="px-2 py-1 text-xs rounded-lg border border-red-400/50 text-red-400 hover:bg-red-400/10"
+                              className="px-2 py-1 text-xs text-red-400 border rounded-lg border-red-400/50 hover:bg-red-400/10"
                             >
                               Rétrograder
                             </button>
@@ -1038,7 +1061,7 @@ export const AdminDashboard: React.FC = () => {
                 <Plus size={16} className="mr-2" /> Créer un Deal
               </Button>
             </div>
-            <div className="overflow-x-auto rounded-xl border border-white/10">
+            <div className="overflow-x-auto border rounded-xl border-white/10">
               <table className="w-full text-left">
                 <thead className="bg-[#0a0a0a] text-xs uppercase text-gray-400">
                   <tr>
@@ -1064,7 +1087,7 @@ export const AdminDashboard: React.FC = () => {
                       <td className="px-4 py-3">
                         <span className="font-medium text-white line-clamp-2">{d.title}</span>
                       </td>
-                      <td className="px-4 py-3 text-gray-400 text-sm">{d.category} • {d.discount || '—'}</td>
+                      <td className="px-4 py-3 text-sm text-gray-400">{d.category} • {d.discount || '—'}</td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1">
                           {d.featured && <Star className="text-coinlect-accent" size={14} fill="currentColor" />}
@@ -1072,7 +1095,7 @@ export const AdminDashboard: React.FC = () => {
                           {d.exclusive && <span className="text-[10px] font-bold text-yellow-500">EXC</span>}
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-gray-400 text-sm">{new Date(d.createdAt).toLocaleDateString('fr-FR')}</td>
+                      <td className="px-4 py-3 text-sm text-gray-400">{new Date(d.createdAt).toLocaleDateString('fr-FR')}</td>
                       <td className="px-4 py-3 text-right">
                         <div className="flex items-center justify-end gap-1">
                           <button

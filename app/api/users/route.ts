@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
       orderBy: { createdAt: 'desc' },
     });
 
-    return NextResponse.json({ users });
+    return NextResponse.json({ users, totalUsers: users.length });
   } catch (err) {
     console.error('Users fetch error', err);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
