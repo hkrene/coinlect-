@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 
 export const dynamic = 'force-dynamic';
 export const generateStaticParams = () => [];
@@ -15,6 +15,18 @@ import { Avatar } from '../components/Avatar';
 import { useLanguage } from '../contexts/LanguageContext';
 import MDEditor from '@uiw/react-md-editor';
 
+type UsersFilter = 'all' | 'user' | 'admin' | 'suspended' | 'suspects';
+
+const USERS_FILTERS: { id: UsersFilter; label: string }[] = [
+  { id: 'all', label: 'Tous' },
+  { id: 'user', label: 'Utilisateurs' },
+  { id: 'admin', label: 'Admins' },
+  { id: 'suspended', label: 'Suspendus' },
+  { id: 'suspects', label: 'Suspects (bots)' },
+];
+
+const USERS_PAGE_SIZES = [10, 25, 50, 100];
+
 export const AdminDashboard: React.FC = () => {
   const { user, isAdmin } = useAuth();
   const router = useRouter();
@@ -27,6 +39,12 @@ export const AdminDashboard: React.FC = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [totalUsers, setTotalUsers] = useState(0);
   const [usersError, setUsersError] = useState<string | null>(null);
+  const [usersPage, setUsersPage] = useState(1);
+  const [usersTotalPages, setUsersTotalPages] = useState(1);
+  const [usersSearch, setUsersSearch] = useState('');
+  const [usersLoading, setUsersLoading] = useState(false);
+  const [usersFilter, setUsersFilter] = useState<UsersFilter>('all');
+  const [usersPageSize, setUsersPageSize] = useState(10);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -177,34 +195,44 @@ export const AdminDashboard: React.FC = () => {
       }
 
       try {
-        const [coursesData, articlesData, eventsData, usersData, dealsData] = await Promise.all([
+        const [coursesData, articlesData, eventsData, dealsData] = await Promise.all([
           courseService.getAll(),
           articleService.getAll(),
           eventService.getAll(),
-          fetchUsers(),
           dealService.getAll()
         ]);
         setCourses(coursesData);
         setArticles(articlesData);
         setEvents(eventsData);
-        setUsers(usersData);
-        setTotalUsers(usersData.length);
-        setUsersError(null);
         setDeals(dealsData);
       } catch (error) {
         console.error('Error loading admin data:', error);
-        setUsers([]);
-        setTotalUsers(0);
-        setUsersError(error instanceof Error ? error.message : 'Failed to fetch users');
       }
     };
 
     loadData();
   }, [isAdmin, router, refreshTrigger]);
 
-  const fetchUsers = async (): Promise<User[]> => {
-    try {
-      const response = await fetch('/api/users', {
+  // Users are loaded separately (and paginated) so a failure here never hides
+  // the rest of the dashboard, and the whole user table is never fetched at once.
+  const fetchUsers = useCallback(
+    async (
+      page = usersPage,
+      search = usersSearch,
+      filter = usersFilter,
+      limit = usersPageSize
+    ): Promise<User[]> => {
+      const params = new URLSearchParams({
+        page: String(page),
+        limit: String(limit),
+      });
+      if (search.trim()) params.set('search', search.trim());
+      if (filter === 'user') params.set('role', 'USER');
+      else if (filter === 'admin') params.set('role', 'ADMIN');
+      else if (filter === 'suspended') params.set('status', 'suspended');
+      else if (filter === 'suspects') params.set('status', 'suspects');
+
+      const response = await fetch(`/api/users?${params.toString()}`, {
         credentials: 'include',
       });
 
@@ -218,14 +246,51 @@ export const AdminDashboard: React.FC = () => {
       }
 
       setTotalUsers(Number.isFinite(data.totalUsers) ? Number(data.totalUsers) : data.users.length);
+      setUsersTotalPages(Number.isFinite(data.totalPages) ? Number(data.totalPages) : 1);
       return data.users;
-    } catch (error) {
-      console.error('Error fetching users:', error);
-      throw error;
-    }
-  };
+    },
+    [usersPage, usersSearch, usersFilter, usersPageSize]
+  );
 
-  const handleRoleChange = async (userId: string, action: 'promote' | 'demote') => {
+  useEffect(() => {
+    if (!isAdmin) return;
+
+    let cancelled = false;
+    const timer = setTimeout(async () => {
+      setUsersLoading(true);
+      try {
+        const usersData = await fetchUsers(usersPage, usersSearch, usersFilter, usersPageSize);
+        if (!cancelled) {
+          setUsers(usersData);
+          setUsersError(null);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          console.error('Error fetching users:', error);
+          setUsers([]);
+          setUsersError(error instanceof Error ? error.message : 'Failed to fetch users');
+        }
+      } finally {
+        if (!cancelled) setUsersLoading(false);
+      }
+    }, usersSearch ? 300 : 0);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [isAdmin, usersPage, usersSearch, usersFilter, usersPageSize, refreshTrigger, fetchUsers]);
+
+  const handleUserAction = async (
+    userId: string,
+    action: 'promote' | 'demote' | 'activate' | 'deactivate'
+  ) => {
+    const actionLabels: Record<typeof action, string> = {
+      promote: 'promouvoir',
+      demote: 'rétrograder',
+      activate: 'réactiver',
+      deactivate: 'suspendre',
+    };
     try {
       const response = await fetch('/api/users', {
         method: 'POST',
@@ -235,17 +300,17 @@ export const AdminDashboard: React.FC = () => {
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        alert(error.error || 'Failed to update user role');
+        const error = await response.json().catch(() => ({}));
+        alert(error.error || `Échec de la tentative de ${actionLabels[action]} cet utilisateur`);
         return;
       }
 
-      // Refresh users list
-      const updatedUsers = await fetchUsers();
+      // Refresh users list (stay on the current page/search/filter)
+      const updatedUsers = await fetchUsers(usersPage, usersSearch, usersFilter, usersPageSize);
       setUsers(updatedUsers);
     } catch (error) {
-      console.error('Error updating user role:', error);
-      alert('Error updating user role. Please try again.');
+      console.error('Error updating user:', error);
+      alert('Erreur lors de la mise à jour. Veuillez réessayer.');
     }
   };
 
@@ -972,8 +1037,53 @@ export const AdminDashboard: React.FC = () => {
 
         {activeTab === 'users' && (
           <div className="space-y-4 md:space-y-6 animate-in fade-in">
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
               <h1 className="text-2xl font-bold md:text-3xl">Gestion des Utilisateurs ({totalUsers || users.length})</h1>
+              <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
+                <input
+                  type="search"
+                  value={usersSearch}
+                  onChange={(e) => {
+                    setUsersSearch(e.target.value);
+                    setUsersPage(1);
+                  }}
+                  placeholder="Rechercher par email ou nom..."
+                  className="w-full px-4 py-2 text-sm text-white placeholder-gray-500 border rounded-lg sm:w-72 bg-[#111] border-white/10 focus:outline-none focus:border-coinlect-accent"
+                />
+                <select
+                  value={usersPageSize}
+                  onChange={(e) => {
+                    setUsersPageSize(Number(e.target.value));
+                    setUsersPage(1);
+                  }}
+                  aria-label="Nombre d'utilisateurs par page"
+                  className="px-3 py-2 text-sm text-white border rounded-lg bg-[#111] border-white/10 focus:outline-none focus:border-coinlect-accent"
+                >
+                  {USERS_PAGE_SIZES.map((size) => (
+                    <option key={size} value={size}>{size} / page</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* Filter tabs: quickly view all, roles, suspended and suspected bot accounts */}
+            <div className="flex flex-wrap gap-2">
+              {USERS_FILTERS.map((filter) => (
+                <button
+                  key={filter.id}
+                  onClick={() => {
+                    setUsersFilter(filter.id);
+                    setUsersPage(1);
+                  }}
+                  className={`px-4 py-2 text-xs font-semibold transition-colors rounded-full ${
+                    usersFilter === filter.id
+                      ? 'bg-coinlect-accent text-black'
+                      : 'bg-white/5 text-gray-400 border border-white/10 hover:bg-white/10'
+                  }`}
+                >
+                  {filter.label}
+                </button>
+              ))}
             </div>
             {usersError && (
               <div className="p-3 text-sm text-red-200 border rounded-lg border-red-500/30 bg-red-500/10">
@@ -1002,25 +1112,36 @@ export const AdminDashboard: React.FC = () => {
                           <span className="font-medium text-white">{u.name || '—'}</span>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-400">{u.email}</td>
+                      <td className="px-4 py-3 text-sm text-gray-400">
+                        <div className="flex flex-col gap-1">
+                          <span>{u.email}</span>
+                          <span className="w-fit px-2 py-0.5 text-[10px] uppercase tracking-wide text-gray-500 bg-white/5 rounded">
+                            {u.provider === 'google' ? 'Google' : 'Local'}
+                          </span>
+                        </div>
+                      </td>
                       <td className="px-4 py-3">
                         <span className={`px-2 py-1 text-xs rounded-full ${u.role === 'ADMIN' ? 'bg-coinlect-accent/20 text-coinlect-accent' : 'bg-gray-500/20 text-gray-400'}`}>{u.role === 'ADMIN' ? 'Admin' : 'Utilisateur'}</span>
                       </td>
                       <td className="px-4 py-3">
-                        <span
-                          className={`inline-block px-2 py-1 text-xs rounded-full ${isUserActiveOnPlatform(u.lastActivityAt) ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}
-                          title={u.lastActivityAt ? `Dernière activité: ${formatRelativeDate(u.lastActivityAt)}` : 'Jamais connecté'}
-                        >
-                          {isUserActiveOnPlatform(u.lastActivityAt) ? 'Actif' : 'Inactif'}
-                        </span>
+                        {u.isActive === false ? (
+                          <span className="inline-block px-2 py-1 text-xs text-red-400 rounded-full bg-red-500/20">Suspendu</span>
+                        ) : (
+                          <span
+                            className={`inline-block px-2 py-1 text-xs rounded-full ${isUserActiveOnPlatform(u.lastActivityAt) ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}
+                            title={u.lastActivityAt ? `Dernière activité: ${formatRelativeDate(u.lastActivityAt)}` : 'Jamais connecté'}
+                          >
+                            {isUserActiveOnPlatform(u.lastActivityAt) ? 'Actif' : 'Inactif'}
+                          </span>
+                        )}
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-400">{new Date(u.createdAt).toLocaleDateString('fr-FR')}</td>
                       <td className="px-4 py-3 text-sm text-gray-400">{u.updatedAt ? formatRelativeDate(u.updatedAt) : '—'}</td>
                       <td className="px-4 py-3 text-right">
-                        <div className="flex items-center justify-end gap-1">
+                        <div className="flex flex-wrap items-center justify-end gap-1">
                           {u.role === 'USER' && (
                             <button
-                              onClick={() => handleRoleChange(u.id, 'promote')}
+                              onClick={() => handleUserAction(u.id, 'promote')}
                               className="px-2 py-1 text-xs border rounded-lg border-white/20 text-coinlect-accent hover:bg-coinlect-accent/10"
                             >
                               Promouvoir
@@ -1028,11 +1149,28 @@ export const AdminDashboard: React.FC = () => {
                           )}
                           {u.role === 'ADMIN' && u.id !== user?.id && (
                             <button
-                              onClick={() => handleRoleChange(u.id, 'demote')}
+                              onClick={() => handleUserAction(u.id, 'demote')}
                               className="px-2 py-1 text-xs text-red-400 border rounded-lg border-red-400/50 hover:bg-red-400/10"
                             >
                               Rétrograder
                             </button>
+                          )}
+                          {u.id !== user?.id && (
+                            u.isActive === false ? (
+                              <button
+                                onClick={() => handleUserAction(u.id, 'activate')}
+                                className="px-2 py-1 text-xs text-green-400 border rounded-lg border-green-400/50 hover:bg-green-400/10"
+                              >
+                                Réactiver
+                              </button>
+                            ) : (
+                              <button
+                                onClick={() => handleUserAction(u.id, 'deactivate')}
+                                className="px-2 py-1 text-xs text-yellow-400 border rounded-lg border-yellow-400/50 hover:bg-yellow-400/10"
+                              >
+                                Suspendre
+                              </button>
+                            )
                           )}
                           {u.id !== user?.id && (
                             <button
@@ -1047,8 +1185,42 @@ export const AdminDashboard: React.FC = () => {
                       </td>
                     </tr>
                   ))}
+                  {!usersLoading && users.length === 0 && (
+                    <tr className="bg-[#111]">
+                      <td colSpan={7} className="px-4 py-8 text-sm text-center text-gray-500">
+                        Aucun utilisateur ne correspond à ce filtre.
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
+            </div>
+            <div className="flex flex-col items-center justify-between gap-3 text-sm text-gray-400 sm:flex-row">
+              <span>
+                {usersLoading
+                  ? 'Chargement...'
+                  : totalUsers === 0
+                    ? 'Aucun utilisateur trouvé'
+                    : `Page ${usersPage} sur ${usersTotalPages} • ${totalUsers} utilisateur${totalUsers > 1 ? 's' : ''}`}
+              </span>
+              {usersTotalPages > 1 && (
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setUsersPage((p) => Math.max(1, p - 1))}
+                    disabled={usersPage <= 1 || usersLoading}
+                    className="px-3 py-1 border rounded-lg border-white/20 hover:bg-white/5 disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    Précédent
+                  </button>
+                  <button
+                    onClick={() => setUsersPage((p) => Math.min(usersTotalPages, p + 1))}
+                    disabled={usersPage >= usersTotalPages || usersLoading}
+                    className="px-3 py-1 border rounded-lg border-white/20 hover:bg-white/5 disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    Suivant
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -1746,7 +1918,7 @@ export const AdminDashboard: React.FC = () => {
                     if (response.ok) {
                       setRefreshTrigger(t => t + 1);
                       if (deleteTarget.type === 'user') {
-                        const updated = await fetchUsers();
+                        const updated = await fetchUsers(usersPage, usersSearch, usersFilter, usersPageSize);
                         setUsers(updated);
                       }
                       setDeleteDialogOpen(false);

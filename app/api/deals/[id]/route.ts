@@ -3,8 +3,11 @@ import { prisma } from '@/lib/prisma';
 import { dealSchema } from '@/lib/validators';
 import { requireAdmin } from '@/lib/auth-utils';
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 export async function GET(req: NextRequest, context: { params: Promise<{ id: string }> }) {
   const { id } = await context.params;
+  if (!UUID_RE.test(id)) return NextResponse.json({ error: 'Not found' }, { status: 404 });
 
   const deal = await prisma.deal.findUnique({
     where: { id },
@@ -17,7 +20,7 @@ export async function GET(req: NextRequest, context: { params: Promise<{ id: str
 
 export const PATCH = requireAdmin(async (req: NextRequest, user: any, params: Promise<{ id: string }>) => {
   const { id } = await params;
-  if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
+  if (!UUID_RE.test(id)) return NextResponse.json({ error: 'Invalid ID' }, { status: 400 });
 
   try {
     const body = await req.json();
@@ -53,7 +56,7 @@ export const PATCH = requireAdmin(async (req: NextRequest, user: any, params: Pr
 
 export const DELETE = requireAdmin(async (req: NextRequest, user: any, params: Promise<{ id: string }>) => {
   const { id } = await params;
-  if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
+  if (!UUID_RE.test(id)) return NextResponse.json({ error: 'Invalid ID' }, { status: 400 });
 
   try {
     const existingDeal = await prisma.deal.findUnique({

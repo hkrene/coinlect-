@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { featuredSchema } from '@/lib/validators';
+import { featuredSchema, featuredBulkUpdateSchema } from '@/lib/validators';
 import { requireAdmin } from '@/lib/auth-utils';
 
 export async function GET() {
@@ -40,12 +40,13 @@ export const POST = requireAdmin(async (req: NextRequest, user) => {
 export const PUT = requireAdmin(async (req: NextRequest, user) => {
 
   try {
-    const { items } = await req.json();
-    if (!Array.isArray(items)) {
-      return NextResponse.json({ error: 'items must be an array' }, { status: 400 });
+    const body = await req.json().catch(() => ({}));
+    const parsed = featuredBulkUpdateSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
     }
 
-    const updates = items.map((item: any) =>
+    const updates = parsed.data.items.map((item) =>
       prisma.featuredItem.update({
         where: { id: item.id },
         data: { order: item.order ?? 0, spotlight: !!item.spotlight },

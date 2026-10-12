@@ -15,11 +15,15 @@ export async function getAuthUser(req: NextRequest): Promise<AuthUser | null> {
     }
 
     const refreshToken = await prisma.refreshToken.findUnique({
-      where: { token: refreshTokenValue, expiresAt: { gt: new Date() } },
+      where: {
+        token: refreshTokenValue,
+        revokedAt: null,
+        expiresAt: { gt: new Date() },
+      },
       include: { user: true },
     });
 
-    if (!refreshToken || !refreshToken.user) {
+    if (!refreshToken || !refreshToken.user || !refreshToken.user.isActive) {
       return null;
     }
 

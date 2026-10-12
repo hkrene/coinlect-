@@ -5,10 +5,15 @@ import { hashPassword, signRefreshToken } from '@/lib/auth';
 import { sendWelcomeEmail } from '@/lib/email';
 import { UserRole } from '@prisma/client';
 import { serialize } from 'cookie';
+import { enforceRateLimit } from '@/lib/rate-limit';
 
 export async function POST(req: NextRequest) {
+  // Limit account creation per IP to slow down automated abuse.
+  const limited = enforceRateLimit(req, 'register', 10, 10 * 60 * 1000);
+  if (limited) return limited;
+
   try {
-    const body = await req.json();
+    const body = await req.json().catch(() => ({}));
     const parsed = registerSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
@@ -53,7 +58,7 @@ export async function POST(req: NextRequest) {
     const cookie = serialize('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production', // Ensure secure cookies in production
-
+      sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 7, // 7 days
       path: '/',
     });

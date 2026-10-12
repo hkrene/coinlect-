@@ -24,7 +24,7 @@ export default function ForgotPasswordPage() {
       const res = await fetch('/api/auth/forgot-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email: email.trim().toLowerCase() }),
       });
       if (!res.ok) {
         throw new Error('Failed to send password reset email');
@@ -64,8 +64,12 @@ export default function ForgotPasswordPage() {
               <div>
                 <label className="block mb-2 text-xs font-medium text-gray-400 sm:text-sm">Email Address</label>
                 <input 
+                  id="forgot-email"
+                  name="email"
                   type="email" 
                   required
+                  maxLength={254}
+                  autoComplete="email"
                   className="w-full px-3 py-3 text-sm text-white transition-colors border rounded-lg sm:px-4 sm:py-3 sm:text-base bg-white/5 border-white/20 focus:outline-none focus:border-coinlect-accent focus:ring-1 focus:ring-coinlect-accent/60" 
                   placeholder="you@example.com"
                   value={email}

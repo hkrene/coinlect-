@@ -13,12 +13,39 @@ import { ComponentsLayout } from '../components-layout';
 
 export function RegisterForm() {
   const [formData, setFormData] = useState({ firstName: '', lastName: '', email: '', password: '' });
+  const [fieldErrors, setFieldErrors] = useState<{ firstName?: string; lastName?: string; email?: string; password?: string }>({});
   const [isLoading, setIsLoading] = useState(false);
   const [googleError, setGoogleError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const { register, error } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  const validate = () => {
+    const errors: typeof fieldErrors = {};
+    const first = formData.firstName.trim();
+    const last = formData.lastName.trim();
+
+    if (!first) errors.firstName = 'First name is required';
+    else if (first.length > 50) errors.firstName = 'First name must be 50 characters or fewer';
+
+    if (!last) errors.lastName = 'Last name is required';
+    else if (last.length > 50) errors.lastName = 'Last name must be 50 characters or fewer';
+
+    if (!formData.email.trim()) errors.email = 'Email is required';
+    else if (formData.email.length > 254 || !EMAIL_RE.test(formData.email.trim())) errors.email = 'Enter a valid email address';
+
+    if (!formData.password) errors.password = 'Password is required';
+    else if (formData.password.length < 8) errors.password = 'Password must be at least 8 characters';
+    else if (formData.password.length > 128) errors.password = 'Password must be 128 characters or fewer';
+    else if (!/[A-Za-z]/.test(formData.password) || !/[0-9]/.test(formData.password)) {
+      errors.password = 'Password must contain at least one letter and one number';
+    }
+
+    return errors;
+  };
 
   // Check for OAuth errors in URL parameters
   useEffect(() => {
@@ -60,9 +87,17 @@ export function RegisterForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    const errors = validate();
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      return;
+    }
+    setFieldErrors({});
+
     setIsLoading(true);
     try {
-      await register(`${formData.firstName} ${formData.lastName}`.trim(), formData.email, formData.password);
+      await register(`${formData.firstName.trim()} ${formData.lastName.trim()}`.trim(), formData.email.trim(), formData.password);
       router.push('/academy');
     } catch (err) {
       // Error is already handled by the AuthContext
@@ -89,49 +124,69 @@ export function RegisterForm() {
               </div>
             )}
 
-            <form className="space-y-4 sm:space-y-5" onSubmit={handleSubmit}>
+            <form className="space-y-4 sm:space-y-5" onSubmit={handleSubmit} noValidate>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="block mb-2 text-xs font-medium text-gray-400 sm:text-sm">First Name</label>
+                  <label htmlFor="firstName" className="block mb-2 text-xs font-medium text-gray-400 sm:text-sm">First Name</label>
                     <input 
                       id="firstName" 
                       type="text" 
-                      required 
+                      required
+                      maxLength={50}
+                      autoComplete="given-name"
+                      value={formData.firstName}
+                      aria-invalid={!!fieldErrors.firstName}
                       onChange={handleChange} 
                       className="w-full px-3 py-3 text-sm text-white transition-colors border rounded-lg sm:px-4 sm:text-base bg-white/5 border-white/20 focus:outline-none focus:border-coinlect-accent focus:ring-1 focus:ring-coinlect-accent/60" 
                       placeholder="John"
                     />
+                  {fieldErrors.firstName && <p className="mt-1 text-xs text-red-400">{fieldErrors.firstName}</p>}
                 </div>
                 <div>
-                  <label className="block mb-2 text-xs font-medium text-gray-400 sm:text-sm">Last Name</label>
+                  <label htmlFor="lastName" className="block mb-2 text-xs font-medium text-gray-400 sm:text-sm">Last Name</label>
                     <input 
                       id="lastName" 
                       type="text" 
-                      required 
+                      required
+                      maxLength={50}
+                      autoComplete="family-name"
+                      value={formData.lastName}
+                      aria-invalid={!!fieldErrors.lastName}
                       onChange={handleChange} 
                       className="w-full px-3 py-3 text-sm text-white transition-colors border rounded-lg sm:px-4 sm:text-base bg-white/5 border-white/20 focus:outline-none focus:border-coinlect-accent focus:ring-1 focus:ring-coinlect-accent/60" 
                       placeholder="Doe"
                     />
+                  {fieldErrors.lastName && <p className="mt-1 text-xs text-red-400">{fieldErrors.lastName}</p>}
                 </div>
               </div>
               <div>
-                <label className="block mb-2 text-xs font-medium text-gray-400 sm:text-sm">Email Address</label>
+                <label htmlFor="email" className="block mb-2 text-xs font-medium text-gray-400 sm:text-sm">Email Address</label>
                   <input 
                     id="email" 
                     type="email" 
                     required 
+                    maxLength={254}
+                    autoComplete="email"
+                    value={formData.email}
+                    aria-invalid={!!fieldErrors.email}
                     onChange={handleChange} 
                     className="w-full px-3 py-3 text-sm text-white transition-colors border rounded-lg sm:px-4 sm:text-base bg-white/5 border-white/20 focus:outline-none focus:border-coinlect-accent focus:ring-1 focus:ring-coinlect-accent/60" 
                     placeholder="you@example.com" 
                   />
+                {fieldErrors.email && <p className="mt-1 text-xs text-red-400">{fieldErrors.email}</p>}
               </div>
               <div>
-                <label className="block mb-2 text-xs font-medium text-gray-400 sm:text-sm">Password</label>
+                <label htmlFor="password" className="block mb-2 text-xs font-medium text-gray-400 sm:text-sm">Password</label>
                 <div className="relative">
                   <input 
                     id="password" 
                     type={showPassword ? 'text' : 'password'} 
                     required 
+                    minLength={8}
+                    maxLength={128}
+                    autoComplete="new-password"
+                    value={formData.password}
+                    aria-invalid={!!fieldErrors.password}
                     onChange={handleChange} 
                       className="w-full px-3 py-3 pr-10 text-sm text-white transition-colors border rounded-lg sm:px-4 sm:text-base bg-white/5 border-white/20 focus:outline-none focus:border-coinlect-accent focus:ring-1 focus:ring-coinlect-accent/60" 
                     placeholder="••••••••" 
@@ -139,11 +194,17 @@ export function RegisterForm() {
                   <button 
                     type="button" 
                     onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
                     className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-white focus:outline-none"
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
+                {fieldErrors.password ? (
+                  <p className="mt-1 text-xs text-red-400">{fieldErrors.password}</p>
+                ) : (
+                  <p className="mt-1 text-xs text-gray-500">At least 8 characters, with a letter and a number.</p>
+                )}
               </div>
               
               <div className="pt-2 text-xs text-gray-500 sm:text-sm">

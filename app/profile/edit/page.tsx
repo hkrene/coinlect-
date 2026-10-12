@@ -39,6 +39,22 @@ export default function EditProfilePage() {
     setMessage(null);
 
     try {
+      // Validate profile fields
+      const name = formData.name.trim();
+      if (!name || name.length > 100) {
+        setMessage({ type: 'error', text: t.profile.errorName });
+        setIsSaving(false);
+        return;
+      }
+      if (formData.dateOfBirth) {
+        const dob = new Date(formData.dateOfBirth);
+        if (Number.isNaN(dob.getTime()) || dob.getTime() > Date.now()) {
+          setMessage({ type: 'error', text: t.profile.errorDateOfBirth });
+          setIsSaving(false);
+          return;
+        }
+      }
+
       // Validate password fields if any are filled
       const isChangingPassword = passwordData.currentPassword || passwordData.newPassword || passwordData.confirmPassword;
       if (isChangingPassword) {
@@ -48,7 +64,22 @@ export default function EditProfilePage() {
           return;
         }
         if (passwordData.newPassword !== passwordData.confirmPassword) {
-          setMessage({ type: 'error', text: t.profile.errorPassword });
+          setMessage({ type: 'error', text: t.profile.errorPasswordMatch });
+          setIsSaving(false);
+          return;
+        }
+        const weak =
+          passwordData.newPassword.length < 8 ||
+          passwordData.newPassword.length > 128 ||
+          !/[A-Za-z]/.test(passwordData.newPassword) ||
+          !/[0-9]/.test(passwordData.newPassword);
+        if (weak) {
+          setMessage({ type: 'error', text: t.profile.errorPasswordWeak });
+          setIsSaving(false);
+          return;
+        }
+        if (passwordData.newPassword === passwordData.currentPassword) {
+          setMessage({ type: 'error', text: t.profile.errorPasswordSame });
           setIsSaving(false);
           return;
         }
@@ -58,7 +89,7 @@ export default function EditProfilePage() {
       const profileRes = await fetch('/api/auth/update-profile', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ name, dateOfBirth: formData.dateOfBirth || undefined }),
       });
 
       if (!profileRes.ok) {
@@ -154,6 +185,9 @@ export default function EditProfilePage() {
                       <input
                         id="profile-name"
                         type="text"
+                        required
+                        maxLength={100}
+                        autoComplete="name"
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         aria-label={t.profile.name}
@@ -165,6 +199,7 @@ export default function EditProfilePage() {
                       <input
                         id="profile-date-of-birth"
                         type="date"
+                        max={new Date().toISOString().split('T')[0]}
                         value={formData.dateOfBirth}
                         onChange={(e) => setFormData({ ...formData, dateOfBirth: e.target.value })}
                         aria-label={t.profile.dateOfBirth}
@@ -196,6 +231,8 @@ export default function EditProfilePage() {
                       <input
                         id="current-password"
                         type="password"
+                        autoComplete="current-password"
+                        maxLength={128}
                         value={passwordData.currentPassword}
                         onChange={(e) =>
                           setPasswordPasswordData({
@@ -216,6 +253,9 @@ export default function EditProfilePage() {
                       <input
                         id="new-password"
                         type="password"
+                        autoComplete="new-password"
+                        minLength={8}
+                        maxLength={128}
                         value={passwordData.newPassword}
                         onChange={(e) =>
                           setPasswordPasswordData({
@@ -236,6 +276,9 @@ export default function EditProfilePage() {
                       <input
                         id="confirm-password"
                         type="password"
+                        autoComplete="new-password"
+                        minLength={8}
+                        maxLength={128}
                         value={passwordData.confirmPassword}
                         onChange={(e) =>
                           setPasswordPasswordData({

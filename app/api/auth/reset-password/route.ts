@@ -4,6 +4,8 @@ import { PrismaClient } from '@prisma/client';
 import * as crypto from 'crypto';
 import { hashPassword } from '@/lib/auth';
 import { sendPasswordResetSuccessEmail } from '@/lib/email';
+import { resetPasswordSchema } from '@/lib/validators';
+import { enforceRateLimit } from '@/lib/rate-limit';
 
 // Create a base PrismaClient instance for operations that need direct model access
 // (Accelerate extension may not expose newly added models immediately)
@@ -16,15 +18,17 @@ function sha256(input: string) {
 }
 
 export async function POST(req: NextRequest) {
+  // Throttle token guessing.
+  const limited = enforceRateLimit(req, 'reset-password', 10, 15 * 60 * 1000);
+  if (limited) return limited;
+
   try {
     const body = await req.json().catch(() => ({}));
-    const userId = typeof body.userId === 'string' ? body.userId : '';
-    const token = typeof body.token === 'string' ? body.token : '';
-    const password = typeof body.password === 'string' ? body.password : '';
-
-    if (!userId || !token || password.length < 8) {
+    const parsed = resetPasswordSchema.safeParse(body);
+    if (!parsed.success) {
       return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
     }
+    const { userId, token, password } = parsed.data;
 
     const tokenHash = sha256(token);
 

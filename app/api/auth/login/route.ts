@@ -3,18 +3,27 @@ import { prisma } from '@/lib/prisma';
 import { loginSchema } from '@/lib/validators';
 import { verifyPassword, signRefreshToken } from '@/lib/auth';
 import { serialize } from 'cookie';
+import { enforceRateLimit } from '@/lib/rate-limit';
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
+    const body = await req.json().catch(() => ({}));
     const parsed = loginSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
     }
 
     const { email, password } = parsed.data;
+
+    // Throttle by IP and by targeted account to slow credential stuffing /
+    // brute-force attacks. A generic message is always returned.
+    const perIp = enforceRateLimit(req, 'login:ip', 20, 10 * 60 * 1000);
+    if (perIp) return perIp;
+    const perAccount = enforceRateLimit(req, 'login:account', 10, 10 * 60 * 1000, email);
+    if (perAccount) return perAccount;
+
     const user = await prisma.user.findUnique({ where: { email } });
-    if (!user || !user.passwordHash) {
+    if (!user || !user.passwordHash || !user.isActive) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 
@@ -39,7 +48,7 @@ export async function POST(req: NextRequest) {
     const cookie = serialize('refreshToken', refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production', // Ensure secure cookies in production
-
+      sameSite: 'lax',
       maxAge: 60 * 60 * 24 * 7, // 7 days
       path: '/',
     });

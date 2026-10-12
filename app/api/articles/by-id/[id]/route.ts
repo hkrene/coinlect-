@@ -4,9 +4,11 @@ import { articleSchema } from '@/lib/validators';
 import { requireAdmin } from '@/lib/auth-utils';
 import { PublishStatus } from '@prisma/client';
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 export const PATCH = requireAdmin(async (req: NextRequest, _user: any, params: Promise<{ id: string }>) => {
   const { id } = await params;
-  if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
+  if (!UUID_RE.test(id)) return NextResponse.json({ error: 'Invalid ID' }, { status: 400 });
 
   try {
     const body = await req.json();
@@ -31,7 +33,7 @@ export const PATCH = requireAdmin(async (req: NextRequest, _user: any, params: P
 
 export const DELETE = requireAdmin(async (req: NextRequest, _user: any, params: Promise<{ id: string }>) => {
   const { id } = await params;
-  if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
+  if (!UUID_RE.test(id)) return NextResponse.json({ error: 'Invalid ID' }, { status: 400 });
 
   try {
     await prisma.article.delete({ where: { id } });

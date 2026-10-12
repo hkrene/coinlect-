@@ -59,15 +59,13 @@ export function LoginForm() {
     e.preventDefault();
     setIsLoading(true);
     try {
-      console.log('LoginPage: Attempting login with email:', email);
-      await login(email, password);
+      await login(email.trim().toLowerCase(), password);
       // Check if there's a redirect path stored in sessionStorage
       const redirectPath = sessionStorage.getItem('redirectAfterLogin') || '/academy';
       sessionStorage.removeItem('redirectAfterLogin'); // Clean up
-      console.log('LoginPage: Login function completed, redirecting to:', redirectPath);
       router.push(redirectPath);
     } catch (err) {
-      console.error('LoginPage: Login failed in catch block:', err);
+      console.error('Login failed');
     } finally {
       setIsLoading(false);
     }
@@ -91,10 +89,14 @@ export function LoginForm() {
 
             <form className="space-y-5 sm:space-y-6" onSubmit={handleSubmit}>
               <div>
-                <label className="block mb-2 text-xs font-medium text-gray-400 sm:text-sm">Email Address</label>
+                <label htmlFor="login-email" className="block mb-2 text-xs font-medium text-gray-400 sm:text-sm">Email Address</label>
                 <input 
+                  id="login-email"
+                  name="email"
                   type="email" 
                   required
+                  maxLength={254}
+                  autoComplete="email"
                   className="w-full px-3 py-3 text-sm text-white transition-colors border rounded-lg sm:px-4 sm:py-3 sm:text-base bg-white/5 border-white/20 focus:outline-none focus:border-coinlect-accent focus:ring-1 focus:ring-coinlect-accent/60" 
                   placeholder="you@example.com"
                   value={email}
@@ -102,11 +104,15 @@ export function LoginForm() {
                 />
               </div>
               <div>
-                <label className="block mb-2 text-xs font-medium text-gray-400 sm:text-sm">Password</label>
+                <label htmlFor="login-password" className="block mb-2 text-xs font-medium text-gray-400 sm:text-sm">Password</label>
                 <div className="relative">
                 <input 
+                    id="login-password"
+                    name="password"
                     type={showPassword ? 'text' : 'password'} 
                   required
+                  maxLength={128}
+                  autoComplete="current-password"
                     className="w-full px-3 py-3 pr-10 text-sm text-white transition-colors border rounded-lg sm:px-4 sm:py-3 sm:text-base bg-white/5 border-white/20 focus:outline-none focus:border-coinlect-accent focus:ring-1 focus:ring-coinlect-accent/60" 
                   placeholder="••••••••"
                   value={password}
@@ -115,6 +121,7 @@ export function LoginForm() {
                   <button 
                     type="button" 
                     onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
                     className="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-white focus:outline-none"
                   >
                     {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}

@@ -1,24 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { verifyToken, hashPassword, verifyPassword } from '@/lib/auth';
+import { hashPassword, verifyPassword } from '@/lib/auth';
+import { getAuthUser } from '@/lib/auth-utils';
+import { changePasswordSchema } from '@/lib/validators';
+import { enforceRateLimit } from '@/lib/rate-limit';
 
 export async function POST(req: NextRequest) {
+  const auth = await getAuthUser(req);
+  if (!auth) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  // Throttle password attempts per account.
+  const limited = enforceRateLimit(req, 'change-password', 5, 15 * 60 * 1000, auth.id);
+  if (limited) return limited;
+
   try {
-    const refreshToken = req.cookies.get('refreshToken')?.value;
-    if (!refreshToken) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const body = await req.json().catch(() => ({}));
+    const parsed = changePasswordSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
     }
-
-    const payload = await verifyToken(refreshToken);
-    if (!payload.sub) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
-    const body = await req.json();
-    const { currentPassword, newPassword } = body;
+    const { currentPassword, newPassword } = parsed.data;
 
     const user = await prisma.user.findUnique({
-      where: { id: payload.sub },
+      where: { id: auth.id },
     });
 
     if (!user || !user.passwordHash) {
@@ -31,16 +37,33 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid current password' }, { status: 400 });
     }
 
+    // Reject reuse of the current password.
+    const isSame = await verifyPassword(newPassword, user.passwordHash);
+    if (isSame) {
+      return NextResponse.json(
+        { error: 'New password must be different from the current password' },
+        { status: 400 }
+      );
+    }
+
     // Hash new password
     const passwordHash = await hashPassword(newPassword);
 
-    await prisma.user.update({
-      where: { id: payload.sub },
-      data: { passwordHash },
-    });
+    // Update password and invalidate all *other* sessions.
+    const currentToken = req.cookies.get('refreshToken')?.value;
+    await prisma.$transaction([
+      prisma.user.update({
+        where: { id: auth.id },
+        data: { passwordHash },
+      }),
+      prisma.refreshToken.updateMany({
+        where: { userId: auth.id, revokedAt: null, token: { not: currentToken } },
+        data: { revokedAt: new Date() },
+      }),
+    ]);
 
     return NextResponse.json({ success: true });
-  } catch (err: any) {
+  } catch (err) {
     console.error('Change password error:', err);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }

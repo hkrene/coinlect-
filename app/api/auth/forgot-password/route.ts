@@ -3,6 +3,8 @@ import { prisma } from '@/lib/prisma';
 import { PrismaClient } from '@prisma/client';
 import * as crypto from 'crypto';
 import { buildResetPasswordUrl, sendPasswordResetEmail } from '@/lib/email';
+import { forgotPasswordSchema } from '@/lib/validators';
+import { enforceRateLimit } from '@/lib/rate-limit';
 
 // Create a base PrismaClient instance for operations that need direct model access
 // (Accelerate extension may not expose newly added models immediately)
@@ -14,25 +16,30 @@ function sha256(input: string) {
   return crypto.createHash('sha256').update(input).digest('hex');
 }
 
+const genericResponse = () =>
+  NextResponse.json({
+    success: true,
+    message: 'If an account with that email exists, a password reset link has been sent.',
+  });
+
 export async function POST(req: NextRequest) {
+  // Throttle to prevent email bombing / reset-token flooding.
+  const limited = enforceRateLimit(req, 'forgot-password', 5, 15 * 60 * 1000);
+  if (limited) return limited;
+
   try {
     const body = await req.json().catch(() => ({}));
-    const email = typeof body.email === 'string' ? body.email.trim().toLowerCase() : '';
+    const parsed = forgotPasswordSchema.safeParse(body);
 
     // Always respond with success to avoid user enumeration.
-    if (!email) {
-      return NextResponse.json({
-        success: true,
-        message: 'If an account with that email exists, a password reset link has been sent.',
-      });
+    if (!parsed.success) {
+      return genericResponse();
     }
+    const email = parsed.data.email;
 
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
-      return NextResponse.json({
-        success: true,
-        message: 'If an account with that email exists, a password reset link has been sent.',
-      });
+      return genericResponse();
     }
 
     const token = crypto.randomBytes(32).toString('hex');
@@ -53,17 +60,11 @@ export async function POST(req: NextRequest) {
     const resetUrl = buildResetPasswordUrl({ userId: user.id, token });
     await sendPasswordResetEmail({ to: user.email, resetUrl });
 
-    return NextResponse.json({
-      success: true,
-      message: 'If an account with that email exists, a password reset link has been sent.',
-    });
+    return genericResponse();
   } catch (err) {
     console.error('Forgot password error', err);
     // Still return generic success to avoid enumeration / leaking failures.
-    return NextResponse.json({
-      success: true,
-      message: 'If an account with that email exists, a password reset link has been sent.',
-    });
+    return genericResponse();
   }
 }
 

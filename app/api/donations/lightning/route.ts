@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { UserRole } from '@prisma/client';
+import crypto from 'crypto';
+import { getAuthUser } from '@/lib/auth-utils';
+import { lightningDonationSchema, donationStatusUpdateSchema } from '@/lib/validators';
+import { enforceRateLimit } from '@/lib/rate-limit';
 
 // Optional: configure an external Lightning invoice service (LNbits, BTCPay, etc.)
 // These environment variables are intentionally generic so you can plug in
@@ -7,30 +12,36 @@ import { prisma } from '@/lib/prisma';
 const LIGHTNING_INVOICE_URL = process.env.LIGHTNING_INVOICE_URL;
 const LIGHTNING_API_KEY = process.env.LIGHTNING_API_KEY;
 
+const MAX_METADATA_BYTES = 5000;
+
 export async function POST(req: NextRequest) {
+  // Public endpoint: throttle to avoid donation-record flooding.
+  const limited = enforceRateLimit(req, 'lightning-donation', 10, 60 * 1000);
+  if (limited) return limited;
+
   try {
     const body = await req.json().catch(() => ({}));
 
-    const rawAmount =
-      typeof body.amountSats === 'number'
-        ? body.amountSats
-        : typeof body.amount === 'number'
-        ? body.amount
-        : parseInt(body.amountSats || body.amount || '0', 10);
-
-    const amountSats = Number.isFinite(rawAmount) ? Math.floor(rawAmount) : 0;
-
-    if (!amountSats || amountSats <= 0) {
+    // Accept either `amountSats` or the legacy `amount` field.
+    const parsed = lightningDonationSchema.safeParse({
+      amountSats: body.amountSats ?? body.amount,
+      memo: body.memo,
+      metadata: body.metadata,
+    });
+    if (!parsed.success) {
       return NextResponse.json(
         { error: 'Invalid amount. Please provide amountSats > 0.' },
         { status: 400 }
       );
     }
 
-    const memo =
-      typeof body.memo === 'string' && body.memo.trim().length > 0
-        ? body.memo.trim()
-        : 'CoinLect Lightning donation';
+    const { amountSats } = parsed.data;
+    const memo = parsed.data.memo || 'CoinLect Lightning donation';
+    const metadata = parsed.data.metadata ?? {};
+
+    if (JSON.stringify(metadata).length > MAX_METADATA_BYTES) {
+      return NextResponse.json({ error: 'Metadata is too large' }, { status: 400 });
+    }
 
     // Create a pending Donation record first so we can attach external references.
     const donation = await prisma.donation.create({
@@ -39,7 +50,7 @@ export async function POST(req: NextRequest) {
         status: 'PENDING',
         amountSats,
         currency: 'SATS',
-        metadata: body.metadata ?? {},
+        metadata,
       },
     });
 
@@ -112,44 +123,49 @@ export async function POST(req: NextRequest) {
   }
 }
 
+/**
+ * Authorization for updating a donation's status.
+ * Only an authenticated admin or a caller presenting the configured
+ * `x-webhook-secret` (your Lightning backend) may confirm/fail a donation.
+ */
+async function isAuthorizedUpdate(req: NextRequest): Promise<boolean> {
+  const auth = await getAuthUser(req);
+  if (auth?.role === UserRole.ADMIN) return true;
+
+  const configured = process.env.LIGHTNING_WEBHOOK_SECRET;
+  const provided = req.headers.get('x-webhook-secret') || '';
+  if (configured && provided.length === configured.length) {
+    return crypto.timingSafeEqual(Buffer.from(configured), Buffer.from(provided));
+  }
+  return false;
+}
+
 // Optional callback / update endpoint.
-// This is designed to be called either by your Lightning backend (webhook)
-// or by the frontend after a successful WebLN payment.
+// This must only be called by your Lightning backend (webhook) or an admin.
 export async function PUT(req: NextRequest) {
+  if (!(await isAuthorizedUpdate(req))) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+
+  const limited = enforceRateLimit(req, 'donation-status-update', 60, 60 * 1000);
+  if (limited) return limited;
+
   try {
     const body = await req.json().catch(() => ({}));
-    const donationId = typeof body.donationId === 'string' ? body.donationId : '';
-    const statusRaw = typeof body.status === 'string' ? body.status.toUpperCase() : '';
-
-    if (!donationId || !statusRaw) {
+    const parsed = donationStatusUpdateSchema.safeParse(body);
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: 'donationId and status are required' },
+        { error: 'donationId and a valid status are required' },
         { status: 400 }
       );
     }
 
-    const allowed = ['PENDING', 'CONFIRMED', 'FAILED'];
-    if (!allowed.includes(statusRaw)) {
-      return NextResponse.json(
-        { error: 'Invalid status value' },
-        { status: 400 }
-      );
-    }
-
-    const amountSats =
-      typeof body.amountSats === 'number'
-        ? Math.floor(body.amountSats)
-        : undefined;
-
-    const reference =
-      typeof body.reference === 'string' && body.reference.trim().length > 0
-        ? body.reference.trim()
-        : undefined;
+    const { donationId, status, amountSats, reference } = parsed.data;
 
     const updated = await prisma.donation.update({
       where: { id: donationId },
       data: {
-        status: statusRaw as any,
+        status,
         amountSats: amountSats ?? undefined,
         reference,
       },
@@ -164,4 +180,3 @@ export async function PUT(req: NextRequest) {
     );
   }
 }
-

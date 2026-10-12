@@ -1,22 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getGeminiResponse } from '@/services/geminiService';
+import { chatSchema } from '@/lib/validators';
+import { enforceRateLimit } from '@/lib/rate-limit';
 
 export async function POST(request: NextRequest) {
-  try {
-    const { message, language } = await request.json();
+  // The AI backend costs money per call; throttle abuse per IP.
+  const limited = enforceRateLimit(request, 'chat', 20, 60 * 1000);
+  if (limited) return limited;
 
-    if (!message || typeof message !== 'string') {
-      return NextResponse.json(
-        { error: 'Message is required' },
-        { status: 400 }
-      );
+  try {
+    const body = await request.json().catch(() => ({}));
+    const parsed = chatSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
     }
 
-    // Debug: Check if API key is available
-    const apiKeyAvailable = !!process.env.GEMINI_API_KEY;
-    console.log('API Key available:', apiKeyAvailable);
-    console.log('API Key length:', process.env.GEMINI_API_KEY?.length || 0);
-    console.log('User language:', language);
+    const { message, language } = parsed.data;
 
     const response = await getGeminiResponse(message, language);
 
@@ -24,9 +23,8 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Chat API Error:', error);
     return NextResponse.json(
-      { error: 'Failed to process message', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Failed to process message' },
       { status: 500 }
     );
   }
 }
-

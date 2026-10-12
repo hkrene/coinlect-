@@ -14,6 +14,9 @@ export async function DELETE(
 
   const { id } = await context.params;
   if (!id) return NextResponse.json({ error: 'ID required' }, { status: 400 });
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(id)) {
+    return NextResponse.json({ error: 'Invalid user ID' }, { status: 400 });
+  }
 
   if (id === auth.id) {
     return NextResponse.json({ error: 'Cannot delete your own account' }, { status: 400 });

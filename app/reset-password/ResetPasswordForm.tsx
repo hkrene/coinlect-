@@ -24,7 +24,8 @@ export function ResetPasswordForm() {
 
   const canSubmit = useMemo(() => {
     if (!token || !userId) return false;
-    if (password.length < 8) return false;
+    if (password.length < 8 || password.length > 128) return false;
+    if (!/[A-Za-z]/.test(password) || !/[0-9]/.test(password)) return false;
     if (password !== confirm) return false;
     return true;
   }, [token, userId, password, confirm]);
@@ -89,6 +90,8 @@ export function ResetPasswordForm() {
                 type={showPassword ? 'text' : 'password'}
                 required
                 minLength={8}
+                maxLength={128}
+                autoComplete="new-password"
                 className="w-full px-3 py-3 pr-10 text-sm text-white transition-colors border rounded-lg sm:px-4 sm:py-3 sm:text-base bg-white/5 border-white/20 focus:outline-none focus:border-coinlect-accent focus:ring-1 focus:ring-coinlect-accent/60"
                 placeholder="********"
                 value={password}
@@ -103,6 +106,7 @@ export function ResetPasswordForm() {
                 {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
               </button>
             </div>
+            <p className="mt-1 text-xs text-gray-500">At least 8 characters, with a letter and a number.</p>
           </div>
           <div>
             <label className="block mb-2 text-xs font-medium text-gray-400 sm:text-sm">Confirm Password</label>
@@ -111,6 +115,8 @@ export function ResetPasswordForm() {
                 type={showConfirm ? 'text' : 'password'}
                 required
                 minLength={8}
+                maxLength={128}
+                autoComplete="new-password"
                 className="w-full px-3 py-3 pr-10 text-sm text-white transition-colors border rounded-lg sm:px-4 sm:py-3 sm:text-base bg-white/5 border-white/20 focus:outline-none focus:border-coinlect-accent focus:ring-1 focus:ring-coinlect-accent/60"
                 placeholder="********"
                 value={confirm}
