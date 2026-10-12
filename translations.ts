@@ -552,6 +552,13 @@ export const translations = {
       },
       teamTitle: "Rencontrez Notre Équipe",
       volunteersTitle: "Nos Volontaires"
+    },
+    cookieBanner: {
+      title: "Nous respectons votre vie privée",
+      description: "Nous utilisons des cookies pour améliorer votre expérience, analyser le trafic et personnaliser nos contenus. Vous pouvez accepter ou refuser à tout moment.",
+      accept: "Accepter",
+      decline: "Refuser",
+      privacy: "Politique de confidentialité"
     }
   },
   en: {
@@ -1107,6 +1114,13 @@ export const translations = {
       },
       teamTitle: "Meet Our Team Members",
       volunteersTitle: "Our Volunteers"
+    },
+    cookieBanner: {
+      title: "We respect your privacy",
+      description: "We use cookies to improve your experience, analyse traffic, and personalise our content. You can accept or decline at any time.",
+      accept: "Accept",
+      decline: "Decline",
+      privacy: "Privacy Policy"
     }
   }
 };

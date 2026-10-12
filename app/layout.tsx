@@ -4,6 +4,7 @@ import { Providers } from './providers';
 import { Orbitron, Jura } from 'next/font/google';
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { GoogleAnalytics } from './components/GoogleAnalytics';
+import { CookieConsent } from '@/components/CookieConsent';
 
 const orbitron = Orbitron({
   subsets: ['latin'],
@@ -93,6 +94,7 @@ export default function RootLayout({
         <GoogleAnalytics />
         <Providers>
           {children}
+          <CookieConsent />
         </Providers>
         <SpeedInsights />
       </body>

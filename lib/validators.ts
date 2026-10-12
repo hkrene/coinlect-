@@ -40,12 +40,71 @@ export const passwordField = z
 export const spamNameLinkRe =
   /(https?:\/\/|www\.|\b(?:bit\.ly|t\.co|goo\.gl|tinyurl|is\.gd|rb\.gy|rebrandly|linktr\.ee|t\.me|wa\.me|shorturl\.at)\b)/i;
 
+/** Characters that are letters, numbers or plain whitespace. */
+const WORD_CHARS_RE = /[\p{L}\p{N}\s]/gu;
+
+/** Promotional keywords common to scam/spam signup copy (TR/EN/FR). */
+const PROMO_KEYWORDS_RE =
+  /\b(bonus|kazan|kazand[ıi]r?|[çc]evir|[çc]evirme|ödül|promosyon|promotion|davet|üyelik|ücretsiz|free gift|claim|reward|prize|offer|whatsapp|telegram)\b/i;
+
+/**
+ * Names that are visibly not a person's name: all-symbol/emoji strings, names
+ * where more than half the characters are symbols, or long sentences that read
+ * like promotional copy (e.g. "Bonus kazan 50.000 TL ozel carki cevir").
+ */
+export function isSpamLikeName(name: string): boolean {
+  const n = name.trim();
+  if (!n) return false;
+
+  // No letters at all (e.g. "🔥🔥🔥🔥", "12345") — never a real name.
+  if (!/\p{L}/u.test(n)) return true;
+
+  const symbolCount = n.replace(WORD_CHARS_RE, '').length;
+  if (symbolCount / n.length > 0.5) return true;
+
+  // Long ad-pitch sentences loaded with promo words.
+  if (PROMO_KEYWORDS_RE.test(n) && n.length > 40) return true;
+
+  return false;
+}
+
+/**
+ * Well-known temporary/disposable email providers. Blocking them removes one of
+ * the most common vectors for bot account factories, which almost always use a
+ * throwaway inbox so they never need to verify anything.
+ */
+export const DISPOSABLE_EMAIL_DOMAINS = new Set([
+  'mailinator.com', 'mailinator.net', 'mailinator.org', 'mailinator.io',
+  'guerrillamail.com', 'guerrillamail.net', 'guerrillamail.org', 'guerrillamail.info', 'grr.la',
+  '10minutemail.com', '10minutemail.net', '10minutemail.org',
+  'tempmail.com', 'tempmail.net', 'tempmail.org', 'temp-mail.org', 'temp-mail.io', 'temp-mail.com', 'tempmailo.com', 'tempr.email',
+  'yopmail.com', 'yopmail.fr', 'yopmail.net', 'yopmail.org',
+  'throwawaymail.com', 'throwaway.email',
+  'maildrop.cc', 'mailnesia.com', 'spam4.me',
+  'getnada.com', 'nada.email', 'inboxkitten.com',
+  'dispostable.com', 'mintemail.com', 'mail.tm', 'emailfake.com', 'fakemail.net',
+  'temporarymail.com', '33mail.com', 'moakt.com', 'dropmail.me', 'emailondeck.com',
+  'sharklasers.com', 'spamgourmet.com', 'e4ward.com', 'mailcatch.com',
+  'mytrashmail.com', 'trashmail.com', 'trashmail.de', 'mailtemp.net',
+  'emailtemporario.com.br', 'temporarioemail.com.br', 'jetable.org', 'mvrht.net',
+  'mailmetrash.com', 'trash-mail.com', 'wegwerfmail.de', 'spambox.us', 'mailforspam.com',
+]);
+
+/** True when the email domain is a known disposable/temporary provider. */
+export function isDisposableEmail(email: string): boolean {
+  const at = email.lastIndexOf('@');
+  if (at === -1) return false;
+  const domain = email.slice(at + 1).trim().toLowerCase();
+  return DISPOSABLE_EMAIL_DOMAINS.has(domain);
+}
+
 const nameField = z
   .string()
   .trim()
   .min(1, 'Name is required')
   .max(100, 'Name is too long')
-  .refine((value) => !spamNameLinkRe.test(value), 'Name must not contain links');
+  .refine((value) => !spamNameLinkRe.test(value), 'Name must not contain links')
+  .refine((value) => !isSpamLikeName(value), 'Name must not contain multiple symbols, emojis or promotional text');
 
 /**
  * A URL that is guaranteed to use http(s). `z.string().url()` alone accepts
@@ -99,6 +158,11 @@ export const registerSchema = z.object({
   email: emailField,
   password: passwordField,
   name: nameField,
+  // Bot-protection signals sent by the registration form (see RegisterForm):
+  // - website:   invisible honeypot field; real humans never fill it
+  // - elapsedMs: time (ms) the visitor spent filling the form
+  website: z.string().trim().max(200).optional(),
+  elapsedMs: z.number().int().min(0).max(3600000).optional(),
 });
 
 export const loginSchema = z.object({

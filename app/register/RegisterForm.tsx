@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Button } from '@/components/Button';
@@ -12,7 +12,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { ComponentsLayout } from '../components-layout';
 
 export function RegisterForm() {
-  const [formData, setFormData] = useState({ firstName: '', lastName: '', email: '', password: '' });
+  const [formData, setFormData] = useState({ firstName: '', lastName: '', email: '', password: '', website: '' });
   const [fieldErrors, setFieldErrors] = useState<{ firstName?: string; lastName?: string; email?: string; password?: string }>({});
   const [isLoading, setIsLoading] = useState(false);
   const [googleError, setGoogleError] = useState<string | null>(null);
@@ -20,6 +20,13 @@ export function RegisterForm() {
   const { register, error } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
+  // Timestamp when the form first rendered — used as a bot-detection signal
+  // (bots submit instantly, humans take a few seconds to fill the form).
+  const startedAtRef = useRef<number>(0);
+
+  useEffect(() => {
+    startedAtRef.current = Date.now();
+  }, []);
 
   const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -97,7 +104,15 @@ export function RegisterForm() {
 
     setIsLoading(true);
     try {
-      await register(`${formData.firstName.trim()} ${formData.lastName.trim()}`.trim(), formData.email.trim(), formData.password);
+      await register(
+        `${formData.firstName.trim()} ${formData.lastName.trim()}`.trim(),
+        formData.email.trim(),
+        formData.password,
+        {
+          website: formData.website,
+          elapsedMs: Date.now() - (startedAtRef.current || Date.now()),
+        }
+      );
       router.push('/academy');
     } catch (err) {
       // Error is already handled by the AuthContext
@@ -125,6 +140,19 @@ export function RegisterForm() {
             )}
 
             <form className="space-y-4 sm:space-y-5" onSubmit={handleSubmit} noValidate>
+              {/* Honeypot: invisible to humans, bots auto-fill it. DO NOT remove. */}
+              <div className="absolute left-[-9999px] top-[-9999px]" aria-hidden="true">
+                <label htmlFor="website">Please leave this field empty</label>
+                <input
+                  id="website"
+                  name="website"
+                  type="text"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  value={formData.website}
+                  onChange={handleChange}
+                />
+              </div>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <label htmlFor="firstName" className="block mb-2 text-xs font-medium text-gray-400 sm:text-sm">First Name</label>

@@ -1,14 +1,34 @@
 'use client';
 
 import Script from 'next/script';
+import { useEffect, useState } from 'react';
+import { readCookieConsent } from '@/components/CookieConsent';
 
 const GA_MEASUREMENT_ID = 'G-CF5XWRM2XQ';
 
 /**
- * Composant Google Analytics pour le tracking des événements
- * Utilise le composant Script de Next.js pour un chargement optimisé
+ * Google Analytics, loaded only after the visitor accepts the cookie banner.
+ *
+ * Until a consent choice is made nothing is loaded; if the visitor declines,
+ * gtag.js is never injected on this or future visits (the choice is persisted
+ * in localStorage by CookieConsent).
  */
 export function GoogleAnalytics() {
+  const [accepted, setAccepted] = useState(false);
+
+  useEffect(() => {
+    setAccepted(readCookieConsent() === 'accepted');
+
+    const onConsent = (e: Event) => {
+      const detail = (e as CustomEvent<string>).detail;
+      setAccepted(detail === 'accepted');
+    };
+    window.addEventListener('cookie-consent', onConsent);
+    return () => window.removeEventListener('cookie-consent', onConsent);
+  }, []);
+
+  if (!accepted) return null;
+
   return (
     <>
       {/* Script Google Analytics (gtag.js) */}

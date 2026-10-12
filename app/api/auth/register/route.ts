@@ -1,11 +1,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { registerSchema } from '@/lib/validators';
+import { registerSchema, isDisposableEmail } from '@/lib/validators';
 import { hashPassword, signRefreshToken } from '@/lib/auth';
 import { sendWelcomeEmail } from '@/lib/email';
 import { UserRole } from '@prisma/client';
 import { serialize } from 'cookie';
 import { enforceRateLimit } from '@/lib/rate-limit';
+
+/**
+ * Minimum time a human needs to fill the registration form (ms). Automated
+ * submissions (and requests with no timing signal at all) are rejected.
+ */
+const MIN_FORM_FILL_MS = 2000;
+
+/** Generic message returned for every bot-detection gate, so scripts can't
+ *  reverse-engineer the individual rules from the error text. */
+const BOT_REJECTION = 'Unable to complete registration at this time. Please try again.';
 
 export async function POST(req: NextRequest) {
   // Limit account creation per IP to slow down automated abuse.
@@ -19,7 +29,25 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
     }
 
-    const { email, password, name } = parsed.data;
+    const { email, password, name, website, elapsedMs } = parsed.data;
+
+    // Honeypot: invisible to humans, filled by naive bots and form scrapers.
+    if (website && website.trim().length > 0) {
+      return NextResponse.json({ error: BOT_REJECTION }, { status: 400 });
+    }
+
+    // Timing gate: bots submit instantly (or omit the signal entirely).
+    if (typeof elapsedMs !== 'number' || elapsedMs < MIN_FORM_FILL_MS) {
+      return NextResponse.json({ error: BOT_REJECTION }, { status: 400 });
+    }
+
+    // Temporary inboxes are the fuel of account factories.
+    if (isDisposableEmail(email)) {
+      return NextResponse.json(
+        { error: 'Registrations with temporary email providers are not allowed. Please use a permanent email address.' },
+        { status: 400 }
+      );
+    }
 
     const existing = await prisma.user.findUnique({ where: { email } });
     if (existing) {
