@@ -77,6 +77,9 @@ export const metadata: Metadata = {
       follow: true,
     },
   },
+  other: {
+    coinzilla: "15f8b6e007346343a259d5a44a817c45",
+  },
 };
 
 export default function RootLayout({
