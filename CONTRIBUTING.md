@@ -27,8 +27,8 @@ You can contribute by:
 ### 1. Fork and clone the repository
 
 ```bash
-git clone https://github.com/<your-username>/coinlect.git
-cd coinlect
+git clone https://github.com/hkrene/coinlect-.git
+cd coinlect-
 ```
 
 If you are contributing to the main project repository rather than a fork, make sure you have proper repository access and follow the maintainers' branch conventions.

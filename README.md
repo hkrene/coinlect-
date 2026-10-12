@@ -10,6 +10,7 @@ A Next.js application for crypto education, community learning, and Web3 onboard
 
 Coinlect welcomes contributions from developers, educators, and crypto enthusiasts.
 
+- Repository: [github.com/hkrene/coinlect-](https://github.com/hkrene/coinlect-)
 - Contribution guide: [CONTRIBUTING.md](./CONTRIBUTING.md)
 - License: [LICENSE](./LICENSE)
 - Environment template: [.env.example](./.env.example)

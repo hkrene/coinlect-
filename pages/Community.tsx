@@ -42,6 +42,11 @@ const Icons = {
   <path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.436 2.503 1.163 3.473L6.539 18.3l3.018-.79c.801.433 1.709.68 2.473.681h.001c3.181 0 5.767-2.586 5.768-5.766 0-3.18-2.586-5.753-5.768-5.753zm3.435 8.165c-.141.396-.708.721-1.018.769-.301.048-.679.083-1.077-.101-.248-.115-1.053-.435-2.004-1.284-.738-.659-1.238-1.472-1.382-1.72-.144-.249-.015-.384.11-.508.112-.112.249-.292.373-.439.124-.146.166-.249.249-.415.083-.166.042-.311-.021-.436-.062-.125-.56-1.348-.767-1.846-.202-.485-.407-.419-.56-.426l-.478-.008c-.166 0-.436.062-.664.311-.229.249-.873.852-.873 2.077s.893 2.408 1.018 2.574c.125.166 1.756 2.682 4.254 3.759.595.256 1.058.41 1.419.524.598.19 1.141.163 1.571.099.479-.071 1.474-.602 1.681-1.183.208-.581.208-1.079.146-1.183-.063-.104-.229-.166-.478-.291zM12.036 0C5.402 0 .021 5.381.018 12.016c0 2.12.553 4.189 1.604 6.012L0 24l6.136-1.61a11.91 11.91 0 0 0 5.897 1.569h.005c6.632 0 12.014-5.381 12.017-12.016A11.94 11.94 0 0 0 12.036 0z"/>
 </svg>
   ),
+  GitHub: () => (
+    <svg viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
+      <path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/>
+    </svg>
+  ),
 };
 
 // URL, icon, and color mapping using canonical keys
@@ -167,6 +172,39 @@ export const Community: React.FC = () => {
             </div>
           </div>
         ))}
+
+        {/* Developers / Open Source (GitHub) */}
+        <div className="mb-16">
+          <ScrollReveal delay={communities.length * 100}>
+            <h2 className="mb-8 text-xs font-black tracking-[0.3em] text-[#a1a1aa] uppercase border-l border-white/20 pl-4">
+              {t.community.github.title}
+            </h2>
+          </ScrollReveal>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+            <ScrollReveal delay={(communities.length * 100) + 50}>
+              <a
+                href="https://github.com/hkrene/coinlect-"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-between gap-4 p-6 transition-all duration-500 border rounded-none bg-[#0a0a0a] border-white/5 hover:border-white/20 group"
+              >
+                <div className="flex items-center min-w-0 gap-5">
+                  <div className="text-white transition-all duration-500 shrink-0 group-hover:scale-110">
+                    <Icons.GitHub />
+                  </div>
+                  <div className="flex flex-col min-w-0">
+                    <span className="text-[15px] font-bold text-white tracking-tight">GitHub</span>
+                    <span className="text-[11px] text-[#71717a] font-medium uppercase tracking-tight">{t.community.github.desc}</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 text-[11px] font-semibold text-gray-400 transition-colors shrink-0 group-hover:text-white">
+                  <span className="hidden whitespace-nowrap sm:inline">{t.community.github.cta}</span>
+                  <ArrowRight size={18} className="text-[#333] group-hover:text-white transition-all translate-x-0 group-hover:translate-x-1" />
+                </div>
+              </a>
+            </ScrollReveal>
+          </div>
+        </div>
       </div>
     </div>
   );
