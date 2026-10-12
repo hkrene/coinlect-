@@ -4,7 +4,8 @@ import { PrismaClient } from '@prisma/client';
 import * as crypto from 'crypto';
 import { buildResetPasswordUrl, sendPasswordResetEmail } from '@/lib/email';
 import { forgotPasswordSchema } from '@/lib/validators';
-import { enforceRateLimit } from '@/lib/rate-limit';
+import { enforceRateLimit, getClientIp } from '@/lib/rate-limit';
+import { verifyCaptcha } from '@/lib/captcha';
 
 // Create a base PrismaClient instance for operations that need direct model access
 // (Accelerate extension may not expose newly added models immediately)
@@ -36,6 +37,16 @@ export async function POST(req: NextRequest) {
       return genericResponse();
     }
     const email = parsed.data.email;
+
+    // CAPTCHA (Cloudflare Turnstile). A bot failing this gets a 400 (it is a
+    // client error, not an enumeration signal). No-op without a secret key.
+    const captcha = await verifyCaptcha(parsed.data.captchaToken, getClientIp(req));
+    if (!captcha.success) {
+      return NextResponse.json(
+        { error: 'Anti-bot verification failed. Please try again.' },
+        { status: 400 }
+      );
+    }
 
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {

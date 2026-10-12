@@ -98,6 +98,20 @@ export function isDisposableEmail(email: string): boolean {
   return DISPOSABLE_EMAIL_DOMAINS.has(domain);
 }
 
+/**
+ * Email local-parts that look like promo copy rather than a personal address,
+ * e.g. `bit.ly-bonus2024@outlook.com` or `bonus.kazan.cevir.free@mail.ru`.
+ */
+export function isSpamEmailLocalPart(email: string): boolean {
+  const at = email.lastIndexOf('@');
+  if (at <= 0) return false;
+  const local = email.slice(0, at).toLowerCase();
+  if (spamNameLinkRe.test(local)) return true;
+  // Long, keyword-dense local parts are almost never real.
+  if (local.length > 24 && PROMO_KEYWORDS_RE.test(local)) return true;
+  return false;
+}
+
 const nameField = z
   .string()
   .trim()
@@ -154,25 +168,40 @@ const uuidField = z.string().uuid('Invalid id');
 // Auth validators
 // ---------------------------------------------------------------------------
 
-export const registerSchema = z.object({
-  email: emailField,
-  password: passwordField,
-  name: nameField,
-  // Bot-protection signals sent by the registration form (see RegisterForm):
-  // - website:   invisible honeypot field; real humans never fill it
-  // - elapsedMs: time (ms) the visitor spent filling the form
-  website: z.string().trim().max(200).optional(),
-  elapsedMs: z.number().int().min(0).max(3600000).optional(),
-});
+/**
+ * Cloudflare Turnstile token produced by the client widget. Verified
+ * server-side in the auth routes via `verifyCaptcha` (see lib/captcha.ts).
+ */
+const captchaTokenField = z.string().trim().max(4096, 'Captcha token is too long').optional();
+
+export const registerSchema = z
+  .object({
+    email: emailField,
+    password: passwordField,
+    name: nameField,
+    // Bot-protection signals sent by the registration form (see RegisterForm):
+    // - website:   invisible honeypot field; real humans never fill it
+    // - elapsedMs: time (ms) the visitor spent filling the form
+    // - captchaToken: Cloudflare Turnstile token
+    website: z.string().trim().max(200).optional(),
+    elapsedMs: z.number().int().min(0).max(3600000).optional(),
+    captchaToken: captchaTokenField,
+  })
+  .refine((data) => !isSpamEmailLocalPart(data.email), {
+    path: ['email'],
+    message: 'Email address is not allowed',
+  });
 
 export const loginSchema = z.object({
   email: emailField,
   // Do not apply the full policy on login: existing accounts may predate it.
   password: z.string().min(1, 'Password is required').max(128, 'Password is too long'),
+  captchaToken: captchaTokenField,
 });
 
 export const forgotPasswordSchema = z.object({
   email: emailField,
+  captchaToken: captchaTokenField,
 });
 
 export const resetPasswordSchema = z.object({

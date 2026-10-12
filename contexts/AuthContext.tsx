@@ -18,12 +18,12 @@ interface AuthContextType {
   isAuthenticated: boolean;
   isAdmin: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string, captchaToken?: string) => Promise<void>;
   register: (
     name: string,
     email: string,
     password: string,
-    botSignals?: { website?: string; elapsedMs?: number }
+    botSignals?: { website?: string; elapsedMs?: number; captchaToken?: string }
   ) => Promise<void>;
   logout: () => void;
   error: string | null;
@@ -63,13 +63,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password: string, captchaToken?: string) => {
     setError(null);
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, captchaToken }),
       });
 
       const data = await res.json();
@@ -91,7 +91,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     name: string,
     email: string,
     password: string,
-    botSignals?: { website?: string; elapsedMs?: number }
+    botSignals?: { website?: string; elapsedMs?: number; captchaToken?: string }
   ) => {
     setError(null);
     try {

@@ -8,6 +8,7 @@ import { ScrollReveal } from '@/components/ScrollReveal';
 import { AdBanner } from '@/components/AdBanner';
 import { Eye, EyeOff } from 'lucide-react';
 import { GoogleAuthButton } from '@/components/GoogleAuthButton';
+import { Turnstile, isTurnstileEnabled } from '@/components/Turnstile';
 import { useAuth } from '@/contexts/AuthContext';
 import { ComponentsLayout } from '../components-layout';
 
@@ -17,6 +18,9 @@ export function LoginForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [googleError, setGoogleError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaError, setCaptchaError] = useState<string | null>(null);
+  const [captchaKey, setCaptchaKey] = useState(0);
   const { login, error } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -57,15 +61,26 @@ export function LoginForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Require the CAPTCHA only when a Turnstile site key is configured.
+    if (isTurnstileEnabled() && !captchaToken) {
+      setCaptchaError('Please complete the anti-bot verification.');
+      return;
+    }
+    setCaptchaError(null);
+
     setIsLoading(true);
     try {
-      await login(email.trim().toLowerCase(), password);
+      await login(email.trim().toLowerCase(), password, captchaToken ?? undefined);
       // Check if there's a redirect path stored in sessionStorage
       const redirectPath = sessionStorage.getItem('redirectAfterLogin') || '/academy';
       sessionStorage.removeItem('redirectAfterLogin'); // Clean up
       router.push(redirectPath);
     } catch (err) {
       console.error('Login failed');
+      // Turnstile tokens are single-use — reset so the visitor can retry.
+      setCaptchaToken(null);
+      setCaptchaKey((key) => key + 1);
     } finally {
       setIsLoading(false);
     }
@@ -128,13 +143,18 @@ export function LoginForm() {
                   </button>
                 </div>
               </div>
-              
+
               <div className="flex flex-col gap-3 text-xs sm:flex-row sm:items-center sm:justify-between sm:text-sm">
                 <label className="flex items-center gap-2 text-gray-400 cursor-pointer">
                   <input type="checkbox" className="w-4 h-4 bg-transparent border-gray-600 rounded" />
                   <span>Remember me</span>
                 </label>
                 <a href="/forgot-password" className="font-medium text-coinlect-accent hover:underline">Forgot password?</a>
+              </div>
+
+              <div>
+                <Turnstile onVerify={setCaptchaToken} resetKey={captchaKey} className="flex justify-center" />
+                {captchaError && <p className="mt-1 text-xs text-red-400">{captchaError}</p>}
               </div>
 
               <Button className="justify-center w-full py-3 text-sm font-semibold sm:py-4 sm:text-base" disabled={isLoading}>

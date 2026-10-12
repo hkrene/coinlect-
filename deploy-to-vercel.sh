@@ -60,6 +60,10 @@ read -p "Enter GOOGLE_CLIENT_SECRET (optional, press Enter to skip): " GOOGLE_CL
 # Get Gemini API key (optional)
 read -p "Enter GEMINI_API_KEY (optional, press Enter to skip): " GEMINI_API_KEY
 
+# Get Cloudflare Turnstile keys (optional but recommended — bot/CAPTCHA protection)
+read -p "Enter NEXT_PUBLIC_TURNSTILE_SITE_KEY (optional, press Enter to skip): " TURNSTILE_SITE_KEY
+read -p "Enter TURNSTILE_SECRET_KEY (optional, press Enter to skip): " TURNSTILE_SECRET_KEY
+
 echo ""
 echo "Adding environment variables to Vercel..."
 
@@ -79,6 +83,14 @@ if [ ! -z "$GEMINI_API_KEY" ]; then
     vercel env add GEMINI_API_KEY production <<< "$GEMINI_API_KEY"
 fi
 
+if [ ! -z "$TURNSTILE_SITE_KEY" ]; then
+    vercel env add NEXT_PUBLIC_TURNSTILE_SITE_KEY production <<< "$TURNSTILE_SITE_KEY"
+fi
+
+if [ ! -z "$TURNSTILE_SECRET_KEY" ]; then
+    vercel env add TURNSTILE_SECRET_KEY production <<< "$TURNSTILE_SECRET_KEY"
+fi
+
 # Also add to preview and development
 vercel env add DATABASE_URL preview <<< "$DATABASE_URL"
 vercel env add POSTGRES_URL preview <<< "$POSTGRES_URL"
@@ -93,6 +105,14 @@ fi
 
 if [ ! -z "$GEMINI_API_KEY" ]; then
     vercel env add GEMINI_API_KEY preview <<< "$GEMINI_API_KEY"
+fi
+
+if [ ! -z "$TURNSTILE_SITE_KEY" ]; then
+    vercel env add NEXT_PUBLIC_TURNSTILE_SITE_KEY preview <<< "$TURNSTILE_SITE_KEY"
+fi
+
+if [ ! -z "$TURNSTILE_SECRET_KEY" ]; then
+    vercel env add TURNSTILE_SECRET_KEY preview <<< "$TURNSTILE_SECRET_KEY"
 fi
 
 echo ""

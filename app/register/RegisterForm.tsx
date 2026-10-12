@@ -8,6 +8,7 @@ import { ScrollReveal } from '@/components/ScrollReveal';
 import { AdBanner } from '@/components/AdBanner';
 import { Eye, EyeOff } from 'lucide-react';
 import { GoogleAuthButton } from '@/components/GoogleAuthButton';
+import { Turnstile, isTurnstileEnabled } from '@/components/Turnstile';
 import { useAuth } from '@/contexts/AuthContext';
 import { ComponentsLayout } from '../components-layout';
 
@@ -17,6 +18,9 @@ export function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false);
   const [googleError, setGoogleError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaError, setCaptchaError] = useState<string | null>(null);
+  const [captchaKey, setCaptchaKey] = useState(0);
   const { register, error } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -102,6 +106,13 @@ export function RegisterForm() {
     }
     setFieldErrors({});
 
+    // Require the CAPTCHA only when a Turnstile site key is configured.
+    if (isTurnstileEnabled() && !captchaToken) {
+      setCaptchaError('Please complete the anti-bot verification.');
+      return;
+    }
+    setCaptchaError(null);
+
     setIsLoading(true);
     try {
       await register(
@@ -111,12 +122,16 @@ export function RegisterForm() {
         {
           website: formData.website,
           elapsedMs: Date.now() - (startedAtRef.current || Date.now()),
+          captchaToken: captchaToken ?? undefined,
         }
       );
       router.push('/academy');
     } catch (err) {
       // Error is already handled by the AuthContext
       console.error('Registration failed:', err);
+      // Turnstile tokens are single-use — reset so the visitor can retry.
+      setCaptchaToken(null);
+      setCaptchaKey((key) => key + 1);
     } finally {
       setIsLoading(false);
     }
@@ -234,7 +249,12 @@ export function RegisterForm() {
                   <p className="mt-1 text-xs text-gray-500">At least 8 characters, with a letter and a number.</p>
                 )}
               </div>
-              
+
+              <div>
+                <Turnstile onVerify={setCaptchaToken} resetKey={captchaKey} className="flex justify-center" />
+                {captchaError && <p className="mt-1 text-xs text-red-400">{captchaError}</p>}
+              </div>
+
               <div className="pt-2 text-xs text-gray-500 sm:text-sm">
                 By clicking Sign Up, you agree to our <a href="/terms" className="font-medium underline text-coinlect-accent">Terms</a> and <a href="/privacy" className="font-medium underline text-coinlect-accent">Privacy Policy</a>.
               </div>

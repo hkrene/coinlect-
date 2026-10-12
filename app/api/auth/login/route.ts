@@ -3,7 +3,8 @@ import { prisma } from '@/lib/prisma';
 import { loginSchema } from '@/lib/validators';
 import { verifyPassword, signRefreshToken } from '@/lib/auth';
 import { serialize } from 'cookie';
-import { enforceRateLimit } from '@/lib/rate-limit';
+import { enforceRateLimit, getClientIp } from '@/lib/rate-limit';
+import { verifyCaptcha } from '@/lib/captcha';
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,7 +14,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
     }
 
-    const { email, password } = parsed.data;
+    const { email, password, captchaToken } = parsed.data;
 
     // Throttle by IP and by targeted account to slow credential stuffing /
     // brute-force attacks. A generic message is always returned.
@@ -21,6 +22,15 @@ export async function POST(req: NextRequest) {
     if (perIp) return perIp;
     const perAccount = enforceRateLimit(req, 'login:account', 10, 10 * 60 * 1000, email);
     if (perAccount) return perAccount;
+
+    // CAPTCHA (Cloudflare Turnstile). No-op when no secret key is configured.
+    const captcha = await verifyCaptcha(captchaToken, getClientIp(req));
+    if (!captcha.success) {
+      return NextResponse.json(
+        { error: 'Anti-bot verification failed. Please try again.' },
+        { status: 400 }
+      );
+    }
 
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user || !user.passwordHash || !user.isActive) {

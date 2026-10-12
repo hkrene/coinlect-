@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/Button';
 import { ScrollReveal } from '@/components/ScrollReveal';
+import { Turnstile, isTurnstileEnabled } from '@/components/Turnstile';
 // import { useAuth } from '@/contexts/AuthContext';
 import { ComponentsLayout } from '../components-layout';
 
@@ -12,10 +13,20 @@ export default function ForgotPasswordPage() {
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaError, setCaptchaError] = useState<string | null>(null);
+  const [captchaKey, setCaptchaKey] = useState(0);
   // const { forgotPassword } = useAuth(); // TODO: Implement forgot password functionality
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (isTurnstileEnabled() && !captchaToken) {
+      setCaptchaError('Please complete the anti-bot verification.');
+      return;
+    }
+    setCaptchaError(null);
+
     setIsLoading(true);
     setError(null);
     setMessage(null);
@@ -24,7 +35,7 @@ export default function ForgotPasswordPage() {
       const res = await fetch('/api/auth/forgot-password', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: email.trim().toLowerCase() }),
+        body: JSON.stringify({ email: email.trim().toLowerCase(), captchaToken: captchaToken ?? undefined }),
       });
       if (!res.ok) {
         throw new Error('Failed to send password reset email');
@@ -33,6 +44,9 @@ export default function ForgotPasswordPage() {
     } catch (err) {
       setError('Failed to send password reset email. Please try again.');
       console.error(err);
+      // Turnstile tokens are single-use — reset so the visitor can retry.
+      setCaptchaToken(null);
+      setCaptchaKey((key) => key + 1);
     } finally {
       setIsLoading(false);
     }
@@ -77,6 +91,11 @@ export default function ForgotPasswordPage() {
                 />
               </div>
               
+              <div>
+                <Turnstile onVerify={setCaptchaToken} resetKey={captchaKey} className="flex justify-center" />
+                {captchaError && <p className="mt-1 text-xs text-red-400">{captchaError}</p>}
+              </div>
+
               <Button size="sm" className="justify-center w-full rounded-lg py-3 text-sm font-semibold shadow-none" disabled={isLoading}>
                 {isLoading ? 'Sending...' : 'Send Reset Link'}
               </Button>

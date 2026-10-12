@@ -5,7 +5,8 @@ import { hashPassword, signRefreshToken } from '@/lib/auth';
 import { sendWelcomeEmail } from '@/lib/email';
 import { UserRole } from '@prisma/client';
 import { serialize } from 'cookie';
-import { enforceRateLimit } from '@/lib/rate-limit';
+import { enforceRateLimit, getClientIp } from '@/lib/rate-limit';
+import { verifyCaptcha } from '@/lib/captcha';
 
 /**
  * Minimum time a human needs to fill the registration form (ms). Automated
@@ -29,7 +30,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: parsed.error.flatten() }, { status: 400 });
     }
 
-    const { email, password, name, website, elapsedMs } = parsed.data;
+    const { email, password, name, website, elapsedMs, captchaToken } = parsed.data;
 
     // Honeypot: invisible to humans, filled by naive bots and form scrapers.
     if (website && website.trim().length > 0) {
@@ -39,6 +40,15 @@ export async function POST(req: NextRequest) {
     // Timing gate: bots submit instantly (or omit the signal entirely).
     if (typeof elapsedMs !== 'number' || elapsedMs < MIN_FORM_FILL_MS) {
       return NextResponse.json({ error: BOT_REJECTION }, { status: 400 });
+    }
+
+    // CAPTCHA (Cloudflare Turnstile). No-op when no secret key is configured.
+    const captcha = await verifyCaptcha(captchaToken, getClientIp(req));
+    if (!captcha.success) {
+      return NextResponse.json(
+        { error: 'Anti-bot verification failed. Please try again.' },
+        { status: 400 }
+      );
     }
 
     // Temporary inboxes are the fuel of account factories.
