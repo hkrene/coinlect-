@@ -421,6 +421,7 @@ export const translations = {
         },
         newsTitle: "Actualités",
         newsSubtitle: "Crypto",
+        viewMoreNews: "Voir plus d'actualités",
         readFull: "Lire l'article"
     },
     community: {
@@ -983,6 +984,7 @@ export const translations = {
         },
         newsTitle: "News",
         newsSubtitle: "Crypto",
+        viewMoreNews: "View More News",
         readFull: "Read Article"
     },
     community: {

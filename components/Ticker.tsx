@@ -11,15 +11,14 @@ export const Ticker: React.FC = () => {
   useEffect(() => {
     const fetchPrices = async () => {
       try {
-        const response = await fetch(
-          'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=15&page=1&sparkline=false&price_change_percentage=24h'
-        );
-        
+        const response = await fetch('/api/market/prices', { cache: 'no-store' });
+
         if (response.ok) {
           const data = await response.json();
-          if (Array.isArray(data)) {
-            setItems(data);
-            setIsUsingRealtime(true);
+          const list = Array.isArray(data.coins) ? data.coins : [];
+          if (list.length > 0) {
+            setItems(list);
+            setIsUsingRealtime(Boolean(data.live));
           }
         }
       } catch (error) {
