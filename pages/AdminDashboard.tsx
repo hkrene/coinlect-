@@ -86,6 +86,22 @@ export const AdminDashboard: React.FC = () => {
     return Date.now() - new Date(lastActivityAt).getTime() < ACTIVE_THRESHOLD_MS;
   };
 
+  // A stored name that contains a URL/shortener is promo spam, not a real name.
+  // Fall back to a name derived from the email so the admin never sees ad copy.
+  const SPAM_NAME_RE = /(https?:\/\/|www\.|\b(?:bit\.ly|t\.co|goo\.gl|tinyurl|rb\.gy|t\.me|wa\.me)\b)/i;
+  const displayUserName = (u: User): string => {
+    const name = u.name?.trim();
+    if (name && !SPAM_NAME_RE.test(name)) return name;
+    const local = (u.email.split('@')[0] || u.email)
+      .replace(/[^a-zA-Z0-9]+/g, ' ')
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean)
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+      .join(' ');
+    return local || u.email.split('@')[0] || '—';
+  };
+
   // Image upload function for markdown editor
   const uploadImage = async (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -1109,7 +1125,7 @@ export const AdminDashboard: React.FC = () => {
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
                           <Avatar src={u.avatar} name={u.name} email={u.email} size="sm" />
-                          <span className="font-medium text-white">{u.name || '—'}</span>
+                          <span className="font-medium text-white">{displayUserName(u)}</span>
                         </div>
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-400">
@@ -1881,7 +1897,7 @@ export const AdminDashboard: React.FC = () => {
               } ?
               <br />
               <span className="font-semibold text-white">
-                {deleteTarget.type === 'user' ? (deleteTarget.item.name || deleteTarget.item.email) : deleteTarget.item.title}
+                {deleteTarget.type === 'user' ? displayUserName(deleteTarget.item) : deleteTarget.item.title}
               </span>
               <br />
               <span className="text-sm text-red-400">Cette action est irréversible.</span>

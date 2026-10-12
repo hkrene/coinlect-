@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "next lint",
     "postinstall": "prisma generate",
-    "db:seed": "tsx prisma/seed.ts"
+    "db:seed": "tsx prisma/seed.ts",
+    "db:cleanup-bot-names": "tsx prisma/cleanup-bot-names.ts"
   },
   "dependencies": {
     "@google/genai": "^1.30.0",

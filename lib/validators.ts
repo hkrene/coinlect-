@@ -32,7 +32,20 @@ export const passwordField = z
   .regex(/[A-Za-z]/, 'Password must contain at least one letter')
   .regex(/[0-9]/, 'Password must contain at least one number');
 
-const nameField = z.string().trim().min(1, 'Name is required').max(100, 'Name is too long');
+/**
+ * Names that carry a URL or a link-shortener domain are almost always
+ * promotional spam (bot signups). Matches e.g.
+ * "🔥50.000 TL ozel bonus! ... https://bit.ly/4oYBhMv 🔥 Go".
+ */
+export const spamNameLinkRe =
+  /(https?:\/\/|www\.|\b(?:bit\.ly|t\.co|goo\.gl|tinyurl|is\.gd|rb\.gy|rebrandly|linktr\.ee|t\.me|wa\.me|shorturl\.at)\b)/i;
+
+const nameField = z
+  .string()
+  .trim()
+  .min(1, 'Name is required')
+  .max(100, 'Name is too long')
+  .refine((value) => !spamNameLinkRe.test(value), 'Name must not contain links');
 
 /**
  * A URL that is guaranteed to use http(s). `z.string().url()` alone accepts
