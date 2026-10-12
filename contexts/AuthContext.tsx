@@ -103,11 +103,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
       const data = await res.json();
 
-      if (res.ok && data.user) {
-        setUser(data.user);
-      } else {
-        throw new Error(data.error || 'Registration failed. Please try again.');
+      if (!res.ok) {
+        throw new Error(
+          typeof data.error === 'string'
+            ? data.error
+            : 'Registration failed. Please try again.'
+        );
       }
+
+      // No auto-login: local accounts must confirm their email address via the
+      // link sent by the API before they can sign in.
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Network error. Please try again.';
       setError(errorMessage);

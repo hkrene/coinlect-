@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
+import * as crypto from 'crypto';
 import { prisma } from '@/lib/prisma';
 import { registerSchema, isDisposableEmail } from '@/lib/validators';
-import { hashPassword, signRefreshToken } from '@/lib/auth';
-import { sendWelcomeEmail } from '@/lib/email';
+import { hashPassword } from '@/lib/auth';
+import { sendVerificationEmail, buildVerificationUrl } from '@/lib/email';
 import { UserRole } from '@prisma/client';
-import { serialize } from 'cookie';
 import { enforceRateLimit, getClientIp } from '@/lib/rate-limit';
 import { verifyCaptcha } from '@/lib/captcha';
 
@@ -17,6 +18,19 @@ const MIN_FORM_FILL_MS = 2000;
 /** Generic message returned for every bot-detection gate, so scripts can't
  *  reverse-engineer the individual rules from the error text. */
 const BOT_REJECTION = 'Unable to complete registration at this time. Please try again.';
+
+/** Email verification links are valid for 24 hours. */
+const VERIFICATION_TTL_MS = 1000 * 60 * 60 * 24;
+
+// Create a base PrismaClient instance for operations that need direct model access
+// (Accelerate extension may not expose newly added models immediately)
+const basePrisma = new PrismaClient({
+  datasourceUrl: process.env.DATABASE_URL,
+}) as PrismaClient;
+
+function sha256(input: string) {
+  return crypto.createHash('sha256').update(input).digest('hex');
+}
 
 export async function POST(req: NextRequest) {
   // Limit account creation per IP to slow down automated abuse.
@@ -72,40 +86,48 @@ export async function POST(req: NextRequest) {
         name,
         role: UserRole.USER,
         provider: 'local',
+        emailVerifiedAt: null, // must confirm their email via link before signing in
       },
     });
 
-    // Send welcome email (best-effort; never block signup)
-    await sendWelcomeEmail({ to: user.email, name: user.name }).catch((e) => {
-      console.error('Welcome email failed', e);
+    // Generate a single-use verification token and email the confirmation link.
+    // The account is NOT usable (no session is issued) until the email is confirmed.
+    const token = crypto.randomBytes(32).toString('hex');
+    const tokenHash = sha256(token);
+    const expiresAt = new Date(Date.now() + VERIFICATION_TTL_MS);
+
+    try {
+      await (basePrisma as any).emailVerificationToken.create({
+        data: {
+          userId: user.id,
+          token,
+          tokenHash,
+          expiresAt,
+        },
+      });
+    } catch (err) {
+      // Roll back the account so a legitimate visitor can simply retry sign-up
+      // instead of hitting an "email already in use" dead-end.
+      console.error('Failed to create email verification token', err);
+      await prisma.user.delete({ where: { id: user.id } }).catch(() => {});
+      throw err;
+    }
+
+    const verificationUrl = buildVerificationUrl({ userId: user.id, token });
+    await sendVerificationEmail({ to: user.email, name: user.name, verificationUrl }).catch((e) => {
+      console.error('Verification email failed', e);
     });
 
-    // Create refresh token
-    const tokenPayload = { sub: user.id, role: user.role };
-    const refreshToken = await signRefreshToken(tokenPayload);
-
-    await prisma.refreshToken.create({
-      data: {
-        userId: user.id,
-        token: refreshToken,
-        expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+    // Do NOT create a session: {@link User.emailVerifiedAt} must be set first.
+    return NextResponse.json(
+      {
+        success: true,
+        requiresEmailVerification: true,
+        message:
+          'Account created. Please check your email to confirm your address and activate your account.',
       },
-    });
-
-    // Set the refresh token cookie
-    const cookie = serialize('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production', // Ensure secure cookies in production
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-      path: '/',
-    });
-
-    const response = NextResponse.json({
-      user: { id: user.id, email: user.email, name: user.name, role: user.role },
-    });
-    response.headers.set('Set-Cookie', cookie);
-    return response;
+      { status: 201 }
+    );
   } catch (err: any) {
     console.error('Register error:', err.message, err.stack);
     if (err.message === 'JWT_SECRET missing') {
@@ -114,4 +136,3 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
-

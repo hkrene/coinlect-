@@ -9,7 +9,7 @@ import { ChatAssistant } from '@/components/ChatAssistant';
 
 export function ComponentsLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isSpecialPage = pathname === '/privacy' || pathname === '/terms' || pathname === '/login' || pathname === '/register' || pathname === '/forgot-password';
+  const isSpecialPage = pathname === '/privacy' || pathname === '/terms' || pathname === '/login' || pathname === '/register' || pathname === '/forgot-password' || pathname === '/verify-email';
   const isAdminPage = pathname === '/admin';
   
   // Pages that should not have footer

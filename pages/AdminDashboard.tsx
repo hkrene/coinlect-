@@ -107,7 +107,7 @@ export const AdminDashboard: React.FC = () => {
     return new Promise((resolve, reject) => {
       const formData = new FormData();
       formData.append('file', file);
-      formData.append('upload_preset', 'coinlect-uploads'); // You'll need to create this preset in Cloudinary
+      formData.append('upload_preset', 'coinlect-uploads'); // You'll need to create this preset in 
 
       fetch('https://api.cloudinary.com/v1_1/drsd8adkq/image/upload', {
         method: 'POST',
@@ -1055,7 +1055,7 @@ export const AdminDashboard: React.FC = () => {
           <div className="space-y-4 md:space-y-6 animate-in fade-in">
             <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
               <h1 className="text-2xl font-bold md:text-3xl">Gestion des Utilisateurs ({totalUsers || users.length})</h1>
-              <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:items-center">
+              <div className="flex flex-col w-full gap-3 sm:w-auto sm:flex-row sm:items-center">
                 <input
                   type="search"
                   value={usersSearch}

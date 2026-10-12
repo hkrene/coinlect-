@@ -90,7 +90,7 @@ export const Header: React.FC = () => {
                   </button>
 
                   {/* Mega Menu - Desktop Full Width */}
-                  <div className={`fixed left-0 right-0 w-screen bg-black/95 backdrop-blur-xl border-t border-b border-white/10 shadow-2xl transition-all duration-300 pointer-events-auto ${isScrolled ? 'top-[73px]' : 'top-[89px]'} ${academyDropdownOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-2'}`}>
+                  <div className={`fixed left-0 right-0 bg-black/95 backdrop-blur-xl border-t border-b border-white/10 shadow-2xl transition-all duration-300 pointer-events-auto ${isScrolled ? 'top-[73px]' : 'top-[89px]'} ${academyDropdownOpen ? 'opacity-100 visible translate-y-0' : 'opacity-0 invisible -translate-y-2'}`}>
                     <div className="container px-6 py-12 mx-auto">
                       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
                         {academyMegaMenuContent.map((subItem) => (

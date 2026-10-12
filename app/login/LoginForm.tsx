@@ -21,6 +21,14 @@ export function LoginForm() {
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const [captchaError, setCaptchaError] = useState<string | null>(null);
   const [captchaKey, setCaptchaKey] = useState(0);
+  // Resend-verification state (account created but email not confirmed yet).
+  const [showResend, setShowResend] = useState(false);
+  const [resendEmail, setResendEmail] = useState('');
+  const [resendCaptchaToken, setResendCaptchaToken] = useState<string | null>(null);
+  const [resendCaptchaKey, setResendCaptchaKey] = useState(0);
+  const [resendError, setResendError] = useState<string | null>(null);
+  const [resendMessage, setResendMessage] = useState<string | null>(null);
+  const [isResending, setIsResending] = useState(false);
   const { login, error } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -83,6 +91,53 @@ export function LoginForm() {
       setCaptchaKey((key) => key + 1);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleResend = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!resendEmail.trim()) {
+      setResendError('Please enter the email address you signed up with.');
+      return;
+    }
+    if (isTurnstileEnabled() && !resendCaptchaToken) {
+      setResendError('Please complete the anti-bot verification.');
+      return;
+    }
+    setResendError(null);
+    setResendMessage(null);
+
+    setIsResending(true);
+    try {
+      const res = await fetch('/api/auth/resend-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: resendEmail.trim().toLowerCase(), captchaToken: resendCaptchaToken ?? undefined }),
+      });
+      const data = await res.json().catch(() => ({}));
+
+      if (!res.ok) {
+        throw new Error(
+          typeof data.error === 'string'
+            ? data.error
+            : 'Could not resend the verification email. Please try again.'
+        );
+      }
+
+      setResendMessage(
+        typeof data.message === 'string'
+          ? data.message
+          : 'A new verification link has been sent. Please check your inbox (and spam folder).'
+      );
+      setResendCaptchaToken(null);
+      setResendCaptchaKey((key) => key + 1);
+    } catch (err) {
+      setResendError(err instanceof Error ? err.message : 'Could not resend the verification email. Please try again.');
+      setResendCaptchaToken(null);
+      setResendCaptchaKey((key) => key + 1);
+    } finally {
+      setIsResending(false);
     }
   };
 
@@ -161,6 +216,62 @@ export function LoginForm() {
                 {isLoading ? 'Signing In...' : 'Sign In'}
               </Button>
             </form>
+
+            <div className="mt-4 text-center">
+              <button
+                type="button"
+                onClick={() => {
+                  setShowResend((v) => !v);
+                  setResendEmail(email);
+                  setResendError(null);
+                  setResendMessage(null);
+                }}
+                className="text-xs font-medium text-gray-400 transition-colors hover:text-coinlect-accent sm:text-sm"
+              >
+                {showResend ? 'Hide resend form' : "Didn't get a verification email? Resend it"}
+              </button>
+            </div>
+
+            {showResend && (
+              <form onSubmit={handleResend} className="p-4 mt-4 border rounded-lg border-white/10 bg-white/5">
+                <p className="mb-3 text-xs text-gray-400 sm:text-sm">
+                  Enter the email you signed up with and we&apos;ll send a new confirmation link.
+                </p>
+                <input
+                  id="resend-email"
+                  name="resendEmail"
+                  type="email"
+                  required
+                  maxLength={254}
+                  autoComplete="email"
+                  className="w-full px-3 py-3 mb-3 text-sm text-white transition-colors border rounded-lg sm:text-base bg-white/5 border-white/20 focus:outline-none focus:border-coinlect-accent focus:ring-1 focus:ring-coinlect-accent/60"
+                  placeholder="you@example.com"
+                  value={resendEmail}
+                  onChange={(e) => setResendEmail(e.target.value)}
+                />
+                <div className="mb-3">
+                  <Turnstile onVerify={setResendCaptchaToken} resetKey={resendCaptchaKey} className="flex justify-center" />
+                </div>
+                {resendError && (
+                  <div className="p-3 mb-3 text-xs text-center text-red-400 border rounded bg-red-500/10 border-red-500/20">
+                    {resendError}
+                  </div>
+                )}
+                {resendMessage && (
+                  <div className="p-3 mb-3 text-xs text-center text-green-400 border rounded bg-green-500/10 border-green-500/20">
+                    {resendMessage}
+                  </div>
+                )}
+                <Button
+                  type="submit"
+                  size="sm"
+                  className="justify-center w-full py-3 text-sm font-semibold rounded-lg shadow-none"
+                  disabled={isResending}
+                >
+                  {isResending ? 'Sending...' : 'Resend verification email'}
+                </Button>
+              </form>
+            )}
 
             <div className="mt-5 sm:mt-6">
               <div className="relative">

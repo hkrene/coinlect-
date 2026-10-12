@@ -4,8 +4,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("POSTGRES_URL")
 }
 
@@ -40,58 +40,59 @@ enum DonationStatus {
   FAILED
 }
 
-
 // Models
 model User {
-  id             String          @id @default(uuid())
-  email          String          @unique
-  passwordHash   String?
-  name           String?
-  avatar         String?         // Profile picture URL
-  dateOfBirth    DateTime?
-  role           UserRole        @default(USER)
-  isActive       Boolean         @default(true)
-  provider       String?         // local | google
-  googleId       String?         @unique
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  lastActivityAt DateTime?
+  id              String    @id @default(uuid())
+  email           String    @unique
+  passwordHash    String?
+  name            String?
+  avatar          String? // Profile picture URL
+  dateOfBirth     DateTime?
+  role            UserRole  @default(USER)
+  isActive        Boolean   @default(true)
+  provider        String? // local | google
+  googleId        String?   @unique
+  emailVerifiedAt DateTime? // set when a local account confirms its email address
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  lastActivityAt  DateTime?
 
-  courses        Course[]        @relation("CourseAuthor")
-  articles       Article[]       @relation("ArticleAuthor")
-  events         Event[]         @relation("EventAuthor")
-  enrollments    Enrollment[]
-  progress       Progress[]
-  refreshTokens  RefreshToken[]
-  sessions       Session[]
-  passwordResetTokens PasswordResetToken[]
+  courses                 Course[]                 @relation("CourseAuthor")
+  articles                Article[]                @relation("ArticleAuthor")
+  events                  Event[]                  @relation("EventAuthor")
+  enrollments             Enrollment[]
+  progress                Progress[]
+  refreshTokens           RefreshToken[]
+  sessions                Session[]
+  passwordResetTokens     PasswordResetToken[]
+  emailVerificationTokens EmailVerificationToken[]
 }
 
 model Course {
-  id            String          @id @default(uuid())
-  title         String
-  slug          String          @unique
-  description   String
-  seoTitle      String?
+  id             String        @id @default(uuid())
+  title          String
+  slug           String        @unique
+  description    String
+  seoTitle       String?
   seoDescription String?
-  status        PublishStatus   @default(DRAFT)
-  publishedAt   DateTime?
-  image         String?
-  videoLink     String?
+  status         PublishStatus @default(DRAFT)
+  publishedAt    DateTime?
+  image          String?
+  videoLink      String?
   // Optional/legacy fields used by the frontend/admin UI
-  about         String?
-  level         String?
-  duration      String?
-  category      String?
-  courseType    String?
-  partnerName   String?
-  partnerLogo   String?
-  isPaid        Boolean         @default(false)
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
+  about          String?
+  level          String?
+  duration       String?
+  category       String?
+  courseType     String?
+  partnerName    String?
+  partnerLogo    String?
+  isPaid         Boolean       @default(false)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 
-  authorId      String?
-  author        User?           @relation("CourseAuthor", fields: [authorId], references: [id])
+  authorId String?
+  author   User?   @relation("CourseAuthor", fields: [authorId], references: [id])
 
   modules       CourseModule[]
   enrollments   Enrollment[]
@@ -109,8 +110,8 @@ model CourseModule {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  progress    Progress[]
+  course   Course     @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  progress Progress[]
 }
 
 model Article {
@@ -132,10 +133,10 @@ model Article {
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
-  authorId       String?
-  author         User?         @relation("ArticleAuthor", fields: [authorId], references: [id])
+  authorId String?
+  author   User?   @relation("ArticleAuthor", fields: [authorId], references: [id])
 
-  featuredItems  FeaturedItem[]
+  featuredItems FeaturedItem[]
 }
 
 model Event {
@@ -153,12 +154,12 @@ model Event {
   seoDescription String?
   status         PublishStatus @default(DRAFT)
   publishedAt    DateTime?
-  url            String?       // External event source URL
+  url            String? // External event source URL
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
-  authorId       String?
-  author         User?         @relation("EventAuthor", fields: [authorId], references: [id])
+  authorId String?
+  author   User?   @relation("EventAuthor", fields: [authorId], references: [id])
 }
 
 model FeaturedItem {
@@ -170,8 +171,8 @@ model FeaturedItem {
   spotlight Boolean      @default(false)
   createdAt DateTime     @default(now())
 
-  course    Course?      @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  article   Article?     @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  course  Course?  @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  article Article? @relation(fields: [articleId], references: [id], onDelete: Cascade)
 }
 
 model Enrollment {
@@ -180,24 +181,24 @@ model Enrollment {
   courseId  String
   createdAt DateTime @default(now())
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
 
   @@unique([userId, courseId])
 }
 
 model Progress {
-  id            String   @id @default(uuid())
-  userId        String
-  courseId      String
-  moduleId      String
-  completed     Boolean  @default(false)
-  progressPct   Int      @default(0)
-  lastActivity  DateTime @default(now())
+  id           String   @id @default(uuid())
+  userId       String
+  courseId     String
+  moduleId     String
+  completed    Boolean  @default(false)
+  progressPct  Int      @default(0)
+  lastActivity DateTime @default(now())
 
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  course        Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  module        CourseModule @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  user   User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  module CourseModule @relation(fields: [moduleId], references: [id], onDelete: Cascade)
 
   @@unique([userId, moduleId])
 }
@@ -220,14 +221,14 @@ model Deal {
 }
 
 model RefreshToken {
-  id        String   @id @default(uuid())
+  id        String    @id @default(uuid())
   userId    String
-  token     String   @unique
+  token     String    @unique
   expiresAt DateTime
   revokedAt DateTime?
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Session {
@@ -236,45 +237,59 @@ model Session {
   expiresAt DateTime
   createdAt DateTime @default(now())
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model PasswordResetToken {
-  id        String   @id @default(uuid())
+  id        String    @id @default(uuid())
   userId    String
-  token     String   @unique
-  tokenHash String   @unique
+  token     String    @unique
+  tokenHash String    @unique
   expiresAt DateTime
   usedAt    DateTime?
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
 
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+}
+
+model EmailVerificationToken {
+  id        String    @id @default(uuid())
+  userId    String
+  token     String    @unique
+  tokenHash String    @unique
+  expiresAt DateTime
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, expiresAt])
 }
 
 model Donation {
-  id                   String          @id @default(uuid())
-  method               DonationMethod
-  status               DonationStatus  @default(PENDING)
+  id     String         @id @default(uuid())
+  method DonationMethod
+  status DonationStatus @default(PENDING)
 
   // Amounts
-  amountSats           Int?            // For Lightning donations in sats
-  amountFiat           Float?          // Optional approximate fiat value
-  currency             String?         // e.g. "USD", "EUR", "CDF", "SATS"
+  amountSats Int? // For Lightning donations in sats
+  amountFiat Float? // Optional approximate fiat value
+  currency   String? // e.g. "USD", "EUR", "CDF", "SATS"
 
   // Lightning-specific fields
-  lightningInvoice     String?         // Bolt11 invoice string
-  lightningPaymentHash String?        @unique
+  lightningInvoice     String? // Bolt11 invoice string
+  lightningPaymentHash String? @unique
 
   // Optional metadata
-  reference            String?         // TX hash, external reference or payment id
-  donorName            String?
-  donorEmail           String?
-  metadata             Json?
+  reference  String? // TX hash, external reference or payment id
+  donorName  String?
+  donorEmail String?
+  metadata   Json?
 
-  createdAt            DateTime        @default(now())
-  updatedAt            DateTime        @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([method, status])
 }

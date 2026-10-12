@@ -215,6 +215,16 @@ export const changePasswordSchema = z.object({
   newPassword: passwordField,
 });
 
+export const verifyEmailSchema = z.object({
+  userId: uuidField,
+  token: z.string().trim().min(10, 'Invalid token').max(200, 'Invalid token'),
+});
+
+export const resendVerificationSchema = z.object({
+  email: emailField,
+  captchaToken: captchaTokenField,
+});
+
 export const updateProfileSchema = z.object({
   name: nameField.optional(),
   dateOfBirth: optional(

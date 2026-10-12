@@ -86,7 +86,8 @@ export async function GET(req: NextRequest) {
     const existingUser = await prisma.user.findUnique({ where: { email } });
     const isNewUser = !existingUser;
 
-    // Create or update user
+    // Create or update user. Google already verified the email address, so
+    // mark it as confirmed regardless of the provider the account was created with.
     const user = await prisma.user.upsert({
       where: { email },
       update: {
@@ -94,6 +95,7 @@ export async function GET(req: NextRequest) {
         provider: 'google',
         name,
         avatar,
+        emailVerifiedAt: new Date(),
       },
       create: {
         email,
@@ -102,6 +104,7 @@ export async function GET(req: NextRequest) {
         name,
         avatar,
         role: UserRole.USER,
+        emailVerifiedAt: new Date(),
       },
     });
 

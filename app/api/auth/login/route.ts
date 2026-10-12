@@ -42,6 +42,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 
+    // Local accounts must confirm their email address before signing in. This
+    // ensures sign-ups can only be used with a real, deliverable inbox.
+    if (user.provider === 'local' && !(user as any).emailVerifiedAt) {
+      return NextResponse.json(
+        { error: 'Please confirm your email address first. A verification link was sent to your inbox — check your email (and spam folder).' },
+        { status: 403 }
+      );
+    }
+
     // Create refresh token
     const tokenPayload = { sub: user.id, role: user.role };
     const refreshToken = await signRefreshToken(tokenPayload);
