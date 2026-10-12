@@ -48,7 +48,7 @@ export const Statistics = () => {
         
         {/* TOP NARRATIVE: RAW TYPOGRAPHY */}
         <div className="mb-20 lg:mb-32">
-          <h2 className="mb-8 text-2xl font-bold text-white lg:text-5xl">
+          <h2 className="mb-8 text-2xl font-bold text-white md:text-4xl lg:text-5xl">
             {t.statistics.title} <span className="text-amber-500">{t.statistics.titleSuffix}</span> <br />
             {t.statistics.subtitle}
           </h2>

@@ -241,7 +241,7 @@ export const Academy: React.FC = () => {
         <div className="container relative z-10 px-6 mx-auto">
             <ScrollReveal>
                 <div className="max-w-5xl mx-auto">
-                    <h1 className="mb-8 text-4xl  font-bold leading-[1.1] tracking-tighter text-white md:text-6xl lg:text-6xl">
+                    <h1 className="mb-8 text-3xl font-bold leading-[1.1] tracking-tighter text-white sm:text-4xl md:text-6xl lg:text-6xl">
                         <span className="text-[#a1a1aa]">{t.academy.hero.titlePrefix}</span>{' '}{t.academy.hero.titleMain}{' '}<span className="text-[#a1a1aa]">{t.academy.hero.titleMiddle}</span>{' '}<br className="hidden md:block" />
                         <span className="relative inline-block text-white">
                             <span className="absolute inset-x-0 top-1/2 h-[2px] w-[110%] -translate-x-[5%] bg-white -rotate-2 z-10" />
@@ -347,8 +347,8 @@ export const Academy: React.FC = () => {
 
   <div className="relative z-10 w-full px-6 mx-auto max-w-7xl">
     <ScrollReveal>
-      <div className="mb-24 text-center">
-        <h2 className="mb-8 text-4xl font-bold leading-[1.1] tracking-tighter text-white md:text-6xl lg:text-6xl">
+      <div className="mb-16 text-center md:mb-24">
+        <h2 className="mb-8 text-3xl font-bold leading-[1.1] tracking-tighter text-white sm:text-4xl md:text-6xl lg:text-6xl">
           <span className="text-[#a1a1aa]">Explorez les</span>{' '}Protocoles{' '}<span className="text-[#a1a1aa]">et</span>{' '}<br className="hidden md:block" />
           <span className="relative inline-block text-white">
             <span className="absolute inset-x-0 top-1/2 h-[2px] w-[110%] -translate-x-[5%] bg-white -rotate-2 z-10" />
@@ -374,7 +374,7 @@ export const Academy: React.FC = () => {
           return (
           <div 
             key={index} 
-            className="relative flex flex-col items-start p-10 transition-all duration-300 bg-transparent group rounded-none border-white/10 border-b md:border-r hover:bg-white/[0.02]"
+            className="relative flex flex-col items-start p-6 transition-all duration-300 bg-transparent group rounded-none border-white/10 border-b md:border-r hover:bg-white/[0.02] md:p-10"
           >
             {/* Ligne d'accentuation verticale au survol */}
             <div className="absolute left-0 top-0 bottom-0 w-[2px] bg-white/0 group-hover:bg-white transition-all duration-300" />

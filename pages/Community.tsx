@@ -117,7 +117,7 @@ export const Community: React.FC = () => {
         <div className="relative z-10 w-full px-6 mx-auto max-w-7xl">
           <ScrollReveal>
             <div className="text-center">
-              <h1 className="mb-8 text-4xl font-bold leading-[1.1] tracking-tighter text-white md:text-6xl lg:text-6xl">
+              <h1 className="mb-8 text-3xl font-bold leading-[1.1] tracking-tighter text-white sm:text-4xl md:text-6xl lg:text-6xl">
                 <span className="text-[#a1a1aa]">{t.community.page.titlePrefix}</span>{' '}
                 <span className="relative inline-block text-white">
                   <span className="absolute inset-x-0 top-1/2 h-[2px] w-[110%] -translate-x-[5%] bg-white -rotate-2 z-10" />
@@ -126,9 +126,6 @@ export const Community: React.FC = () => {
               </h1>
               <p className="max-w-3xl mx-auto text-base leading-relaxed text-[#71717a] md:text-sm lg:text-sm font-medium">
                 {t.community.page.subtitle}
-              </p>
-              <p className="max-w-3xl mx-auto mt-6 text-base font-medium leading-relaxed text-gray-300 md:text-sm lg:text-sm">
-                {t.community.page.seoDescription}
               </p>
             </div>
           </ScrollReveal>

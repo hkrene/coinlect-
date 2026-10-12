@@ -86,9 +86,9 @@ export const CourseDetail: React.FC = () => {
           </div>
           
           <ScrollReveal>
-            <div className="grid items-center gap-12 lg:grid-cols-2">
-              <div>
-                <div className="flex items-center gap-3 mb-6">
+            <div className="flex flex-col gap-8 lg:gap-10">
+              <div className="max-w-4xl">
+                <div className="flex flex-wrap items-center gap-3 mb-6">
                   <span className="px-3 py-1 text-[10px] font-black tracking-widest uppercase border rounded-none bg-coinlect-accent/10 text-coinlect-accent border-coinlect-accent/20">
                     {course.category}
                   </span>
@@ -117,13 +117,13 @@ export const CourseDetail: React.FC = () => {
                   )}
                 </div>
                 
-                <h1 className="mb-6 text-2xl font-black leading-tight tracking-tighter text-left text-white md:text-4xl ">
+                <h1 className="mb-6 text-3xl font-black leading-tight tracking-tighter text-left text-white sm:text-4xl md:text-5xl ">
                   {course.title}
                 </h1>
               </div>
 
               {/* Video Preview - Direct from Database */}
-              <div className="relative overflow-hidden bg-black border rounded-none shadow-2xl aspect-video border-white/10">
+              <div className="relative w-full overflow-hidden bg-black border rounded-none shadow-2xl aspect-video border-white/10">
                 {course.videoLink && course.videoLink.trim() !== '' && !videoError ? (
                   <>
                     {/* YouTube Video */}

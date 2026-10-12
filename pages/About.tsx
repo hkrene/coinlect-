@@ -126,11 +126,11 @@ export const About: React.FC = () => {
         <ScrollReveal>
           <div className="flex flex-col items-center gap-12 mb-20 md:flex-row md:justify-between">
             <div className="md:w-1/2">
-              <h1 className="mb-6 text-4xl font-extrabold text-white md:text-5xl">
+              <h1 className="mb-6 text-3xl sm:text-4xl font-extrabold text-white md:text-5xl">
                 {t.aboutAcademy.title.split(' ')[0]} <span className="text-coinlect-accent">{t.aboutAcademy.title.split(' ')[1]}</span>
               </h1>
 
-              <p className="mb-4 text-sm text-gray-400 eading-relaxed md:text-xl">
+              <p className="mb-4 text-sm leading-relaxed text-gray-400 md:text-xl">
                 {t.aboutAcademy.description.para1}
               </p>
 
@@ -173,7 +173,7 @@ export const About: React.FC = () => {
             </div>
 
             <div className="md:w-1/2">
-              <h2 className="mb-6 text-4xl font-extrabold text-white md:text-5xl">
+              <h2 className="mb-6 text-3xl sm:text-4xl font-extrabold text-white md:text-5xl">
                 {t.aboutAcademy.missionTitle.split(' ')[0]} <span className="text-coinlect-accent">{t.aboutAcademy.missionTitle.split(' ')[1]}</span>
               </h2>
 
@@ -195,13 +195,13 @@ export const About: React.FC = () => {
         {/* Team Section — untouched */}
         <ScrollReveal delay={400}>
           <div className="mb-16 text-center">
-            <h2 className="mb-12 text-4xl font-extrabold text-white md:text-5xl">
+            <h2 className="mb-12 text-3xl sm:text-4xl font-extrabold text-white md:text-5xl">
               {t.aboutAcademy.teamTitle.split(' ')[0]} {t.aboutAcademy.teamTitle.split(' ')[1]} <span className="text-coinlect-accent">{t.aboutAcademy.teamTitle.split(' ')[2]}<span className='hidden md:inline'> {t.aboutAcademy.teamTitle.split(' ')[3]}</span></span>
             </h2>
 
-            <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+            <div className="flex flex-wrap justify-center gap-8 sm:gap-10">
               {TEAM_MEMBERS.map((member, index) => (
-                <div key={index} className="flex flex-col items-center justify-center">
+                <div key={index} className="flex w-36 flex-col items-center justify-center sm:w-40">
                   <img
                     src={member.image}
                     alt={member.name}
@@ -243,13 +243,13 @@ export const About: React.FC = () => {
         {/* Volunteers Section */}
 <ScrollReveal delay={500}>
   <div className="mb-16 text-center">
-    <h2 className="mb-12 text-4xl font-extrabold text-white md:text-5xl">
+    <h2 className="mb-12 text-3xl sm:text-4xl font-extrabold text-white md:text-5xl">
       {t.aboutAcademy.volunteersTitle.split(' ')[0]} <span className="text-coinlect-accent">{t.aboutAcademy.volunteersTitle.split(' ')[1]}</span>
     </h2>
 
-    <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+    <div className="flex flex-wrap justify-center gap-8 sm:gap-10">
       {VOLUNTEERS.map((volunteer, index) => (
-        <div key={index} className="flex flex-col items-center">
+        <div key={index} className="flex w-36 flex-col items-center sm:w-40">
           <img
             src={volunteer.image}
             alt={volunteer.name}

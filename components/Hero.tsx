@@ -69,7 +69,7 @@ export const Hero: React.FC = () => {
           </div>
         </Link>
         {/* MAIN HEADLINE */}
-        <h1 className="mx-auto mb-8 text-2xl md:text-6xl font-bold tracking-tight text-white leading-[1.1]">
+        <h1 className="mx-auto mb-8 text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-6xl leading-[1.1]">
           {t.hero.titlePrefix}
           <span className="ml-3 italic text-amber-500">Web3.0</span>
         </h1>
@@ -80,14 +80,13 @@ export const Hero: React.FC = () => {
         </p>
         
         {/* CTAs */}
-        <div className="flex flex-row items-center justify-center gap-3 mb-24">
+        <div className="flex flex-wrap items-center justify-center gap-3 mb-24">
           <Link href="https://t.me/coinlect_academy">
             <button className="flex items-center gap-3 px-6 py-3 font-semibold text-white transition-all border rounded-full bg-white/5 border-white/10 hover:bg-white/10">
               <div className="p-1 text-black bg-white rounded-full">
                 <Play className="w-3 h-3 fill-current" />
               </div>
-              <span className="hidden sm:inline">{t.hero.ctaDonation}</span>
-              <span className="inline sm:hidden">telegran</span>
+              <span>{t.hero.ctaDonation}</span>
             </button>
           </Link>
           
@@ -103,7 +102,7 @@ export const Hero: React.FC = () => {
           <div className="relative w-full max-w-6xl mx-auto rounded-t-3xl border-x border-t border-white/10 bg-[#0a0a0a] p-4 lg:p-8 shadow-[0_-20px_80px_rgba(0,0,0,0.8)]">
             <Link 
               href={`/academy/${featured.slug}`} 
-              className="relative block w-full overflow-hidden border cursor-pointer md:min-h-[500px] rounded-2xl border-white/5 group min-h-[250px]"
+              className="relative block w-full overflow-hidden border cursor-pointer rounded-2xl border-white/5 group min-h-[340px] sm:min-h-[400px] md:min-h-[500px]"
             >
               <img
                 src={featured.image || 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765185502/clclogo_p2v5bp.jpg'}
@@ -121,7 +120,7 @@ export const Hero: React.FC = () => {
                   {isFr ? 'COURS VIDÉO' : 'VIDEO COURSE'}
                 </span>
                 
-                <h2 className="max-w-3xl mb-4 text-2xl font-bold leading-tight text-white md:text-4xl drop-shadow-lg">
+                <h2 className="max-w-3xl mb-4 text-2xl font-bold leading-tight text-white md:text-4xl line-clamp-3 drop-shadow-lg">
                   {featured.title}
                 </h2>
                 
@@ -131,7 +130,7 @@ export const Hero: React.FC = () => {
                   </p>
                 )}
                 
-                <div className="flex items-center justify-center gap-4 mb-8 text-sm font-medium text-gray-300">
+                <div className="flex items-center justify-center gap-4 mb-4 text-sm font-medium text-gray-300 sm:mb-8">
                   {featured.level && (
                     <>
                       <span className="px-2 py-1 text-xs rounded bg-white/10">{featured.level}</span>

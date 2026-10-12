@@ -96,7 +96,7 @@ export const Events: React.FC = () => {
         <div className="mb-8">
           <div className="flex flex-col gap-6 mb-6 md:flex-row md:items-center md:justify-between">
             <div>
-              <h1 className="text-4xl font-extrabold text-white md:text-5xl">{t.events.title} {t.events.titleSuffix}</h1>
+              <h1 className="text-3xl font-extrabold text-white sm:text-4xl md:text-5xl">{t.events.title} {t.events.titleSuffix}</h1>
               <p className="max-w-3xl mt-4 text-sm leading-relaxed text-gray-300 md:text-left">
                 {t.events.subtitle}
               </p>
@@ -127,11 +127,6 @@ export const Events: React.FC = () => {
                 {displayFilters[index] || filterKey}
               </button>
             ))}
-          </div>
-          <div className="flex flex-wrap gap-2 mb-10">
-            <span className="px-3 py-1 text-xs font-semibold uppercase rounded-full bg-white/10 text-gray-200">Blockchain Sénégal</span>
-            <span className="px-3 py-1 text-xs font-semibold uppercase rounded-full bg-white/10 text-gray-200">Meetup Web3 Abidjan</span>
-            <span className="px-3 py-1 text-xs font-semibold uppercase rounded-full bg-white/10 text-gray-200">Hackathon crypto Ouagadougou</span>
           </div>
         </div>
 
@@ -186,7 +181,7 @@ export const Events: React.FC = () => {
 
         {/* Clean Pagination without Page Picker */}
         {filteredEvents.length > 0 && (
-          <div className="flex items-center justify-between pt-8 border-t border-white/10">
+          <div className="flex flex-col gap-4 pt-8 border-t border-white/10 sm:flex-row sm:items-center sm:justify-between">
             <div className="text-sm font-medium text-gray-400">
               Page <span className="text-white">{currentPage}</span> of <span className="text-white">{totalPages}</span>
             </div>

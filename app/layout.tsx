@@ -86,7 +86,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr" className={`${orbitron.variable} ${jura.variable} scroll-smooth`}>
-      <body className={`bg-black text-white`} suppressHydrationWarning={true}>
+      <body className={`bg-black text-white overflow-x-clip`} suppressHydrationWarning={true}>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}

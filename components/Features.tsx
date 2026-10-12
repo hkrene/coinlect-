@@ -43,7 +43,7 @@ export const Features: React.FC = () => {
   }, [communityImages.length]);
 
   return (
-    <div className="container flex flex-col gap-32 px-6 py-24 mx-auto bg-black">
+    <div className="container flex flex-col gap-16 px-6 py-16 mx-auto bg-black md:gap-32 md:py-24">
         
         {/* Feature 1: Clean Image Preview */}
         <div className="grid items-center gap-16 md:grid-cols-2">

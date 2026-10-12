@@ -50,7 +50,7 @@ export const Deals: React.FC = () => {
         <div className="relative z-10 w-full px-6 mx-auto max-w-7xl">
           <ScrollReveal>
             <div className="text-center">
-              <h1 className="mb-8 text-4xl font-bold leading-[1.1] tracking-tighter text-white md:text-6xl lg:text-6xl">
+              <h1 className="mb-8 text-3xl font-bold leading-[1.1] tracking-tighter text-white sm:text-4xl md:text-6xl lg:text-6xl">
                 <span className="text-[#a1a1aa]">{t.deals.title}</span>{' '}
                 <span className="relative inline-block text-white">
                   <span className="absolute inset-x-0 top-1/2 h-[2px] w-[110%] -translate-x-[5%] bg-white -rotate-2 z-10" />
@@ -60,7 +60,6 @@ export const Deals: React.FC = () => {
               <p className="max-w-3xl mx-auto text-sm leading-relaxed text-[#71717a] md:text-sm lg:text-sm">
                 {t.deals.heroDescription}
               </p>
-              <h2 className="mt-8 text-xl font-bold text-white sm:text-3xl">{t.deals.heroHeading}</h2>
             </div>
           </ScrollReveal>
         </div>

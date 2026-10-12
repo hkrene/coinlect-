@@ -432,7 +432,6 @@ export const translations = {
             titlePrefix: "Nos",
             titleMain: "Communautés",
             subtitle: "Connectez-vous avec des milliers de passionnés à travers nos différentes plateformes.",
-            seoDescription: "Rejoignez des passionnés de crypto au Sénégal, en Côte d'Ivoire, au Bénin, au Togo, au Gabon, au Congo et au Burkina Faso.",
             categories: [
                 {
                     name: "Canaux Officiels",
@@ -470,7 +469,6 @@ export const translations = {
       titleSuffix: "Exclusives",
       subtitle: "Nous avons négocié les meilleures offres pour vous. Économisez sur les frais de trading, sécurisez vos cryptos et optimisez votre fiscalité.",
       heroDescription: "Meilleurs deals crypto et offres de formation Web3 pour l'Afrique Francophone. Économisez sur les frais de trading et apprenez la crypto depuis Dakar, Abidjan, Cotonou, Lomé, Libreville, Brazzaville, Kinshasa et Ouagadougou.",
-      heroHeading: "Offres crypto pour les étudiants et investisseurs francophones",
       searchPlaceholder: "Rechercher une offre...",
       filters: ["Tous", "Échange", "Portefeuille", "Fiscalité", "Outil Trading", "Sécurité"],
       claim: "Profiter de l'offre",
@@ -995,7 +993,6 @@ export const translations = {
             titlePrefix: "Our",
             titleMain: "Communities",
             subtitle: "Connect with thousands of enthusiasts across our different platforms.",
-            seoDescription: "Join crypto enthusiasts in Senegal, Côte d'Ivoire, Benin, Togo, Gabon, Congo, and Burkina Faso.",
             categories: [
                 {
                     name: "Official Channels",
@@ -1033,7 +1030,6 @@ export const translations = {
       titleSuffix: "Deals",
       subtitle: "We negotiated the best deals for you. Save on trading fees, secure your crypto, and optimize your taxes.",
       heroDescription: "Best crypto deals and Web3 training offers for Francophone Africa. Save on trading fees and learn crypto from Dakar, Abidjan, Cotonou, Lomé, Libreville, Brazzaville, Kinshasa, and Ouagadougou.",
-      heroHeading: "Crypto deals for Francophone students and investors",
       searchPlaceholder: "Search for a deal...",
       filters: ["All", "Exchange", "Wallet", "Tax", "Trading Tool", "Security"],
       claim: "Claim Offer",

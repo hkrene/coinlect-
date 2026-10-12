@@ -20,7 +20,7 @@ export const Footer: React.FC = () => {
 
         <div className="container relative z-10 px-6 mx-auto">
             {/* CTA Box - Toggles based on page */}
-            <div className="relative p-10 mb-20 overflow-hidden border bg-white/5 border-white/10 rounded-2xl">
+            <div className="relative p-6 mb-16 overflow-hidden border bg-white/5 border-white/10 rounded-2xl sm:p-10 sm:mb-20">
                 <div className="relative z-10 max-w-xl">
                     {isDonatePage ? (
                         <>
@@ -70,7 +70,7 @@ export const Footer: React.FC = () => {
                 </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-8 mb-16 text-xs text-gray-500 md:grid-cols-3 lg:grid-cols-5">
+            <div className="grid grid-cols-1 gap-8 mb-16 text-xs text-gray-500 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
                 <div>
                     <h4 className="mb-4 font-semibold text-white">{t.footer.platform}</h4>
                     <ul className="space-y-2">
@@ -110,8 +110,8 @@ export const Footer: React.FC = () => {
                 <div>
                     <h4 className="mb-4 font-semibold text-white">{t.footer.contact}</h4>
                     <ul className="space-y-2">
-                        <li><a href="mailto:info@coinlect.org" className="hover:text-coinlect-accent">info@coinlect.org</a></li>
-                        <li><a href="mailto:contact@coinlect.org" className="hover:text-coinlect-accent">contact@coinlect.org</a></li>
+                        <li><a href="mailto:info@coinlect.org" className="break-all hover:text-coinlect-accent">info@coinlect.org</a></li>
+                        <li><a href="mailto:contact@coinlect.org" className="break-all hover:text-coinlect-accent">contact@coinlect.org</a></li>
                         <li>
                             <a href="https://wa.me/243971379450" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 hover:text-coinlect-accent">
                                 <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4" aria-hidden="true">
@@ -184,7 +184,7 @@ export const Footer: React.FC = () => {
                         </div>
                     </div>
                 </div>
-                <div className="flex items-center gap-4 my-4 md:mb-0">
+                <div className="flex flex-col items-center gap-2 my-4 text-center sm:flex-row sm:gap-4 md:mb-0">
                     <span className="text-xs text-gray-500">© {new Date().getFullYear()} Coinlect. {t.footer.rights}</span>
                     <a href="https://www.hirwarene.xyz" className="text-xs text-gray-500" target="_blank" rel="noopener noreferrer">
                 <span>Designed by <span  className='text-blue-500'>Hkrene</span></span>

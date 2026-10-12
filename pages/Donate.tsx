@@ -98,7 +98,7 @@ export const Donate: React.FC = () => {
             </ScrollReveal> */}
 
             <ScrollReveal delay={100}>
-              <h1 className="text-4xl font-extrabold leading-tight tracking-tight sm:text-5xl md:text-6xl">
+              <h1 className="text-3xl font-extrabold leading-tight tracking-tight sm:text-5xl md:text-6xl">
                 {t.donatePage.title}{' '}
                 <span className="bg-gradient-to-r from-[#FF6B00] via-orange-400 to-amber-400 bg-clip-text text-transparent">
                   {t.donatePage.titleSuffix}

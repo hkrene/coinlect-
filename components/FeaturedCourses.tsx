@@ -56,7 +56,7 @@ export const FeaturedCourses: React.FC = () => {
           <div className="relative w-full max-w-6xl mx-auto rounded-3xl border border-white/10 bg-[#0a0a0a] p-4 lg:p-8 shadow-[0_20px_80px_rgba(0,0,0,0.8)]">
             <Link 
               href={`/academy/${featured.slug}`} 
-              className="relative block w-full overflow-hidden border cursor-pointer md:min-h-[500px] rounded-2xl border-white/5 group min-h-[250px]"
+              className="relative block w-full overflow-hidden border cursor-pointer rounded-2xl border-white/5 group min-h-[340px] sm:min-h-[400px] md:min-h-[500px]"
             >
               <img
                 src={featured.image || 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765185502/clclogo_p2v5bp.jpg'}
@@ -74,7 +74,7 @@ export const FeaturedCourses: React.FC = () => {
                   {isFr ? 'COURS VIDÉO' : 'VIDEO COURSE'}
                 </span>
                 
-                <h2 className="max-w-3xl mb-4 text-2xl font-bold leading-tight text-white md:text-4xl drop-shadow-lg">
+                <h2 className="max-w-3xl mb-4 text-2xl font-bold leading-tight text-white md:text-4xl line-clamp-3 drop-shadow-lg">
                   {featured.title}
                 </h2>
                 
@@ -84,7 +84,7 @@ export const FeaturedCourses: React.FC = () => {
                   </p>
                 )}
                 
-                <div className="flex items-center justify-center gap-4 mb-8 text-sm font-medium text-gray-300">
+                <div className="flex items-center justify-center gap-4 mb-4 text-sm font-medium text-gray-300 sm:mb-8">
                   {featured.level && (
                     <>
                       <span className="px-2 py-1 text-xs rounded bg-white/10">{featured.level}</span>
@@ -117,7 +117,7 @@ export const FeaturedCourses: React.FC = () => {
                     e.stopPropagation();
                     prevSlide();
                   }}
-                  className="absolute p-2 transition-colors -translate-y-1/2 border rounded-full left-4 top-1/2 bg-black/50 border-white/10 hover:bg-black/70"
+                  className="absolute hidden p-2 transition-colors -translate-y-1/2 border rounded-full left-4 top-1/2 bg-black/50 border-white/10 hover:bg-black/70 md:block"
                   aria-label={isFr ? 'Cours précédent' : 'Previous course'}
                 >
                   <ChevronLeft className="w-5 h-5 text-white" />
@@ -127,7 +127,7 @@ export const FeaturedCourses: React.FC = () => {
                     e.stopPropagation();
                     nextSlide();
                   }}
-                  className="absolute p-2 transition-colors -translate-y-1/2 border rounded-full right-4 top-1/2 bg-black/50 border-white/10 hover:bg-black/70"
+                  className="absolute hidden p-2 transition-colors -translate-y-1/2 border rounded-full right-4 top-1/2 bg-black/50 border-white/10 hover:bg-black/70 md:block"
                   aria-label={isFr ? 'Cours suivant' : 'Next course'}
                 >
                   <ChevronRight className="w-5 h-5 text-white" />
