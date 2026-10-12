@@ -1,4 +1,4 @@
-import { Resend } from 'resend';
+import { Resend, type CreateEmailOptions } from 'resend';
 
 function getResendClient() {
   const apiKey = process.env.RESEND_API_KEY;
@@ -7,6 +7,23 @@ function getResendClient() {
     return null;
   }
   return new Resend(apiKey);
+}
+
+/**
+ * Send one email through Resend and surface API-level failures.
+ *
+ * The Resend SDK resolves with `{ data, error }` instead of throwing when the
+ * API rejects a request (invalid API key, unverified sender domain, suppressed
+ * recipient, rate limit, ...). Callers MUST inspect `error`, otherwise the
+ * failure is silently swallowed and the email is never delivered.
+ */
+async function sendEmail(client: Resend, payload: CreateEmailOptions) {
+  const { error } = await client.emails.send(payload);
+  if (error) {
+    throw new Error(
+      `Resend failed to send "${payload.subject}" to ${payload.to}: ${error.name}: ${error.message}`
+    );
+  }
 }
 
 function getFromAddress() {
@@ -126,7 +143,7 @@ export async function sendWelcomeEmail(params: {
     </div>
   `;
 
-  await client.emails.send({
+  await sendEmail(client, {
     from: getFromAddress(),
     to: params.to,
     subject: t.subject,
@@ -209,7 +226,7 @@ export async function sendPasswordResetEmail(params: {
     </div>
   `;
 
-  await client.emails.send({
+  await sendEmail(client, {
     from: getFromAddress(),
     to: params.to,
     subject: t.subject,
@@ -286,7 +303,7 @@ export async function sendPasswordResetSuccessEmail(params: {
     </div>
   `;
 
-  await client.emails.send({
+  await sendEmail(client, {
     from: getFromAddress(),
     to: params.to,
     subject: t.subject,
@@ -386,7 +403,7 @@ export async function sendVerificationEmail(params: {
     </div>
   `;
 
-  await client.emails.send({
+  await sendEmail(client, {
     from: getFromAddress(),
     to: params.to,
     subject: t.subject,
