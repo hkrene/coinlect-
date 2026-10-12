@@ -4,6 +4,7 @@ import { Providers } from './providers';
 import { Orbitron, Jura } from 'next/font/google';
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { GoogleAnalytics } from './components/GoogleAnalytics';
+import { CoinzillaScript } from '@/components/CoinzillaScript';
 import { CookieConsent } from '@/components/CookieConsent';
 
 const orbitron = Orbitron({
@@ -95,6 +96,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
         />
         <GoogleAnalytics />
+        <CoinzillaScript />
         <Providers>
           {children}
           <CookieConsent />

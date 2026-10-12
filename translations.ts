@@ -558,6 +558,9 @@ export const translations = {
       accept: "Accepter",
       decline: "Refuser",
       privacy: "Politique de confidentialité"
+    },
+    ads: {
+      label: "Publicité"
     }
   },
   en: {
@@ -1119,6 +1122,9 @@ export const translations = {
       accept: "Accept",
       decline: "Decline",
       privacy: "Privacy Policy"
+    },
+    ads: {
+      label: "Advertisement"
     }
   }
 };

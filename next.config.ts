@@ -10,12 +10,12 @@ import type { NextConfig } from 'next';
  */
 const csp = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://accounts.google.com https://apis.google.com https://challenges.cloudflare.com https://va.vercel-scripts.com",
+  "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://accounts.google.com https://apis.google.com https://challenges.cloudflare.com https://va.vercel-scripts.com https://cdn.coinzilla.io https://static.coinzilla.io https://app.coinzilla.com",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data: https:",
-  "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com https://accounts.google.com https://content.googleapis.com https://challenges.cloudflare.com https://vitals.vercel-insights.com https://va.vercel-scripts.com",
-  "frame-src 'self' https://accounts.google.com https://challenges.cloudflare.com https://www.youtube.com https://www.youtube-nocookie.com",
+  "connect-src 'self' https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com https://accounts.google.com https://content.googleapis.com https://challenges.cloudflare.com https://vitals.vercel-insights.com https://va.vercel-scripts.com https://coinzilla.io https://coinzilla.com https://*.coinzilla.io https://*.coinzilla.com",
+  "frame-src 'self' https://accounts.google.com https://challenges.cloudflare.com https://www.youtube.com https://www.youtube-nocookie.com https://coinzilla.io https://coinzilla.com https://*.coinzilla.io https://*.coinzilla.com",
   "media-src 'self' https:",
   "object-src 'none'",
   "base-uri 'self'",

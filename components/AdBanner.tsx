@@ -2,10 +2,14 @@
 
 import React from 'react';
 import { ExternalLink } from 'lucide-react';
+import { CoinzillaAd } from './CoinzillaAd';
+import { isCoinzillaEnabled, type CoinzillaZone } from '../lib/ads';
 
 interface AdBannerProps {
   className?: string;
   variant?: 'wide' | 'compact';
+  /** Coinzilla zone to fill; falls back to house ads when it is not configured. */
+  zone?: CoinzillaZone;
 }
 
 const ADS = [
@@ -35,13 +39,19 @@ const ADS = [
   }
 ];
 
-export const AdBanner: React.FC<AdBannerProps> = ({ className = "", variant = 'wide' }) => {
+export const AdBanner: React.FC<AdBannerProps> = ({ className = "", variant = 'wide', zone = 'inline' }) => {
   // Simple random selection. In a real app, this might come from an ad server.
   const [ad, setAd] = React.useState(ADS[0]);
 
   React.useEffect(() => {
     setAd(ADS[Math.floor(Math.random() * ADS.length)]);
   }, []);
+
+  // When a real Coinzilla zone is configured, serve it; otherwise keep the
+  // built-in house ads so the layout never has an empty gap.
+  if (isCoinzillaEnabled(zone)) {
+    return <CoinzillaAd zone={zone} variant={variant} className={className} />;
+  }
 
   if (variant === 'compact') {
     return (

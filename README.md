@@ -94,6 +94,36 @@ Required variables:
 
 See [.env.example](./.env.example) for the full template.
 
+## Advertising (Coinzilla)
+
+Coinlect can serve ads through the [Coinzilla](https://coinzilla.com) crypto ad
+network. The integration is opt-in and entirely env-driven:
+
+- Site ownership is verified by the `<meta name="coinzilla">` tag in
+  [`app/layout.tsx`](./app/layout.tsx).
+- The shared ad library is loaded once, after cookie consent, by
+  [`components/CoinzillaScript.tsx`](./components/CoinzillaScript.tsx).
+- Individual placements are rendered with
+  [`components/CoinzillaAd.tsx`](./components/CoinzillaAd.tsx), and
+  [`components/AdBanner.tsx`](./components/AdBanner.tsx) automatically serves a
+  Coinzilla zone when one is configured.
+
+Create the zones in your Coinzilla publisher dashboard and set the matching
+variables (see [.env.example](./.env.example)):
+
+```bash
+NEXT_PUBLIC_COINZILLA_SCRIPT_URL=https://...
+NEXT_PUBLIC_COINZILLA_ZONE_HEADER=...
+NEXT_PUBLIC_COINZILLA_ZONE_INLINE=...
+NEXT_PUBLIC_COINZILLA_ZONE_SIDEBAR=...
+```
+
+When no zone is configured the built-in house ads are used instead, so nothing
+breaks in local development or preview deployments. If your account hands out a
+self-contained tag per zone, set `NEXT_PUBLIC_COINZILLA_TAG_URL` with a `%ZONE%`
+placeholder. Remember to allow any Coinzilla hosts in the CSP in
+[`next.config.ts`](./next.config.ts) if they differ from the defaults.
+
 ## Database Setup
 
 1. Create a PostgreSQL database
