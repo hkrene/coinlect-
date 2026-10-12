@@ -25,19 +25,10 @@ export const Home: React.FC = () => {
       <Ticker />
       <Partners />
       <FeaturedCourses />
-      <div className="container max-w-6xl px-6 mx-auto mt-10 mb-8 text-gray-300">
-        <p>{t.home.seoSection1}</p>
-      </div>
       <ScrollReveal>
         <About />
       </ScrollReveal>
-      <div className="container max-w-6xl px-6 mx-auto mt-10 mb-8 text-gray-300">
-        <p>{t.home.seoSection2}</p>
-      </div>
       <Statistics />
-      <div className="container max-w-6xl px-6 mx-auto mt-10 mb-8 text-gray-300">
-        <p>{t.home.statsLine}</p>
-      </div>
       <ScrollReveal>
         <Features />
       </ScrollReveal>
@@ -45,9 +36,6 @@ export const Home: React.FC = () => {
         <AdBanner />
       </ScrollReveal>
       <Testimonials />
-      <div className="container max-w-6xl px-6 mx-auto mt-10 mb-8 text-gray-300">
-        <p>{t.home.seoSection3}</p>
-      </div>
       <ScrollReveal>
         <FAQ />
       </ScrollReveal>
