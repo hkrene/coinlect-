@@ -26,6 +26,23 @@ async function sendEmail(client: Resend, payload: CreateEmailOptions) {
   }
 }
 
+/** True while running `next dev`, where email delivery must never block a signup. */
+function isDevelopment() {
+  return process.env.NODE_ENV === 'development';
+}
+
+/**
+ * Print an action link to the server console during local development.
+ *
+ * Local signups must stay testable even when Resend is not configured, the
+ * recipient is suppressed/bounced, or the machine cannot reach the Resend API.
+ */
+function logDevEmail(kind: string, params: { to: string; url?: string }) {
+  const lines = [`[email:dev] ${kind} for ${params.to}`];
+  if (params.url) lines.push(`[email:dev] ${params.url}`);
+  console.info(`\n${lines.join('\n')}\n`);
+}
+
 function getFromAddress() {
   // Resend requires a verified sender domain for production.
   // Using the verified domain: mail.coinlect.org
@@ -33,14 +50,24 @@ function getFromAddress() {
 }
 
 function getAppBaseUrl() {
+  // Explicit overrides always win (e.g. a tunnel or a staging URL).
+  const explicit = process.env.APP_BASE_URL || process.env.NEXT_PUBLIC_APP_BASE_URL;
+  if (explicit) return explicit.replace(/\/$/, '');
+
+  // In local development, point links at the local server instead of a
+  // production URL configured in NEXT_PUBLIC_APP_URL, so confirmation and
+  // password-reset links actually resolve while testing.
+  if (isDevelopment()) {
+    return `http://localhost:${process.env.PORT || 3000}`;
+  }
+
   // Public base URL used in email links.
-  // Priority: APP_BASE_URL > NEXT_PUBLIC_APP_BASE_URL > NEXT_PUBLIC_APP_URL > VERCEL_URL > localhost fallback
-  const baseUrl = process.env.APP_BASE_URL || 
-                  process.env.NEXT_PUBLIC_APP_BASE_URL || 
-                  process.env.NEXT_PUBLIC_APP_URL || 
-                  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ||
-                  'http://localhost:3000';
-  
+  // Priority: NEXT_PUBLIC_APP_URL > VERCEL_URL > localhost fallback
+  const baseUrl =
+    process.env.NEXT_PUBLIC_APP_URL ||
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ||
+    'http://localhost:3000';
+
   // Ensure URL doesn't end with trailing slash
   return baseUrl.replace(/\/$/, '');
 }
@@ -157,7 +184,12 @@ export async function sendPasswordResetEmail(params: {
   language?: 'fr' | 'en';
 }) {
   const client = getResendClient();
-  if (!client) return;
+  if (!client) {
+    if (isDevelopment()) {
+      logDevEmail('Password reset link', { to: params.to, url: params.resetUrl });
+    }
+    return;
+  }
 
   const lang = params.language || 'fr';
   const logoUrl = 'https://res.cloudinary.com/drsd8adkq/image/upload/v1767997893/coinlect-0_denz8g-removebg-preview_kwnhri.png';
@@ -226,12 +258,25 @@ export async function sendPasswordResetEmail(params: {
     </div>
   `;
 
-  await sendEmail(client, {
-    from: getFromAddress(),
-    to: params.to,
-    subject: t.subject,
-    html,
-  });
+  try {
+    await sendEmail(client, {
+      from: getFromAddress(),
+      to: params.to,
+      subject: t.subject,
+      html,
+    });
+  } catch (err) {
+    if (isDevelopment()) {
+      console.error('Resend failed in development; logging the password reset link instead.', err);
+      logDevEmail('Password reset link', { to: params.to, url: params.resetUrl });
+      return;
+    }
+    throw err;
+  }
+
+  if (isDevelopment()) {
+    logDevEmail('Password reset link', { to: params.to, url: params.resetUrl });
+  }
 }
 
 export async function sendPasswordResetSuccessEmail(params: { 
@@ -334,9 +379,15 @@ export async function sendVerificationEmail(params: {
   language?: 'fr' | 'en';
 }) {
   const client = getResendClient();
-  // Fail loudly instead of silently not sending: registration depends on this
-  // email, and a missing API key would otherwise look like a success to the user.
+  // Fail loudly in production instead of silently not sending: registration
+  // depends on this email, and a missing API key would otherwise look like a
+  // success to the user. In development we log the link instead so a local
+  // signup is never blocked by email configuration or delivery problems.
   if (!client) {
+    if (isDevelopment()) {
+      logDevEmail('Email verification link', { to: params.to, url: params.verificationUrl });
+      return;
+    }
     throw new Error('RESEND_API_KEY is not configured — cannot send verification email');
   }
 
@@ -407,12 +458,27 @@ export async function sendVerificationEmail(params: {
     </div>
   `;
 
-  await sendEmail(client, {
-    from: getFromAddress(),
-    to: params.to,
-    subject: t.subject,
-    html,
-  });
+  try {
+    await sendEmail(client, {
+      from: getFromAddress(),
+      to: params.to,
+      subject: t.subject,
+      html,
+    });
+  } catch (err) {
+    // A Resend failure must not block a local signup: surface the link in the
+    // console so development/testing can continue (production still throws).
+    if (isDevelopment()) {
+      console.error('Resend failed in development; logging the verification link instead.', err);
+      logDevEmail('Email verification link', { to: params.to, url: params.verificationUrl });
+      return;
+    }
+    throw err;
+  }
+
+  if (isDevelopment()) {
+    logDevEmail('Email verification link', { to: params.to, url: params.verificationUrl });
+  }
 }
 
 function escapeHtml(input: string) {
