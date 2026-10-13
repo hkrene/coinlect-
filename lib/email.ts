@@ -334,7 +334,11 @@ export async function sendVerificationEmail(params: {
   language?: 'fr' | 'en';
 }) {
   const client = getResendClient();
-  if (!client) return;
+  // Fail loudly instead of silently not sending: registration depends on this
+  // email, and a missing API key would otherwise look like a success to the user.
+  if (!client) {
+    throw new Error('RESEND_API_KEY is not configured — cannot send verification email');
+  }
 
   const lang = params.language || 'fr'; // Default to French
   const logoUrl = 'https://res.cloudinary.com/drsd8adkq/image/upload/v1767997893/coinlect-0_denz8g-removebg-preview_kwnhri.png';

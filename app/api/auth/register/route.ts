@@ -111,9 +111,17 @@ export async function POST(req: NextRequest) {
     }
 
     const verificationUrl = buildVerificationUrl({ userId: pendingId, token });
-    await sendVerificationEmail({ to: email, name: name || null, verificationUrl }).catch((e) => {
-      console.error('Verification email failed', e);
-    });
+    try {
+      await sendVerificationEmail({ to: email, name: name || null, verificationUrl });
+    } catch (e) {
+      // The staged signup is kept (so a resend works), but never claim success
+      // when the confirmation email was not actually sent.
+      console.error('Verification email failed after signup', e);
+      return NextResponse.json(
+        { error: 'Your signup was saved, but the confirmation email could not be sent right now. Please try again.' },
+        { status: 500 }
+      );
+    }
 
     // No session and no User row yet: the account is created on confirmation.
     return NextResponse.json(

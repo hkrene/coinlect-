@@ -75,7 +75,16 @@ export async function POST(req: NextRequest) {
     });
 
     const verificationUrl = buildVerificationUrl({ userId: pending.id, token });
-    await sendVerificationEmail({ to: pending.email, name: pending.name, verificationUrl });
+    try {
+      await sendVerificationEmail({ to: pending.email, name: pending.name, verificationUrl });
+    } catch (err) {
+      // Never claim a link was sent when it was not.
+      console.error('Resend verification email failed', err);
+      return NextResponse.json(
+        { error: 'The confirmation email could not be sent right now. Please try again in a moment.' },
+        { status: 500 }
+      );
+    }
 
     return genericResponse();
   } catch (err) {
