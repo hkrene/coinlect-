@@ -96,7 +96,7 @@ export const Deals: React.FC = () => {
                             
                             <div className="relative w-full md:w-[380px] h-40 md:h-auto overflow-hidden bg-black flex items-center justify-center border-b md:border-b-0 md:border-r border-white/10 md:rounded-l-2xl rounded-t-xl md:rounded-tr-none">
                                 <img
-                                  src={deal.image}
+                                  src={deal.image || 'https://via.placeholder.com/400x300/333/666?text=No+Image'}
                                   alt={deal.title}
                                   className="object-cover w-full h-full transition-all duration-700 opacity-60 group-hover:opacity-100 group-hover:scale-105"
                                   onError={(e) => {

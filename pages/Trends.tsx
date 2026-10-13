@@ -22,6 +22,10 @@ interface NewsItem {
   url: string;
 }
 
+/** Placeholder shown when a news item has no (or a broken) image URL. */
+const FALLBACK_NEWS_IMAGE =
+  'https://images.unsplash.com/photo-1621504450162-e1529671963b?auto=format&fit=crop&q=80';
+
 /**
  * Localised fallback headlines shown only when the news API is unreachable.
  * The live feed (see /api/market/news) already returns per-language content.
@@ -295,7 +299,7 @@ export const Trends: React.FC = () => {
                             <div className="flex items-center gap-2 md:gap-4">
                               <span className="hidden w-6 text-sm text-gray-600 md:block">#{coin.market_cap_rank}</span>
                               <img
-                                src={coin.image}
+                                src={coin.image || undefined}
                                 alt={coin.name}
                                 className="w-6 h-6 transition-transform duration-300 rounded-full shadow-lg md:w-8 md:h-8 group-hover:scale-110"
                               />
@@ -380,12 +384,13 @@ export const Trends: React.FC = () => {
                   >
                     <div className="relative h-48 overflow-hidden bg-black/50">
                       <img
-                        src={newsItem.imageUrl}
+                        src={newsItem.imageUrl || FALLBACK_NEWS_IMAGE}
                         alt={newsItem.title}
                         className="object-cover w-full h-full transition-transform duration-700 transform group-hover:scale-110 opacity-80 group-hover:opacity-100"
                         onError={(e) => {
-                          (e.target as HTMLImageElement).src =
-                            'https://images.unsplash.com/photo-1621504450162-e1529671963b?auto=format&fit=crop&q=80';
+                          if ((e.target as HTMLImageElement).src !== FALLBACK_NEWS_IMAGE) {
+                            (e.target as HTMLImageElement).src = FALLBACK_NEWS_IMAGE;
+                          }
                         }}
                       />
                       <div className="absolute px-3 py-1 text-xs font-semibold text-white border rounded-full top-4 left-4 bg-black/60 backdrop-blur-md border-white/10">

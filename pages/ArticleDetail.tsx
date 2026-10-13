@@ -172,7 +172,7 @@ export const ArticleDetail: React.FC = () => {
       <div className="container max-w-5xl px-6 mx-auto mb-12">
           <div className="relative aspect-video md:aspect-[21/9] rounded-2xl overflow-hidden shadow-2xl border border-white/10">
               <img
-                src={article.image}
+                src={article.image || 'https://res.cloudinary.com/drsd8adkq/image/upload/v1765185502/clclogo_p2v5bp.jpg'}
                 alt={article.title}
                 className="object-cover w-full h-full"
                 onError={(e) => {
@@ -256,7 +256,7 @@ export const ArticleDetail: React.FC = () => {
                 <Link key={related.id} href={`/academy/article/${related.slug}`} className="flex flex-col gap-4 p-4 transition-colors bg-transparent group md:flex-row hover:bg-white/5 rounded-xl">
                     <div className="flex-shrink-0 w-full h-32 overflow-hidden rounded-lg md:w-48">
                         <img
-                          src={related.image}
+                          src={related.image || 'https://via.placeholder.com/300x200/333/666?text=No+Image'}
                           alt={related.title}
                           className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-110"
                           onError={(e) => {
