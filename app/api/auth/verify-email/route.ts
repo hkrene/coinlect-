@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import * as crypto from 'crypto';
 import { verifyEmailSchema } from '@/lib/validators';
 import { sendWelcomeEmail } from '@/lib/email';
+import { UserRole } from '@prisma/client';
 import { enforceRateLimit } from '@/lib/rate-limit';
 
 // Create a base PrismaClient instance for operations that need direct model access
@@ -30,51 +31,100 @@ export async function POST(req: NextRequest) {
 
     const tokenHash = sha256(token);
 
-    // TypeScript may not see the newly generated model immediately due to caching,
-    // but it exists at runtime after prisma generate
-    const verification = await (basePrisma as any).emailVerificationToken.findFirst({
+    // The link references a PendingSignup (the local account only exists in the
+    // database once this link is confirmed — see register route).
+    // TypeScript may not see the newly generated model immediately due to
+    // caching, but it exists at runtime after prisma generate.
+    const pending = await (basePrisma as any).pendingSignup.findFirst({
       where: {
+        id: userId,
         tokenHash,
-        userId,
-        usedAt: null,
         expiresAt: { gt: new Date() },
       },
     });
 
-    if (!verification) {
+    if (!pending) {
       return NextResponse.json(
         { error: 'This verification link is invalid or has expired. Please request a new one.' },
         { status: 400 }
       );
     }
 
-    const user = await (basePrisma as any).user.findUnique({ where: { id: userId } });
-    if (!user || user.provider === 'google') {
-      return NextResponse.json({ error: 'Invalid verification link' }, { status: 400 });
-    }
+    const alreadyUsed = pending.usedAt != null;
 
-    if (user.emailVerifiedAt) {
-      // Idempotent: the email is already confirmed.
-      return NextResponse.json({
-        success: true,
-        message: 'Your email address is already verified. You can sign in now.',
+    // Idempotent re-clicks: the signup was already confirmed, so the account
+    // (if still present) should already be verified.
+    if (alreadyUsed) {
+      const existingUser = await (basePrisma as any).user.findUnique({
+        where: { email: pending.email },
+        select: { id: true, emailVerifiedAt: true, provider: true },
       });
+      if (existingUser?.emailVerifiedAt) {
+        return NextResponse.json({
+          success: true,
+          message: 'Your email address is already verified. You can sign in now.',
+        });
+      }
+      // Fall through: the account was never created (rolled back / deleted), so
+      // let the visitor confirm again to create it.
     }
 
     const now = new Date();
-    await (basePrisma as any).$transaction([
-      (basePrisma as any).user.update({
-        where: { id: userId },
-        data: { emailVerifiedAt: now, isActive: true },
-      }),
-      (basePrisma as any).emailVerificationToken.update({
-        where: { id: verification.id },
+
+    // Guard: a confirmed account must not be created when one already exists
+    // for this email (e.g. a Google account was created in the meantime).
+    const existingUser = await (basePrisma as any).user.findUnique({
+      where: { email: pending.email },
+      select: { id: true },
+    });
+    if (existingUser) {
+      await (basePrisma as any).pendingSignup.update({
+        where: { id: pending.id },
         data: { usedAt: now },
-      }),
-    ]);
+      });
+      return NextResponse.json(
+        { error: 'An account with this email address already exists. Please sign in instead.' },
+        { status: 409 }
+      );
+    }
+
+    try {
+      // Create the User now that the email address is confirmed, and mark the
+      // staged signup as consumed — atomically.
+      await (basePrisma as any).$transaction([
+        (basePrisma as any).user.create({
+          data: {
+            email: pending.email,
+            passwordHash: pending.passwordHash,
+            name: pending.name,
+            role: UserRole.USER,
+            provider: 'local',
+            emailVerifiedAt: now,
+            isActive: true,
+          },
+        }),
+        (basePrisma as any).pendingSignup.update({
+          where: { id: pending.id },
+          data: { usedAt: now },
+        }),
+      ]);
+    } catch (err: any) {
+      if (err?.code === 'P2002') {
+        // Duplicate email — an account appeared between our check and the write.
+        await (basePrisma as any).pendingSignup.update({
+          where: { id: pending.id },
+          data: { usedAt: now },
+        }).catch(() => {});
+        return NextResponse.json(
+          { error: 'An account with this email address already exists. Please sign in instead.' },
+          { status: 409 }
+        );
+      }
+      throw err;
+    }
 
     // Fire-and-forget welcome email now that the account is active.
-    sendWelcomeEmail({ to: user.email, name: user.name }).catch((err) => {
+    sendWelcomeEmail({ to: pending.email, name: pending.name }).catch((err) => {
       console.error('Welcome email failed after verification', err);
     });
 

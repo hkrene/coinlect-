@@ -5,7 +5,6 @@ import { prisma } from '@/lib/prisma';
 import { registerSchema, isDisposableEmail } from '@/lib/validators';
 import { hashPassword } from '@/lib/auth';
 import { sendVerificationEmail, buildVerificationUrl } from '@/lib/email';
-import { UserRole } from '@prisma/client';
 import { enforceRateLimit, getClientIp } from '@/lib/rate-limit';
 import { verifyCaptcha } from '@/lib/captcha';
 
@@ -78,47 +77,45 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Email already in use' }, { status: 409 });
     }
 
+    // A User row is NOT created yet: signups are staged as pending and only
+    // materialize once the visitor confirms their email via the emailed link.
     const passwordHash = await hashPassword(password);
-    const user = await prisma.user.create({
-      data: {
-        email,
-        passwordHash,
-        name,
-        role: UserRole.USER,
-        provider: 'local',
-        emailVerifiedAt: null, // must confirm their email via link before signing in
-      },
-    });
-
-    // Generate a single-use verification token and email the confirmation link.
-    // The account is NOT usable (no session is issued) until the email is confirmed.
     const token = crypto.randomBytes(32).toString('hex');
     const tokenHash = sha256(token);
     const expiresAt = new Date(Date.now() + VERIFICATION_TTL_MS);
 
+    // Only one active signup per email: drop any previous (stale) one so the
+    // latest submitted data wins and a fresh, working link is always sent.
+    const pendingId = crypto.randomUUID();
+    await (basePrisma as any).pendingSignup.deleteMany({ where: { email } }).catch(() => {});
     try {
-      await (basePrisma as any).emailVerificationToken.create({
-        data: {
-          userId: user.id,
-          token,
-          tokenHash,
-          expiresAt,
-        },
+      await (basePrisma as any).pendingSignup.create({
+        data: { id: pendingId, email, passwordHash, name, tokenHash, expiresAt },
       });
-    } catch (err) {
-      // Roll back the account so a legitimate visitor can simply retry sign-up
-      // instead of hitting an "email already in use" dead-end.
-      console.error('Failed to create email verification token', err);
-      await prisma.user.delete({ where: { id: user.id } }).catch(() => {});
+    } catch (err: any) {
+      if (err?.code === 'P2002') {
+        // Concurrent duplicate submission: another request just staged the same
+        // signup. Treat as success — the visitor keeps their confirmation screen
+        // and can resend from there (no duplicate email is sent).
+        return NextResponse.json(
+          {
+            success: true,
+            requiresEmailVerification: true,
+            message:
+              'Account created. Please check your email to confirm your address and activate your account.',
+          },
+          { status: 201 }
+        );
+      }
       throw err;
     }
 
-    const verificationUrl = buildVerificationUrl({ userId: user.id, token });
-    await sendVerificationEmail({ to: user.email, name: user.name, verificationUrl }).catch((e) => {
+    const verificationUrl = buildVerificationUrl({ userId: pendingId, token });
+    await sendVerificationEmail({ to: email, name: name || null, verificationUrl }).catch((e) => {
       console.error('Verification email failed', e);
     });
 
-    // Do NOT create a session: {@link User.emailVerifiedAt} must be set first.
+    // No session and no User row yet: the account is created on confirmation.
     return NextResponse.json(
       {
         success: true,

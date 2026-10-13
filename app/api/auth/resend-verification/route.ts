@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import * as crypto from 'crypto';
-import { prisma } from '@/lib/prisma';
 import { resendVerificationSchema } from '@/lib/validators';
 import { sendVerificationEmail, buildVerificationUrl } from '@/lib/email';
 import { enforceRateLimit, getClientIp } from '@/lib/rate-limit';
@@ -19,8 +18,8 @@ function sha256(input: string) {
   return crypto.createHash('sha256').update(input).digest('hex');
 }
 
-// Always succeed publicly so scripts cannot tell whether an account exists or
-// is already verified (prevents user enumeration + verification-token flooding).
+// Always succeed publicly so scripts cannot tell whether a signup exists or is
+// already verified (prevents user enumeration + verification-token flooding).
 const genericResponse = () =>
   NextResponse.json({
     success: true,
@@ -53,27 +52,30 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const user = await prisma.user.findUnique({ where: { email } });
-    // Only local, unverified accounts need (and may receive) a new link.
-    if (!user || user.provider === 'google' || (user as any).emailVerifiedAt) {
+    // Unconfirmed local signups live in PendingSignup (a User row only exists
+    // after the link is confirmed — see register/verify-email routes).
+    const pending = await (basePrisma as any).pendingSignup.findUnique({
+      where: { email },
+    });
+
+    // Nothing to verify: no staged signup, or one that was already confirmed
+    // (in which case a real account exists). Never reveal which case it is.
+    if (!pending || pending.usedAt != null) {
       return genericResponse();
     }
 
+    // Rotate the single-use token so only the newest link works.
     const token = crypto.randomBytes(32).toString('hex');
     const tokenHash = sha256(token);
     const expiresAt = new Date(Date.now() + VERIFICATION_TTL_MS);
 
-    await (basePrisma as any).emailVerificationToken.create({
-      data: {
-        userId: user.id,
-        token,
-        tokenHash,
-        expiresAt,
-      },
+    await (basePrisma as any).pendingSignup.update({
+      where: { id: pending.id },
+      data: { tokenHash, expiresAt },
     });
 
-    const verificationUrl = buildVerificationUrl({ userId: user.id, token });
-    await sendVerificationEmail({ to: user.email, name: user.name, verificationUrl });
+    const verificationUrl = buildVerificationUrl({ userId: pending.id, token });
+    await sendVerificationEmail({ to: pending.email, name: pending.name, verificationUrl });
 
     return genericResponse();
   } catch (err) {
