@@ -65,7 +65,7 @@ export const Deals: React.FC = () => {
         </div>
       </section>
 
-      <div className="container px-6 py-12 mx-auto">
+      <div className="container max-w-7xl px-6 py-12 mx-auto">
         {/* Filtres Catégories */}
         <ScrollReveal>
           <div className="flex w-full gap-2 pb-2 mb-8 overflow-x-auto md:mb-16 md:w-auto md:pb-0 scrollbar-hide">
@@ -87,61 +87,63 @@ export const Deals: React.FC = () => {
         </ScrollReveal>
 
         {/* Liste des Offres */}
-        <div className="flex flex-col gap-4 mb-20 md:gap-8">
+        <div className="grid grid-cols-1 gap-6 mb-20 sm:grid-cols-2 lg:grid-cols-3">
             {filteredDeals.length > 0 ? (
                 filteredDeals.map((deal, idx) => (
-                    <ScrollReveal key={deal.id} delay={idx * 50}>
+                    <ScrollReveal key={deal.id} delay={idx * 50} className="h-full">
                         <Link href={`/deals/${deal.id}`} className="block h-full">
-                          <div className="relative flex flex-col md:flex-row h-full overflow-hidden transition-all duration-300 border rounded-xl md:rounded-2xl bg-[#0a0a0a] border-white/10 hover:border-white/30 group cursor-pointer">
-                            
-                            <div className="relative w-full md:w-[380px] h-40 md:h-auto overflow-hidden bg-black flex items-center justify-center border-b md:border-b-0 md:border-r border-white/10 md:rounded-l-2xl rounded-t-xl md:rounded-tr-none">
+                          <article className="relative flex flex-col h-full overflow-hidden transition-all duration-300 border rounded-2xl bg-[#0a0a0a] border-white/10 hover:border-white/30 hover:-translate-y-1 group cursor-pointer">
+
+                            <div className="relative aspect-[16/10] w-full overflow-hidden bg-black">
                                 <img
-                                  src={deal.image || 'https://via.placeholder.com/400x300/333/666?text=No+Image'}
+                                  src={deal.image || 'https://via.placeholder.com/400x250/333/666?text=No+Image'}
                                   alt={deal.title}
-                                  className="object-cover w-full h-full transition-all duration-700 opacity-60 group-hover:opacity-100 group-hover:scale-105"
+                                  className="object-cover w-full h-full transition-all duration-700 opacity-70 group-hover:opacity-100 group-hover:scale-105"
                                   onError={(e) => {
                                     const target = e.target as HTMLImageElement;
-                                    target.src = 'https://via.placeholder.com/400x300/333/666?text=No+Image';
+                                    target.src = 'https://via.placeholder.com/400x250/333/666?text=No+Image';
                                   }}
                                 />
+                                <div aria-hidden className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                                 {deal.exclusive && (
-                                    <div className="absolute top-0 left-0 bg-white text-black text-[8px] md:text-[10px] font-black uppercase tracking-widest px-2 py-1 md:px-3 md:py-1.5 z-20 flex items-center gap-1 shadow-2xl rounded-br-md md:rounded-br-lg">{t.deals.exclusive}
+                                    <div className="absolute top-3 left-3 z-20 flex items-center gap-1 px-2.5 py-1 text-[9px] font-black tracking-widest text-black uppercase rounded-md shadow-lg bg-coinlect-accent">{t.deals.exclusive}
                                     </div>
                                 )}
                             </div>
 
-                            <div className="flex flex-col flex-grow p-4 bg-transparent md:p-8 md:rounded-r-2xl rounded-b-xl md:rounded-bl-none">
-                                <div className="flex flex-col mb-3 md:mb-4">
-                                    <span className="text-[9px] md:text-[10px] font-bold text-coinlect-accent uppercase tracking-[0.2em] mb-2 md:mb-3">{deal.category}</span>
-                                    <h3 className="text-lg font-bold tracking-tight text-white md:text-2xl lg:text-3xl">{deal.title} {deal.discount && <span className="text-sm md:text-base lg:text-lg">— {deal.discount}</span>}</h3>
-                                </div>
-                                <p className="mb-4 md:mb-6 text-xs md:text-sm leading-relaxed text-[#71717a] max-w-2xl font-medium line-clamp-2 md:line-clamp-none">{deal.details || deal.description}</p>
-                                
-                                <div className="flex flex-col items-stretch gap-3 mt-auto sm:flex-row sm:items-center md:gap-6">
+                            <div className="flex flex-col flex-grow p-5">
+                                <span className="mb-2 text-[10px] font-bold text-coinlect-accent uppercase tracking-[0.2em]">{deal.category}</span>
+                                <h3 className="text-lg font-bold leading-snug tracking-tight text-white line-clamp-2">
+                                    {deal.title}
+                                    {deal.discount && <span className="ml-1 text-sm text-zinc-400">— {deal.discount}</span>}
+                                </h3>
+                                <p className="mt-2 text-sm leading-relaxed text-zinc-500 line-clamp-2">{deal.details || deal.description}</p>
+
+                                <div className="mt-auto flex flex-col gap-3 pt-5 border-t border-white/5">
+                                    {deal.code && (
+                                        <div className="flex items-center justify-between gap-2">
+                                            <span className="text-[10px] font-bold tracking-widest text-zinc-500 uppercase">{t.deals.coupon}</span>
+                                            <span className="px-2.5 py-1 font-mono text-xs text-white border border-dashed rounded-md bg-white/5 border-white/15">{deal.code}</span>
+                                        </div>
+                                    )}
                                     <button
                                         onClick={(e) => {
                                           e.preventDefault();
                                           e.stopPropagation();
                                           window.open(deal.link, '_blank');
                                         }}
-                                        className="px-6 py-2.5 md:px-10 md:py-4 text-[10px] md:text-xs font-bold tracking-widest text-black uppercase transition-all bg-white rounded-md hover:bg-coinlect-accent w-full sm:w-auto text-center"
+                                        className="w-full px-6 py-3 text-[11px] font-bold tracking-widest text-black uppercase transition-all bg-white rounded-full hover:bg-coinlect-accent"
                                     >
                                         {t.deals.claim}
                                     </button>
-                                    {deal.code && (
-                                        <div className="flex items-center gap-2 md:gap-3 text-[10px] md:text-xs font-bold tracking-widest text-gray-500 uppercase">
-                                            <span>{t.deals.coupon} :</span>
-                                            <span className="px-3 py-1.5 md:px-4 md:py-2 text-white border border-dashed rounded-md bg-white/5 border-white/10 text-[10px] md:text-xs">{deal.code}</span>
-                                        </div>
-                                    )}
                                 </div>
                             </div>
-                          </div>
+                          </article>
                         </Link>
                     </ScrollReveal>
                 ))
             ) : (
-                <div className="py-20 text-center">
+                <div className="py-20 text-center col-span-full">
                     <p className="text-gray-500">{t.deals.noDealsFound}</p>
                 </div>
             )}
