@@ -10,7 +10,6 @@ import {
   ExternalLink,
   Globe2,
   Smartphone,
-  Heart,
   BookOpen,
   Users,
   Code2,
@@ -85,26 +84,19 @@ export const Donate: React.FC = () => {
 
         <div className="container relative z-10 max-w-5xl px-6 pt-16 pb-20 mx-auto text-center md:pt-24 md:pb-28">
           <ScrollReveal>
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-[11px] font-medium uppercase tracking-[0.2em] text-zinc-300 backdrop-blur">
-              <Heart className="h-3.5 w-3.5 text-coinlect-accent" />
-              {t.donatePage.heroLabel}
-            </span>
-          </ScrollReveal>
-
-          <ScrollReveal delay={100}>
-            <h1 className="mx-auto mt-8 max-w-4xl text-4xl font-bold leading-[1.05] tracking-tight text-white sm:text-5xl md:text-7xl">
+            <h1 className="mx-auto max-w-4xl text-4xl font-bold leading-[1.05] tracking-tight text-white sm:text-5xl md:text-7xl">
               {t.donatePage.title}
               <span className="italic text-coinlect-accent">{t.donatePage.titleSuffix}</span>
             </h1>
           </ScrollReveal>
 
-          <ScrollReveal delay={200}>
+          <ScrollReveal delay={100}>
             <p className="mx-auto mt-6 max-w-2xl text-sm leading-relaxed text-zinc-400 md:text-base">
               {t.donatePage.subtitle}
             </p>
           </ScrollReveal>
 
-          <ScrollReveal delay={300}>
+          <ScrollReveal delay={200}>
             <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
               <button
                 onClick={scrollToDonation}
