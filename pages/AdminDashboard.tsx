@@ -10,7 +10,7 @@ import { courseService, articleService, eventService, dealService } from '../ser
 import { Course, Article, Event, User, Deal } from '../types';
 import { PublishStatus } from '@prisma/client';
 import { Button } from '../components/Button';
-import { Trash2, Plus, BookOpen, FileText, LayoutDashboard, X, Check, Calendar, Star, Menu } from 'lucide-react';
+import { Trash2, Plus, BookOpen, FileText, LayoutDashboard, X, Check, Calendar, Star, Menu, MoreVertical, ShieldCheck, ShieldOff, Ban, UserCheck } from 'lucide-react';
 import { Avatar } from '../components/Avatar';
 import { useLanguage } from '../contexts/LanguageContext';
 import MDEditor from '@uiw/react-md-editor';
@@ -26,6 +26,97 @@ const USERS_FILTERS: { id: UsersFilter; label: string }[] = [
 ];
 
 const USERS_PAGE_SIZES = [10, 25, 50, 100];
+
+interface RowAction {
+  label: string;
+  icon?: React.ReactNode;
+  onClick: () => void;
+  danger?: boolean;
+}
+
+/**
+ * Compact actions menu: the row actions stay hidden behind a 3-dots button
+ * until it is clicked. The menu is rendered fixed so it is never clipped by
+ * the tables' horizontal scroll containers.
+ */
+const RowActions: React.FC<{ actions: RowAction[] }> = ({ actions }) => {
+  const [open, setOpen] = useState(false);
+  const [coords, setCoords] = useState<{ top: number; left: number } | null>(null);
+  const btnRef = React.useRef<HTMLButtonElement>(null);
+  const MENU_WIDTH = 176;
+
+  useEffect(() => {
+    if (!open) return;
+    const close = () => setOpen(false);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false);
+    };
+    document.addEventListener('click', close);
+    document.addEventListener('keydown', onKey);
+    window.addEventListener('scroll', close, true);
+    window.addEventListener('resize', close);
+    return () => {
+      document.removeEventListener('click', close);
+      document.removeEventListener('keydown', onKey);
+      window.removeEventListener('scroll', close, true);
+      window.removeEventListener('resize', close);
+    };
+  }, [open]);
+
+  const toggle = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!open && btnRef.current) {
+      const rect = btnRef.current.getBoundingClientRect();
+      setCoords({
+        top: rect.bottom + 6,
+        left: Math.max(8, Math.min(rect.right - MENU_WIDTH, window.innerWidth - MENU_WIDTH - 8)),
+      });
+    }
+    setOpen((o) => !o);
+  };
+
+  if (!actions || actions.length === 0) return null;
+
+  return (
+    <div className="inline-block">
+      <button
+        ref={btnRef}
+        type="button"
+        onClick={toggle}
+        aria-label="Actions"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        className={`p-2 rounded-lg transition-colors ${open ? 'bg-white/10 text-white' : 'text-gray-400 hover:bg-white/10 hover:text-white'}`}
+      >
+        <MoreVertical size={16} />
+      </button>
+      {open && coords && (
+        <div
+          role="menu"
+          className="fixed z-[80] w-44 py-1 overflow-hidden border rounded-lg shadow-2xl animate-in fade-in border-white/10 bg-[#161616]"
+          style={{ top: coords.top, left: coords.left }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {actions.map((action, i) => (
+            <button
+              key={i}
+              type="button"
+              role="menuitem"
+              onClick={() => {
+                setOpen(false);
+                action.onClick();
+              }}
+              className={`flex w-full items-center gap-2.5 px-3 py-2 text-left text-xs font-medium transition-colors ${action.danger ? 'text-red-400 hover:bg-red-500/10' : 'text-gray-200 hover:bg-white/5'}`}
+            >
+              {action.icon}
+              {action.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
 
 export const AdminDashboard: React.FC = () => {
   const { user, isAdmin } = useAuth();
@@ -646,7 +737,7 @@ export const AdminDashboard: React.FC = () => {
   if (!isAdmin) return null;
 
   return (
-    <div className="flex min-h-screen pt-24 pb-20 text-white bg-black">
+    <div className="flex min-h-screen pb-20 text-white bg-black">
       {/* Mobile Menu Overlay */}
       {mobileMenuOpen && (
         <div
@@ -729,7 +820,7 @@ export const AdminDashboard: React.FC = () => {
         </button>
       </div>
 
-      <main className="flex-1 p-4 pt-16 overflow-y-auto md:p-8 md:ml-64 md:pt-8">
+      <main className="flex-1 p-4 pt-20 overflow-y-auto md:p-8 md:ml-64 md:pt-4">
         {activeTab === 'overview' && (
           <div className="space-y-6 md:space-y-8 animate-in fade-in">
             <h1 className="hidden text-2xl font-bold md:text-3xl md:block">Admin Dashboard</h1>
@@ -752,40 +843,56 @@ export const AdminDashboard: React.FC = () => {
               </div>
 
               {/* Recent Deals */}
-              <div className="bg-[#111] rounded-xl border border-white/10 p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-xl font-bold">Deals Récentes</h2>
-                  <Button variant="outline" size="sm" onClick={() => setActiveTab('deals')}>
+              <div className="overflow-hidden border rounded-xl border-white/10 bg-[#111]">
+                <div className="flex items-center justify-between gap-4 px-5 py-4 border-b border-white/5">
+                  <div className="flex items-center gap-2">
+                    <Star size={18} className="text-coinlect-accent" />
+                    <h2 className="text-base font-semibold text-white">Deals Récentes</h2>
+                  </div>
+                  <button
+                    onClick={() => setActiveTab('deals')}
+                    className="text-xs font-medium transition-colors text-coinlect-accent hover:text-amber-300"
+                  >
                     Voir tous les deals
-                  </Button>
+                  </button>
                 </div>
-                <div className="space-y-3">
-                  {deals.slice(0, 3).map(d => (
-                    <div key={d.id} className="flex items-center gap-4 p-3 border rounded-lg bg-white/5 border-white/10">
-                      <img
-                        src={d.image || 'https://via.placeholder.com/40x30/333/666?text=No+Image'}
-                        className="object-cover w-10 h-8 rounded"
-                        alt="Deal"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.src = 'https://via.placeholder.com/40x30/333/666?text=No+Image';
-                        }}
-                      />
-                      <div className="flex-1 min-w-0">
-                        <h4 className="text-sm font-semibold text-white truncate">{d.title}</h4>
-                        <p className="text-xs text-gray-400">{d.category} • {d.discount}</p>
-                      </div>
-                      <div className="flex gap-1">
-                        {d.featured && <Star className="text-coinlect-accent" size={14} fill="currentColor" />}
-                        {d.verified && <Check className="text-green-500" size={14} />}
-                        {d.exclusive && <span className="text-xs font-bold text-yellow-500">EXC</span>}
-                      </div>
-                    </div>
-                  ))}
-                  {deals.length === 0 && (
-                    <p className="py-4 text-center text-gray-500">Aucun deal disponible</p>
-                  )}
-                </div>
+                {deals.slice(0, 3).length > 0 ? (
+                  <div className="divide-y divide-white/5">
+                    {deals.slice(0, 3).map(d => (
+                      <button
+                        key={d.id}
+                        onClick={() => setActiveTab('deals')}
+                        className="flex items-center w-full gap-4 px-5 py-3 text-left transition-colors hover:bg-white/5"
+                      >
+                        <img
+                          src={d.image || 'https://via.placeholder.com/96x72/333/666?text=No+Image'}
+                          className="object-cover border rounded-md w-12 h-9 border-white/10 shrink-0"
+                          alt=""
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = 'https://via.placeholder.com/96x72/333/666?text=No+Image';
+                          }}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-sm font-medium text-white truncate">{d.title}</h4>
+                          <p className="text-xs truncate text-gray-500">
+                            {d.category}
+                            {d.discount ? ` • ${d.discount}` : ''}
+                          </p>
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          {d.featured && <Star className="text-coinlect-accent" size={14} fill="currentColor" />}
+                          {d.verified && <Check className="text-green-500" size={14} />}
+                          {d.exclusive && (
+                            <span className="px-1.5 py-0.5 text-[10px] font-bold uppercase rounded bg-yellow-500/10 text-yellow-500">EXC</span>
+                          )}
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="py-8 text-sm text-center text-gray-500">Aucun deal disponible</p>
+                )}
               </div>
           </div>
         )}
@@ -826,47 +933,46 @@ export const AdminDashboard: React.FC = () => {
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-400">{new Date(c.createdAt).toLocaleDateString('fr-FR')}</td>
                       <td className="px-4 py-3 text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <button
-                            onClick={() => {
-                              setEditingItem(c);
-                              setModalType('course');
-                              setCourseForm({
-                                title: c.title || '',
-                                slug: c.slug || '',
-                                description: c.description || '',
-                                seoTitle: c.seoTitle || '',
-                                seoDescription: c.seoDescription || '',
-                                status: c.status || 'DRAFT',
-                                publishedAt: c.publishedAt || undefined,
-                                createdAt: c.createdAt || '',
-                                updatedAt: c.updatedAt || '',
-                                authorId: c.authorId || undefined,
-                                author: c.author || undefined,
-                                about: c.about || '',
-                                level: c.level || 'Débutant',
-                                duration: c.duration || '35m',
-                                category: c.category || 'Blockchain',
-                                image: c.image || '',
-                                syllabus: c.syllabus || [],
-                                courseType: c.courseType || 'academy',
-                                videoLink: c.videoLink || ''
-                              });
-                              setIsModalOpen(true);
-                            }}
-                            className="p-2 text-blue-500 rounded-lg hover:bg-blue-500/10"
-                            aria-label="Modifier"
-                          >
-                            <FileText size={16} />
-                          </button>
-                          <button
-                            onClick={() => { setDeleteTarget({ type: 'course', item: c }); setDeleteDialogOpen(true); }}
-                            className="p-2 text-red-500 rounded-lg hover:bg-red-500/10"
-                            aria-label="Supprimer"
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
+                        <RowActions
+                          actions={[
+                            {
+                              label: 'Modifier',
+                              icon: <FileText size={14} />,
+                              onClick: () => {
+                                setEditingItem(c);
+                                setModalType('course');
+                                setCourseForm({
+                                  title: c.title || '',
+                                  slug: c.slug || '',
+                                  description: c.description || '',
+                                  seoTitle: c.seoTitle || '',
+                                  seoDescription: c.seoDescription || '',
+                                  status: c.status || 'DRAFT',
+                                  publishedAt: c.publishedAt || undefined,
+                                  createdAt: c.createdAt || '',
+                                  updatedAt: c.updatedAt || '',
+                                  authorId: c.authorId || undefined,
+                                  author: c.author || undefined,
+                                  about: c.about || '',
+                                  level: c.level || 'Débutant',
+                                  duration: c.duration || '35m',
+                                  category: c.category || 'Blockchain',
+                                  image: c.image || '',
+                                  syllabus: c.syllabus || [],
+                                  courseType: c.courseType || 'academy',
+                                  videoLink: c.videoLink || ''
+                                });
+                                setIsModalOpen(true);
+                              }
+                            },
+                            {
+                              label: 'Supprimer',
+                              icon: <Trash2 size={14} />,
+                              danger: true,
+                              onClick: () => { setDeleteTarget({ type: 'course', item: c }); setDeleteDialogOpen(true); }
+                            }
+                          ]}
+                        />
                       </td>
                     </tr>
                   ))}
@@ -912,60 +1018,61 @@ export const AdminDashboard: React.FC = () => {
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-400">{new Date(a.createdAt).toLocaleDateString('fr-FR')}</td>
                       <td className="px-4 py-3 text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <button
-                            onClick={async () => {
-                              try {
-                                const updatedArticles = await articleService.getAll();
-                                const article = updatedArticles.find(art => art.id === a.id);
-                                if (article) {
-                                  const newFeaturedStatus = !article.featured;
-                                  await articleService.update(a.id, { featured: newFeaturedStatus });
-                                  setRefreshTrigger(t => t + 1);
-                                  if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('contentUpdated'));
+                        <RowActions
+                          actions={[
+                            {
+                              label: a.featured ? 'Retirer de la vedette' : 'Mettre en vedette',
+                              icon: <Star size={14} fill={a.featured ? 'currentColor' : 'none'} className={a.featured ? 'text-coinlect-accent' : ''} />,
+                              onClick: async () => {
+                                try {
+                                  const updatedArticles = await articleService.getAll();
+                                  const article = updatedArticles.find(art => art.id === a.id);
+                                  if (article) {
+                                    const newFeaturedStatus = !article.featured;
+                                    await articleService.update(a.id, { featured: newFeaturedStatus });
+                                    setRefreshTrigger(t => t + 1);
+                                    if (typeof window !== 'undefined') window.dispatchEvent(new CustomEvent('contentUpdated'));
+                                  }
+                                } catch (error) {
+                                  console.error('Error updating article:', error);
+                                  alert('Erreur lors de la mise à jour.');
                                 }
-                              } catch (error) {
-                                console.error('Error updating article:', error);
-                                alert('Erreur lors de la mise à jour.');
                               }
-                            }}
-                            className={`p-2 rounded-lg ${a.featured ? 'text-coinlect-accent' : 'text-gray-500'} hover:bg-white/5`}
-                            aria-label={a.featured ? "Retirer de la vedette" : "Mettre en vedette"}
-                          >
-                            <Star size={16} fill={a.featured ? 'currentColor' : 'none'} />
-                          </button>
-                          <button
-                            onClick={() => {
-                              setEditingItem(a);
-                              setModalType('article');
-                              setArticleForm({
-                                title: a.title || '',
-                                slug: a.slug || '',
-                                excerpt: a.excerpt || '',
-                                content: a.content || '',
-                                tags: a.tags || [],
-                                seoTitle: a.seoTitle || '',
-                                seoDescription: a.seoDescription || '',
-                                status: a.status || 'DRAFT',
-                                image: a.image || '',
-                                authorImage: a.authorImage || '',
-                                keyTakeaways: (a as any).keyTakeaways || '',
-                                authorName: (a as any).authorName || '',
-                                featured: a.featured || false,
-                                readTime: (a as any).readTime || '5 min',
-                                date: a.createdAt ? new Date(a.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]
-                              });
-                              setIsModalOpen(true);
-                            }}
-                            className="p-2 text-blue-500 rounded-lg hover:bg-blue-500/10"
-                            aria-label="Modifier"
-                          >
-                            <FileText size={16} />
-                          </button>
-                          <button onClick={() => { setDeleteTarget({ type: 'article', item: a }); setDeleteDialogOpen(true); }} className="p-2 text-red-500 rounded-lg hover:bg-red-500/10" aria-label="Supprimer">
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
+                            },
+                            {
+                              label: 'Modifier',
+                              icon: <FileText size={14} />,
+                              onClick: () => {
+                                setEditingItem(a);
+                                setModalType('article');
+                                setArticleForm({
+                                  title: a.title || '',
+                                  slug: a.slug || '',
+                                  excerpt: a.excerpt || '',
+                                  content: a.content || '',
+                                  tags: a.tags || [],
+                                  seoTitle: a.seoTitle || '',
+                                  seoDescription: a.seoDescription || '',
+                                  status: a.status || 'DRAFT',
+                                  image: a.image || '',
+                                  authorImage: a.authorImage || '',
+                                  keyTakeaways: (a as any).keyTakeaways || '',
+                                  authorName: (a as any).authorName || '',
+                                  featured: a.featured || false,
+                                  readTime: (a as any).readTime || '5 min',
+                                  date: a.createdAt ? new Date(a.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]
+                                });
+                                setIsModalOpen(true);
+                              }
+                            },
+                            {
+                              label: 'Supprimer',
+                              icon: <Trash2 size={14} />,
+                              danger: true,
+                              onClick: () => { setDeleteTarget({ type: 'article', item: a }); setDeleteDialogOpen(true); }
+                            }
+                          ]}
+                        />
                       </td>
                     </tr>
                   ))}
@@ -1012,36 +1119,39 @@ export const AdminDashboard: React.FC = () => {
                         <span className={`px-2 py-1 text-xs rounded-full ${e.status === 'PUBLISHED' ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}>{e.status}</span>
                       </td>
                       <td className="px-4 py-3 text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <button
-                            onClick={() => {
-                              setEditingItem(e);
-                              setModalType('event');
-                              setEventForm({
-                                title: e.title || '',
-                                slug: e.slug || '',
-                                date: e.date || '',
-                                location: e.location || '',
-                                description: e.description || '',
-                                banner: e.banner || '',
-                                bannerImage: e.bannerImage || '',
-                                eventTypes: e.eventTypes || [],
-                                seoTitle: e.seoTitle || '',
-                                seoDescription: e.seoDescription || '',
-                                status: e.status || 'DRAFT',
-                                url: e.url || '',
-                              });
-                              setIsModalOpen(true);
-                            }}
-                            className="p-2 text-blue-500 rounded-lg hover:bg-blue-500/10"
-                            aria-label="Modifier"
-                          >
-                            <FileText size={16} />
-                          </button>
-                          <button onClick={() => { setDeleteTarget({ type: 'event', item: e }); setDeleteDialogOpen(true); }} className="p-2 text-red-500 rounded-lg hover:bg-red-500/10" aria-label="Supprimer">
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
+                        <RowActions
+                          actions={[
+                            {
+                              label: 'Modifier',
+                              icon: <FileText size={14} />,
+                              onClick: () => {
+                                setEditingItem(e);
+                                setModalType('event');
+                                setEventForm({
+                                  title: e.title || '',
+                                  slug: e.slug || '',
+                                  date: e.date || '',
+                                  location: e.location || '',
+                                  description: e.description || '',
+                                  banner: e.banner || '',
+                                  bannerImage: e.bannerImage || '',
+                                  eventTypes: e.eventTypes || [],
+                                  seoTitle: e.seoTitle || '',
+                                  seoDescription: e.seoDescription || '',
+                                  status: e.status || 'DRAFT',
+                                  url: e.url || '',
+                                });
+                                setIsModalOpen(true);
+                              }
+                            },
+                            {
+                              label: 'Supprimer',
+                              icon: <Trash2 size={14} />,
+                              danger: true,
+                              onClick: () => { setDeleteTarget({ type: 'event', item: e }); setDeleteDialogOpen(true); }
+                            }
+                          ]}
+                        />
                       </td>
                     </tr>
                   ))}
@@ -1122,13 +1232,13 @@ export const AdminDashboard: React.FC = () => {
                 <tbody className="divide-y divide-white/5">
                   {users.map(u => (
                     <tr key={u.id} className="bg-[#111] hover:bg-white/5 transition-colors">
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-2.5">
                         <div className="flex items-center gap-3">
                           <Avatar src={u.avatar} name={u.name} email={u.email} size="sm" />
-                          <span className="font-medium text-white">{displayUserName(u)}</span>
+                          <span className="text-sm font-medium text-white">{displayUserName(u)}</span>
                         </div>
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-400">
+                      <td className="px-4 py-2.5 text-xs text-gray-400">
                         <div className="flex flex-col gap-1">
                           <span>{u.email}</span>
                           <span className="w-fit px-2 py-0.5 text-[10px] uppercase tracking-wide text-gray-500 bg-white/5 rounded">
@@ -1136,68 +1246,50 @@ export const AdminDashboard: React.FC = () => {
                           </span>
                         </div>
                       </td>
-                      <td className="px-4 py-3">
-                        <span className={`px-2 py-1 text-xs rounded-full ${u.role === 'ADMIN' ? 'bg-coinlect-accent/20 text-coinlect-accent' : 'bg-gray-500/20 text-gray-400'}`}>{u.role === 'ADMIN' ? 'Admin' : 'Utilisateur'}</span>
+                      <td className="px-4 py-2.5">
+                        <span className={`px-2 py-1 text-[11px] rounded-full ${u.role === 'ADMIN' ? 'bg-coinlect-accent/20 text-coinlect-accent' : 'bg-gray-500/20 text-gray-400'}`}>{u.role === 'ADMIN' ? 'Admin' : 'Utilisateur'}</span>
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-4 py-2.5">
                         {u.isActive === false ? (
-                          <span className="inline-block px-2 py-1 text-xs text-red-400 rounded-full bg-red-500/20">Suspendu</span>
+                          <span className="inline-block px-2 py-1 text-[11px] text-red-400 rounded-full bg-red-500/20">Suspendu</span>
                         ) : (
                           <span
-                            className={`inline-block px-2 py-1 text-xs rounded-full ${isUserActiveOnPlatform(u.lastActivityAt) ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}
+                            className={`inline-block px-2 py-1 text-[11px] rounded-full ${isUserActiveOnPlatform(u.lastActivityAt) ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-400'}`}
                             title={u.lastActivityAt ? `Dernière activité: ${formatRelativeDate(u.lastActivityAt)}` : 'Jamais connecté'}
                           >
                             {isUserActiveOnPlatform(u.lastActivityAt) ? 'Actif' : 'Inactif'}
                           </span>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-400">{new Date(u.createdAt).toLocaleDateString('fr-FR')}</td>
-                      <td className="px-4 py-3 text-sm text-gray-400">{u.updatedAt ? formatRelativeDate(u.updatedAt) : '—'}</td>
-                      <td className="px-4 py-3 text-right">
-                        <div className="flex flex-wrap items-center justify-end gap-1">
-                          {u.role === 'USER' && (
-                            <button
-                              onClick={() => handleUserAction(u.id, 'promote')}
-                              className="px-2 py-1 text-xs border rounded-lg border-white/20 text-coinlect-accent hover:bg-coinlect-accent/10"
-                            >
-                              Promouvoir
-                            </button>
-                          )}
-                          {u.role === 'ADMIN' && u.id !== user?.id && (
-                            <button
-                              onClick={() => handleUserAction(u.id, 'demote')}
-                              className="px-2 py-1 text-xs text-red-400 border rounded-lg border-red-400/50 hover:bg-red-400/10"
-                            >
-                              Rétrograder
-                            </button>
-                          )}
-                          {u.id !== user?.id && (
-                            u.isActive === false ? (
-                              <button
-                                onClick={() => handleUserAction(u.id, 'activate')}
-                                className="px-2 py-1 text-xs text-green-400 border rounded-lg border-green-400/50 hover:bg-green-400/10"
-                              >
-                                Réactiver
-                              </button>
-                            ) : (
-                              <button
-                                onClick={() => handleUserAction(u.id, 'deactivate')}
-                                className="px-2 py-1 text-xs text-yellow-400 border rounded-lg border-yellow-400/50 hover:bg-yellow-400/10"
-                              >
-                                Suspendre
-                              </button>
-                            )
-                          )}
-                          {u.id !== user?.id && (
-                            <button
-                              onClick={() => { setDeleteTarget({ type: 'user', item: u }); setDeleteDialogOpen(true); }}
-                              className="p-2 text-red-500 rounded-lg hover:bg-red-500/10"
-                              aria-label="Supprimer"
-                            >
-                              <Trash2 size={16} />
-                            </button>
-                          )}
-                        </div>
+                      <td className="px-4 py-2.5 text-xs text-gray-400">{new Date(u.createdAt).toLocaleDateString('fr-FR')}</td>
+                      <td className="px-4 py-2.5 text-xs text-gray-400">{u.updatedAt ? formatRelativeDate(u.updatedAt) : '—'}</td>
+                      <td className="px-4 py-2.5 text-right">
+                        <RowActions
+                          actions={[
+                            u.role === 'USER' && {
+                              label: 'Promouvoir',
+                              icon: <ShieldCheck size={14} />,
+                              onClick: () => handleUserAction(u.id, 'promote')
+                            },
+                            u.role === 'ADMIN' && u.id !== user?.id && {
+                              label: 'Rétrograder',
+                              icon: <ShieldOff size={14} />,
+                              danger: true,
+                              onClick: () => handleUserAction(u.id, 'demote')
+                            },
+                            u.id !== user?.id && {
+                              label: u.isActive === false ? 'Réactiver' : 'Suspendre',
+                              icon: u.isActive === false ? <UserCheck size={14} /> : <Ban size={14} />,
+                              onClick: () => handleUserAction(u.id, u.isActive === false ? 'activate' : 'deactivate')
+                            },
+                            u.id !== user?.id && {
+                              label: 'Supprimer',
+                              icon: <Trash2 size={14} />,
+                              danger: true,
+                              onClick: () => { setDeleteTarget({ type: 'user', item: u }); setDeleteDialogOpen(true); }
+                            }
+                          ].filter(Boolean) as RowAction[]}
+                        />
                       </td>
                     </tr>
                   ))}
@@ -1285,38 +1377,41 @@ export const AdminDashboard: React.FC = () => {
                       </td>
                       <td className="px-4 py-3 text-sm text-gray-400">{new Date(d.createdAt).toLocaleDateString('fr-FR')}</td>
                       <td className="px-4 py-3 text-right">
-                        <div className="flex items-center justify-end gap-1">
-                          <button
-                            onClick={() => {
-                              setEditingItem(d);
-                              setModalType('deal');
-                              setDealForm({
-                                title: d.title || '',
-                                description: d.description || '',
-                                details: d.details || '',
-                                category: d.category || '',
-                                link: d.link || '',
-                                image: d.image || '',
-                                discount: d.discount || '',
-                                code: d.code || '',
-                                exclusive: d.exclusive || false,
-                                verified: d.verified || false,
-                                featured: d.featured || false,
-                                createdAt: d.createdAt || '',
-                                updatedAt: d.updatedAt || '',
-                                status: (d as any).status || 'DRAFT'
-                              });
-                              setIsModalOpen(true);
-                            }}
-                            className="p-2 text-blue-500 rounded-lg hover:bg-blue-500/10"
-                            aria-label="Modifier"
-                          >
-                            <FileText size={16} />
-                          </button>
-                          <button onClick={() => { setDeleteTarget({ type: 'deal', item: d }); setDeleteDialogOpen(true); }} className="p-2 text-red-500 rounded-lg hover:bg-red-500/10" aria-label="Supprimer">
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
+                        <RowActions
+                          actions={[
+                            {
+                              label: 'Modifier',
+                              icon: <FileText size={14} />,
+                              onClick: () => {
+                                setEditingItem(d);
+                                setModalType('deal');
+                                setDealForm({
+                                  title: d.title || '',
+                                  description: d.description || '',
+                                  details: d.details || '',
+                                  category: d.category || '',
+                                  link: d.link || '',
+                                  image: d.image || '',
+                                  discount: d.discount || '',
+                                  code: d.code || '',
+                                  exclusive: d.exclusive || false,
+                                  verified: d.verified || false,
+                                  featured: d.featured || false,
+                                  createdAt: d.createdAt || '',
+                                  updatedAt: d.updatedAt || '',
+                                  status: (d as any).status || 'DRAFT'
+                                });
+                                setIsModalOpen(true);
+                              }
+                            },
+                            {
+                              label: 'Supprimer',
+                              icon: <Trash2 size={14} />,
+                              danger: true,
+                              onClick: () => { setDeleteTarget({ type: 'deal', item: d }); setDeleteDialogOpen(true); }
+                            }
+                          ]}
+                        />
                       </td>
                     </tr>
                   ))}
