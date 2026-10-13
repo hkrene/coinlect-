@@ -1,22 +1,17 @@
 import { PrismaClient, UserRole } from '@prisma/client';
-import * as crypto from 'crypto';
+import { hashPassword } from '../lib/auth';
 
 const prisma = new PrismaClient();
 
-async function hashPassword(password: string): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const salt = crypto.randomBytes(16).toString('hex');
-    crypto.pbkdf2(password, salt, 100000, 64, 'sha512', (err, derivedKey) => {
-      if (err) reject(err);
-      resolve(salt + ':' + derivedKey.toString('hex'));
-    });
-  });
-}
-
 async function createAdmin() {
-  const email = 'hirwarene6@gmail.com';
-  const password = 'Holimonk.2004';
-  const name = 'Admin User';
+  const email = process.env.ADMIN_EMAIL;
+  const password = process.env.ADMIN_PASSWORD;
+  const name = process.env.ADMIN_NAME || 'Admin';
+
+  if (!email || !password) {
+    console.error('ADMIN_EMAIL and ADMIN_PASSWORD must be set (see .env.example).');
+    process.exit(1);
+  }
 
   try {
     // Check if user already exists
