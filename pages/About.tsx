@@ -31,10 +31,10 @@ const TEAM_MEMBERS: TeamMember[] = [
   {
     name: "Hirwa Rene",
     title: "Founder & CEO",
-    image: "https://res.cloudinary.com/drsd8adkq/image/upload/v1756494553/hkrene-min_ykpodo.jpg",
+    image: "/team/hirwa-rene.jpg",
     socials: {
-      twitter: "https://x.com/0Xhrene",
-      linkedin: "https://www.linkedin.com/hkrene",
+      twitter: "https://x.com/0Xhkrene",
+      linkedin: "https://www.linkedin.com/in/hkrene",
     },
   },
   {
